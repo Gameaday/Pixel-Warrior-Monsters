@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pixel art inspired color palette -->
+    <color name="pixel_black">#000000</color>
+    <color name="pixel_white">#FFFFFF</color>
+    <color name="pixel_dark_gray">#404040</color>
+    <color name="pixel_gray">#808080</color>
+    <color name="pixel_light_gray">#C0C0C0</color>
+    
+    <!-- Primary colors -->
+    <color name="pixel_blue">#0066CC</color>
+    <color name="pixel_dark_blue">#003366</color>
+    <color name="pixel_light_blue">#66AAFF</color>
+    
+    <!-- Secondary colors -->
+    <color name="pixel_green">#00AA00</color>
+    <color name="pixel_dark_green">#005500</color>
+    <color name="pixel_light_green">#66FF66</color>
+    
+    <!-- Game specific colors -->
+    <color name="hp_red">#CC0000</color>
+    <color name="mp_blue">#0000CC</color>
+    <color name="exp_yellow">#FFCC00</color>
+    <color name="gold_orange">#FF8800</color>
+    
+    <!-- Monster type colors -->
+    <color name="monster_normal">#A8A878</color>
+    <color name="monster_fire">#F08030</color>
+    <color name="monster_water">#6890F0</color>
+    <color name="monster_grass">#78C850</color>
+    <color name="monster_electric">#F8D030</color>
+    <color name="monster_ice">#98D8D8</color>
+    <color name="monster_fighting">#C03028</color>
+    <color name="monster_poison">#A040A0</color>
+    <color name="monster_ground">#E0C068</color>
+    <color name="monster_flying">#A890F0</color>
+    <color name="monster_psychic">#F85888</color>
+    <color name="monster_bug">#A8B820</color>
+    <color name="monster_rock">#B8A038</color>
+    <color name="monster_ghost">#705898</color>
+    <color name="monster_dragon">#7038F8</color>
+    <color name="monster_dark">#705848</color>
+    <color name="monster_steel">#B8B8D0</color>
+</resources>
