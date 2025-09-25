@@ -23,7 +23,8 @@ import com.pixelwarrior.monsters.ui.theme.*
 fun BattleScreen(
     battleState: BattleState,
     onBattleAction: (BattleActionData) -> Unit,
-    onBattleEnd: () -> Unit
+    onBattleEnd: () -> Unit,
+    audioViewModel: AudioViewModel
 ) {
     var selectedAction by remember { mutableStateOf<BattleAction?>(null) }
     var selectedSkill by remember { mutableStateOf<String?>(null) }
@@ -65,6 +66,7 @@ fun BattleScreen(
                         SkillSelectionPanel(
                             skills = battleState.playerMonsters[battleState.currentPlayerMonster].skills,
                             onSkillSelected = { skillId ->
+                                audioViewModel.playMenuSelectSound()
                                 val actionData = BattleActionData(
                                     action = BattleAction.SKILL,
                                     skillId = skillId,
@@ -76,11 +78,15 @@ fun BattleScreen(
                                 selectedAction = null
                                 selectedSkill = null
                             },
-                            onBack = { selectedAction = null }
+                            onBack = { 
+                                audioViewModel.playMenuBackSound()
+                                selectedAction = null 
+                            }
                         )
                     } else {
                         BattleActionsPanel(
                             onAction = { action ->
+                                audioViewModel.playMenuSelectSound()
                                 when (action) {
                                     BattleAction.SKILL -> {
                                         selectedAction = action

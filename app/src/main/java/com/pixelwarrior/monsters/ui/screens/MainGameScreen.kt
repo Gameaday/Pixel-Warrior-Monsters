@@ -8,11 +8,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pixelwarrior.monsters.R
+import com.pixelwarrior.monsters.audio.AudioViewModel
+import com.pixelwarrior.monsters.audio.AudioViewModelFactory
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.ui.theme.PixelBlack
 import com.pixelwarrior.monsters.ui.theme.PixelBlue
@@ -26,24 +29,61 @@ fun MainGameScreen() {
     var currentScreen by remember { mutableStateOf(GameScreen.MAIN_MENU) }
     var gameViewModel: GameViewModel = viewModel()
     
+    val context = LocalContext.current
+    val audioViewModel: AudioViewModel = viewModel(
+        factory = AudioViewModelFactory(context)
+    )
+    
+    // Play appropriate music based on current screen
+    LaunchedEffect(currentScreen) {
+        when (currentScreen) {
+            GameScreen.MAIN_MENU -> audioViewModel.playTitleMusic()
+            GameScreen.WORLD_MAP -> audioViewModel.playWorldMapMusic()
+            GameScreen.BATTLE -> audioViewModel.playBattleMusic()
+            GameScreen.BREEDING -> audioViewModel.playBreedingMusic()
+            else -> { /* Keep current music */ }
+        }
+    }
+    
     when (currentScreen) {
         GameScreen.MAIN_MENU -> MainMenuScreen(
             onStartGame = { 
+                audioViewModel.playMenuSelectSound()
                 gameViewModel.startNewGame("Player")
                 currentScreen = GameScreen.WORLD_MAP 
             },
-            onLoadGame = { /* TODO: Implement load game */ },
-            onSettings = { /* TODO: Implement settings */ },
-            onCredits = { /* TODO: Implement credits */ }
+            onLoadGame = { 
+                audioViewModel.playMenuSelectSound()
+                /* TODO: Implement load game */ 
+            },
+            onSettings = { 
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.AUDIO_SETTINGS
+            },
+            onCredits = { 
+                audioViewModel.playMenuSelectSound()
+                /* TODO: Implement credits */ 
+            }
         )
         GameScreen.WORLD_MAP -> WorldMapScreen(
-            onBackToMenu = { currentScreen = GameScreen.MAIN_MENU },
+            onBackToMenu = { 
+                audioViewModel.playMenuBackSound()
+                currentScreen = GameScreen.MAIN_MENU 
+            },
             onBattle = { 
+                audioViewModel.playMenuSelectSound()
                 gameViewModel.startWildBattle()
                 currentScreen = GameScreen.BATTLE 
             },
-            onMonsterManagement = { currentScreen = GameScreen.MONSTER_MANAGEMENT },
-            onBreeding = { currentScreen = GameScreen.BREEDING }
+            onMonsterManagement = { 
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.MONSTER_MANAGEMENT 
+            },
+            onBreeding = { 
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.BREEDING 
+            },
+            audioViewModel = audioViewModel
         )
         GameScreen.BATTLE -> {
             val battleState by gameViewModel.battleState.collectAsState()
@@ -52,11 +92,25 @@ fun MainGameScreen() {
                     battleState = state,
                     onBattleAction = { action ->
                         gameViewModel.executeBattleAction(action)
+                        // Play appropriate sound effect
+                        when (action.action) {
+                            BattleAction.ATTACK -> audioViewModel.playBattleHitSound()
+                            BattleAction.SKILL -> audioViewModel.playSkillUseSound()
+                            BattleAction.DEFEND -> audioViewModel.playMenuSelectSound()
+                            BattleAction.RUN -> audioViewModel.playMenuBackSound()
+                        }
                     },
                     onBattleEnd = {
+                        when (state.battlePhase) {
+                            BattlePhase.VICTORY -> audioViewModel.playVictoryMusic()
+                            BattlePhase.DEFEAT -> audioViewModel.playGameOverMusic()
+                            BattlePhase.CAPTURE -> audioViewModel.playMonsterCaptureSound()
+                            else -> { /* No special music */ }
+                        }
                         gameViewModel.endBattle()
                         currentScreen = GameScreen.WORLD_MAP
-                    }
+                    },
+                    audioViewModel = audioViewModel
                 )
             }
         }
@@ -66,11 +120,18 @@ fun MainGameScreen() {
                 MonsterManagementScreen(
                     partyMonsters = save.partyMonsters,
                     farmMonsters = save.farmMonsters,
-                    onMonsterSelected = { /* TODO: Handle monster selection */ },
+                    onMonsterSelected = { 
+                        audioViewModel.playMenuSelectSound()
+                        /* TODO: Handle monster selection */ 
+                    },
                     onPartyChanged = { newParty ->
+                        audioViewModel.playMenuSelectSound()
                         gameViewModel.updateParty(newParty)
                     },
-                    onBackPressed = { currentScreen = GameScreen.WORLD_MAP }
+                    onBackPressed = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP 
+                    }
                 )
             }
         }
@@ -81,11 +142,23 @@ fun MainGameScreen() {
                 BreedingScreen(
                     availableMonsters = availableMonsters,
                     onBreed = { parent1, parent2 ->
+                        audioViewModel.playBreedingSuccessSound()
                         gameViewModel.breedMonsters(parent1, parent2)
                     },
-                    onBackPressed = { currentScreen = GameScreen.WORLD_MAP }
+                    onBackPressed = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP 
+                    }
                 )
             }
+        }
+        GameScreen.AUDIO_SETTINGS -> {
+            AudioSettingsScreen(
+                onBackPressed = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.MAIN_MENU 
+                }
+            )
         }
     }
 }
@@ -98,7 +171,8 @@ enum class GameScreen {
     WORLD_MAP,
     BATTLE,
     MONSTER_MANAGEMENT,
-    BREEDING
+    BREEDING,
+    AUDIO_SETTINGS
 }
 
 /**
@@ -143,7 +217,7 @@ fun MainMenuScreen(
             )
             
             PixelButton(
-                text = stringResource(R.string.settings),
+                text = "Audio Settings",
                 onClick = onSettings
             )
             
@@ -191,7 +265,8 @@ fun WorldMapScreen(
     onBackToMenu: () -> Unit,
     onBattle: () -> Unit,
     onMonsterManagement: () -> Unit,
-    onBreeding: () -> Unit
+    onBreeding: () -> Unit,
+    audioViewModel: AudioViewModel
 ) {
     val gameViewModel: GameViewModel = viewModel()
     val gameSave by gameViewModel.gameSave.collectAsState()
@@ -266,7 +341,10 @@ fun WorldMapScreen(
                     )
                     PixelButton(
                         text = "Explore",
-                        onClick = { /* TODO: Implement exploration */ },
+                        onClick = { 
+                            audioViewModel.playErrorSound()
+                            /* TODO: Implement exploration */ 
+                        },
                         modifier = Modifier.weight(1f)
                     )
                 }
