@@ -217,6 +217,9 @@ class GameViewModel : ViewModel() {
             val updatedSave = save.copy(farmMonsters = updatedFarm)
             _gameSave.value = updatedSave
             
+            // Add species to discovered list
+            addDiscoveredSpecies(monster.species)
+            
             viewModelScope.launch {
                 gameRepository.saveGame(updatedSave)
             }

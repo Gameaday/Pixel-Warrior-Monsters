@@ -160,6 +160,34 @@ fun MainGameScreen() {
                 }
             )
         }
+        GameScreen.GAME_SETTINGS -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                GameSettingsScreen(
+                    gameSettings = save.gameSettings,
+                    onSettingsChanged = { newSettings ->
+                        gameViewModel.updateGameSettings(newSettings)
+                    },
+                    onBackPressed = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.MAIN_MENU 
+                    }
+                )
+            }
+        }
+        GameScreen.MONSTER_CODEX -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                MonsterCodexScreen(
+                    discoveredMonsters = save.discoveredSpecies,
+                    allSpecies = gameViewModel.getAllMonsterSpecies(),
+                    onBackPressed = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP 
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -172,7 +200,9 @@ enum class GameScreen {
     BATTLE,
     MONSTER_MANAGEMENT,
     BREEDING,
-    AUDIO_SETTINGS
+    AUDIO_SETTINGS,
+    GAME_SETTINGS,
+    MONSTER_CODEX
 }
 
 /**
@@ -219,6 +249,13 @@ fun MainMenuScreen(
             PixelButton(
                 text = "Audio Settings",
                 onClick = onSettings
+            )
+            
+            PixelButton(
+                text = "Game Settings", 
+                onClick = {
+                    // TODO: Navigate to game settings
+                }
             )
             
             PixelButton(
@@ -340,10 +377,10 @@ fun WorldMapScreen(
                         modifier = Modifier.weight(1f)
                     )
                     PixelButton(
-                        text = "Explore",
+                        text = "Codex",
                         onClick = { 
-                            audioViewModel.playErrorSound()
-                            /* TODO: Implement exploration */ 
+                            audioViewModel.playMenuSelectSound()
+                            /* TODO: Navigate to codex */
                         },
                         modifier = Modifier.weight(1f)
                     )
