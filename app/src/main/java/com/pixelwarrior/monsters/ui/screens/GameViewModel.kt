@@ -52,7 +52,7 @@ class GameViewModel : ViewModel() {
     /**
      * Load an existing game save
      */
-    fun loadGame(saveId: String) {
+    fun loadGame(saveId: String = "default") {
         viewModelScope.launch {
             try {
                 val save = gameRepository.loadGame(saveId)
@@ -60,7 +60,7 @@ class GameViewModel : ViewModel() {
                     _gameSave.value = save
                     _gameMessage.value = "Game loaded successfully!"
                 } else {
-                    _gameMessage.value = "Failed to load game"
+                    _gameMessage.value = "No saved game found"
                 }
                 clearMessageAfterDelay()
             } catch (e: Exception) {
@@ -68,6 +68,13 @@ class GameViewModel : ViewModel() {
                 clearMessageAfterDelay()
             }
         }
+    }
+    
+    /**
+     * Load the default/most recent game save
+     */
+    fun loadGame() {
+        loadGame("default")
     }
     
     /**

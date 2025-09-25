@@ -54,7 +54,7 @@ fun MainGameScreen() {
             },
             onLoadGame = { 
                 audioViewModel.playMenuSelectSound()
-                /* TODO: Implement load game */ 
+                currentScreen = GameScreen.LOAD_GAME
             },
             onSettings = { 
                 audioViewModel.playMenuSelectSound()
@@ -62,7 +62,7 @@ fun MainGameScreen() {
             },
             onCredits = { 
                 audioViewModel.playMenuSelectSound()
-                /* TODO: Implement credits */ 
+                currentScreen = GameScreen.CREDITS
             }
         )
         GameScreen.WORLD_MAP -> WorldMapScreen(
@@ -82,6 +82,18 @@ fun MainGameScreen() {
             onBreeding = { 
                 audioViewModel.playMenuSelectSound()
                 currentScreen = GameScreen.BREEDING 
+            },
+            onSaveGame = {
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.SAVE_GAME
+            },
+            onSettings = {
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.GAME_SETTINGS
+            },
+            onCodex = {
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.MONSTER_CODEX
             },
             audioViewModel = audioViewModel
         )
@@ -188,6 +200,44 @@ fun MainGameScreen() {
                 )
             }
         }
+        GameScreen.SAVE_GAME -> {
+            SaveLoadScreen(
+                mode = SaveLoadMode.SAVE,
+                onSaveSelected = { saveId ->
+                    gameViewModel.saveGame()
+                    audioViewModel.playCoinSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                },
+                onLoadSelected = { /* Not used in save mode */ },
+                onBackPressed = {
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                }
+            )
+        }
+        GameScreen.LOAD_GAME -> {
+            SaveLoadScreen(
+                mode = SaveLoadMode.LOAD,
+                onSaveSelected = { /* Not used in load mode */ },
+                onLoadSelected = { saveId ->
+                    gameViewModel.loadGame(saveId)
+                    audioViewModel.playCoinSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                },
+                onBackPressed = {
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.MAIN_MENU
+                }
+            )
+        }
+        GameScreen.CREDITS -> {
+            CreditsScreen(
+                onBackPressed = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.MAIN_MENU 
+                }
+            )
+        }
     }
 }
 
@@ -202,7 +252,10 @@ enum class GameScreen {
     BREEDING,
     AUDIO_SETTINGS,
     GAME_SETTINGS,
-    MONSTER_CODEX
+    MONSTER_CODEX,
+    CREDITS,
+    SAVE_GAME,
+    LOAD_GAME
 }
 
 /**
@@ -254,7 +307,8 @@ fun MainMenuScreen(
             PixelButton(
                 text = "Game Settings", 
                 onClick = {
-                    // TODO: Navigate to game settings
+                    audioViewModel.playMenuSelectSound()
+                    currentScreen = GameScreen.GAME_SETTINGS
                 }
             )
             
@@ -303,6 +357,9 @@ fun WorldMapScreen(
     onBattle: () -> Unit,
     onMonsterManagement: () -> Unit,
     onBreeding: () -> Unit,
+    onSaveGame: () -> Unit,
+    onSettings: () -> Unit,
+    onCodex: () -> Unit,
     audioViewModel: AudioViewModel
 ) {
     val gameViewModel: GameViewModel = viewModel()
@@ -378,10 +435,22 @@ fun WorldMapScreen(
                     )
                     PixelButton(
                         text = "Codex",
-                        onClick = { 
-                            audioViewModel.playMenuSelectSound()
-                            /* TODO: Navigate to codex */
-                        },
+                        onClick = onCodex,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    PixelButton(
+                        text = "Save Game",
+                        onClick = onSaveGame,
+                        modifier = Modifier.weight(1f)
+                    )
+                    PixelButton(
+                        text = "Settings",
+                        onClick = onSettings,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -401,4 +470,87 @@ fun WorldMapScreen(
         message = gameMessage,
         onDismiss = { /* Messages auto-dismiss */ }
     )
+}
+
+/**
+ * Credits screen showing game development information
+ */
+@Composable
+fun CreditsScreen(
+    onBackPressed: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(PixelBlack),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(24.dp)
+        ) {
+            Text(
+                text = "Credits",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = "Pixel Warrior Monsters",
+                style = MaterialTheme.typography.titleMedium,
+                color = PixelBlue,
+                textAlign = TextAlign.Center
+            )
+            
+            Text(
+                text = "An open-source reimagining of classic monster collecting RPGs",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Development:",
+                style = MaterialTheme.typography.titleSmall,
+                color = PixelBlue,
+                textAlign = TextAlign.Center
+            )
+            
+            Text(
+                text = "Game Design & Programming\nOriginal Pixel Art & Music\nAndroid Implementation",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            Text(
+                text = "Special Thanks:",
+                style = MaterialTheme.typography.titleSmall,
+                color = PixelBlue,
+                textAlign = TextAlign.Center
+            )
+            
+            Text(
+                text = "Classic monster collecting games for inspiration\nOpen source community\nPixel art and chiptune music communities",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            PixelButton(
+                text = "Back to Menu",
+                onClick = onBackPressed
+            )
+        }
+    }
 }
