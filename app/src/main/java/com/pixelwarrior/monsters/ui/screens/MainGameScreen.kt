@@ -95,6 +95,10 @@ fun MainGameScreen() {
                 audioViewModel.playMenuSelectSound()
                 currentScreen = GameScreen.MONSTER_CODEX
             },
+            onDungeonExploration = {
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.DUNGEON_EXPLORATION
+            },
             audioViewModel = audioViewModel
         )
         GameScreen.BATTLE -> {
@@ -230,6 +234,19 @@ fun MainGameScreen() {
                 }
             )
         }
+        GameScreen.DUNGEON_EXPLORATION -> {
+            DungeonExplorationScreen(
+                gameViewModel = gameViewModel,
+                onNavigateBack = {
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                },
+                onBattleStart = { wildMonster ->
+                    gameViewModel.startBattleWithWildMonster(wildMonster)
+                    currentScreen = GameScreen.BATTLE
+                }
+            )
+        }
         GameScreen.CREDITS -> {
             CreditsScreen(
                 onBackPressed = { 
@@ -255,7 +272,8 @@ enum class GameScreen {
     MONSTER_CODEX,
     CREDITS,
     SAVE_GAME,
-    LOAD_GAME
+    LOAD_GAME,
+    DUNGEON_EXPLORATION
 }
 
 /**
@@ -360,6 +378,7 @@ fun WorldMapScreen(
     onSaveGame: () -> Unit,
     onSettings: () -> Unit,
     onCodex: () -> Unit,
+    onDungeonExploration: () -> Unit,
     audioViewModel: AudioViewModel
 ) {
     val gameViewModel: GameViewModel = viewModel()
@@ -419,11 +438,20 @@ fun WorldMapScreen(
                         modifier = Modifier.weight(1f)
                     )
                     PixelButton(
+                        text = "Dungeons",
+                        onClick = onDungeonExploration,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    PixelButton(
                         text = "Monsters",
                         onClick = onMonsterManagement,
                         modifier = Modifier.weight(1f)
                     )
-                }
                 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)

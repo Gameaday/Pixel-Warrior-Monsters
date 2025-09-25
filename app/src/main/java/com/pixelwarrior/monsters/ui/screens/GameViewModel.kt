@@ -108,23 +108,39 @@ class GameViewModel : ViewModel() {
             )
             
             if (wildMonster != null) {
-                val healthyMonsters = save.partyMonsters.filter { it.currentHp > 0 }
-                _battleState.value = BattleState(
-                    playerMonsters = healthyMonsters,
-                    enemyMonsters = listOf(wildMonster),
-                    currentPlayerMonster = 0,
-                    currentEnemyMonster = 0,
-                    turn = 1,
-                    battlePhase = BattlePhase.SELECTION,
-                    lastAction = "A wild ${wildMonster.name} appeared!",
-                    isWildBattle = true,
-                    canEscape = true,
-                    canCapture = true
-                )
-                _gameMessage.value = "Battle started against ${wildMonster.name}!"
+                startBattleWithWildMonster(wildMonster)
             } else {
-                _gameMessage.value = "No wild monsters encountered"
+                _gameMessage.value = "No wild monsters found in this area."
+                clearMessageAfterDelay()
             }
+        }
+    }
+    
+    /**
+     * Start a battle with a specific wild monster
+     */
+    fun startBattleWithWildMonster(wildMonster: Monster) {
+        _gameSave.value?.let { save ->
+            if (save.partyMonsters.isEmpty() || save.partyMonsters.all { it.currentHp <= 0 }) {
+                _gameMessage.value = "No healthy monsters available for battle!"
+                clearMessageAfterDelay()
+                return
+            }
+            
+            val healthyMonsters = save.partyMonsters.filter { it.currentHp > 0 }
+            _battleState.value = BattleState(
+                playerMonsters = healthyMonsters,
+                enemyMonsters = listOf(wildMonster),
+                currentPlayerMonster = 0,
+                currentEnemyMonster = 0,
+                turn = 1,
+                battlePhase = BattlePhase.SELECTION,
+                lastAction = "A wild ${wildMonster.name} appeared!",
+                isWildBattle = true,
+                canEscape = true,
+                canCapture = true
+            )
+            _gameMessage.value = "Battle started against ${wildMonster.name}!"
             clearMessageAfterDelay()
         }
     }

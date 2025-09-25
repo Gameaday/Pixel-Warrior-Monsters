@@ -16,8 +16,10 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 - ✅ **Battle System**: Turn-based combat with damage calculation, type effectiveness, and skill usage
 - ✅ **Breeding System**: Monster genetics with family compatibility and stat inheritance  
 - ✅ **World Exploration**: Random encounters, area progression, and item discovery
+- ✅ **Advanced Dungeon System**: 8 themed dungeons with multiple floors, boss encounters, and special events
 - ✅ **Experience System**: Level progression with multiple growth rate curves
 - ✅ **Save System**: Complete game state persistence with settings and progress tracking
+- ✅ **Chiptune Audio System**: 8-bit style music and sound effects with 7 background tracks and 11 SFX
 
 ### Technical Architecture
 - ✅ **Android Project**: Properly configured Gradle build with Jetpack Compose UI
@@ -31,6 +33,44 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 - ✅ **Navigation**: Screen management for menu, world map, battles, and monster management
 - ✅ **Theming**: Pixel art color palette and typography optimized for retro aesthetic
 - ✅ **Mobile Optimization**: Landscape orientation and touch-friendly controls
+- ✅ **Complete Game Screens**: 11+ screens including battles, breeding, dungeon exploration, settings
+- ✅ **Audio Integration**: Chiptune music that changes contextually with screen navigation
+
+### Advanced Dungeon System
+
+The game features an extensive dungeon exploration system inspired by the original Dragon Warrior Monsters:
+
+#### 8 Themed Dungeons
+- 🌲 **Whispering Woods** (16 floors) - Forest theme with nature monsters
+- 🌋 **Molten Core Depths** (20 floors) - Volcanic theme with fire monsters  
+- ❄️ **Eternal Ice Palace** (18 floors) - Ice theme with frost monsters
+- 🏺 **Ancient Lost Ruins** (24 floors) - Archaeological theme with ancient monsters
+- 🌊 **Abyssal Ocean Depths** (22 floors) - Underwater theme with sea monsters
+- ☁️ **Celestial Sky Tower** (30 floors) - Sky theme with flying monsters
+- 🏜️ **Endless Mirage Desert** (20 floors) - Desert theme with sand monsters
+- 💎 **Rainbow Crystal Caverns** (32 floors) - Crystal theme with gem monsters
+
+#### Floor Types
+- **Regular Floors**: Standard exploration with encounters and wandering events
+- **Boss Floors**: Every 8th floor features powerful guardian monsters with guaranteed encounters
+- **Event Floors**: Special areas with unique mechanics like monster villages, treasure vaults, trials
+
+#### Wandering Events
+Random events occur as you explore, themed to each dungeon:
+- **Forest**: Fairy rings (healing), ancient trees (experience), mushroom circles
+- **Volcanic**: Lava pools (damage), fire crystals (fire boost), magical forges  
+- **Ice**: Frozen fountains (MP restore), ice storms, crystal mazes
+- **Ruins**: Ancient inscriptions (stat boost), treasure chambers, spirit councils
+- **Underwater**: Air pockets, coral gardens, sunken ships with pirate treasure
+- **Sky**: Wind currents (agility boost), cloud shrines, storm centers
+- **Desert**: Hidden oases (full healing), sandstorms, pyramid chambers
+- **Crystal**: Crystal resonance (magic boost), gem veins, rainbow portals
+
+#### Progressive Difficulty
+- Encounter rates increase with floor depth
+- Monster levels scale with dungeon progression  
+- Special key items required to unlock advanced dungeons
+- Each dungeon unlocks through story progression
 
 ## Project Structure
 
