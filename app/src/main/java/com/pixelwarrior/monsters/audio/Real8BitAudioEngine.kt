@@ -160,14 +160,14 @@ class Real8BitAudioEngine(private val context: Context) {
             }
             
             // Apply simple low-pass filter for 8-bit feel
-            buffer[i] = (sample * 0.8 + (if (i > 0) buffer[i-1] * 0.2 else 0)).toShort()
+            buffer[i] = (sample.toDouble() * 0.8 + (if (i > 0) buffer[i-1].toDouble() * 0.2 else 0.0)).toInt().toShort()
         }
         
         // Apply fade-out to prevent clicking
         val fadeOutSamples = minOf(samples / 10, 1000)
         for (i in (samples - fadeOutSamples) until samples) {
             val fade = (samples - i).toFloat() / fadeOutSamples
-            buffer[i] = (buffer[i] * fade).toShort()
+            buffer[i] = (buffer[i].toInt() * fade).toInt().toShort()
         }
         
         return buffer
