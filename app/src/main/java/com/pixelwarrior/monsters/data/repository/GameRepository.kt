@@ -49,13 +49,25 @@ class GameRepository {
     }
     
     /**
-     * Save the current game state
+     * Save the current game state to database
      */
     suspend fun saveGame(gameSave: GameSave): Boolean {
         return try {
             val updatedSave = gameSave.copy(lastSaved = System.currentTimeMillis())
+            
+            // Save to database
+            val saveDao = database.gameSaveDao()
+            val monsterDao = database.monsterDao()
+            
+            // Save game state
+            saveDao.insertSave(updatedSave.toEntity())
+            
+            // Save all monsters
+            val monsterEntities = updatedSave.allMonsters.map { it.toEntity(updatedSave.saveId) }
+            monsterDao.insertMonsters(monsterEntities)
+            
+            // Update in-memory state
             _currentGameSave.value = updatedSave
-            // TODO: Persist to local storage/database
             true
         } catch (e: Exception) {
             false
@@ -63,21 +75,140 @@ class GameRepository {
     }
     
     /**
-     * Load a saved game
+     * Load a saved game from database
      */
     suspend fun loadGame(saveId: String): GameSave? {
-        // TODO: Load from local storage/database
-        return _currentGameSave.value
+        return try {
+            val saveDao = database.gameSaveDao()
+            val monsterDao = database.monsterDao()
+            
+            val saveEntity = saveDao.getSaveById(saveId) ?: return null
+            val monsterEntities = monsterDao.getMonstersForSave(saveId)
+            val monsters = monsterEntities.map { it.toDomain() }
+            
+            val gameSave = saveEntity.toDomain(monsters)
+            _currentGameSave.value = gameSave
+            gameSave
+        } catch (e: Exception) {
+            null
+        }
     }
     
     /**
-     * Update player's party
+     * Get all saved games
+     */
+    suspend fun getAllSaves(): List<GameSave> {
+        return try {
+            val saveDao = database.gameSaveDao()
+            val monsterDao = database.monsterDao()
+            
+            val saveEntities = saveDao.getAllSaves()
+            saveEntities.map { saveEntity ->
+                val monsters = monsterDao.getMonstersForSave(saveEntity.saveId).map { it.toDomain() }
+                saveEntity.toDomain(monsters)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+    
+    /**
+     * Delete a saved game
+     */
+    suspend fun deleteSave(saveId: String): Boolean {
+        return try {
+            val saveDao = database.gameSaveDao()
+            val monsterDao = database.monsterDao()
+            
+            // Delete monsters first (foreign key relationship)
+            monsterDao.deleteMonstersForSave(saveId)
+            // Delete save
+            saveDao.deleteSaveById(saveId)
+            
+            // Clear current save if it was the deleted one
+            if (_currentGameSave.value?.saveId == saveId) {
+                _currentGameSave.value = null
+            }
+            
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+    
+    /**
+     * Create a new game save
+     */
+    suspend fun createNewSave(playerName: String): GameSave? {
+        return try {
+            val newSave = GameSave(
+                saveId = UUID.randomUUID().toString(),
+                playerName = playerName,
+                currentLevel = 1,
+                currentArea = "starting_area",
+                playtimeMinutes = 0,
+                goldAmount = 500,
+                storyProgress = mapOf("game_started" to true),
+                inventory = mapOf("herb" to 5, "monster_treat" to 3),
+                partyMonsters = emptyList(),
+                allMonsters = emptyList(),
+                lastSaved = System.currentTimeMillis(),
+                gameVersion = "1.0"
+            )
+            
+            if (saveGame(newSave)) {
+                newSave
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    /**
+     * Get all skills from database
+     */
+    suspend fun getAllSkills(): List<SkillEntity> {
+        return database.skillDao().getAllSkills()
+    }
+    
+    /**
+     * Get skill by ID from database
+     */
+    suspend fun getSkillById(skillId: String): SkillEntity? {
+        return database.skillDao().getSkillById(skillId)
+    }
+    
+    /**
+     * Update player's party monsters
      */
     suspend fun updatePartyMonsters(monsters: List<Monster>) {
         _currentGameSave.value?.let { save ->
-            _currentGameSave.value = save.copy(partyMonsters = monsters)
+            val updatedSave = save.copy(partyMonsters = monsters)
+            _currentGameSave.value = updatedSave
+            saveGame(updatedSave)
         }
     }
+    
+    /**
+     * Create default skills for the database
+     */
+    private fun createDefaultSkills(): List<SkillEntity> {
+        return listOf(
+            SkillEntity("tackle", "Tackle", "A physical ramming attack", "PHYSICAL", "NORMAL", 40, 100, 0, "SINGLE", "Basic physical attack"),
+            SkillEntity("heal", "Heal", "Restores HP to target", "HEALING", "NORMAL", 40, 100, 6, "SINGLE", "Heals 30-50 HP"),
+            SkillEntity("fireball", "Fireball", "Launches a ball of fire", "MAGICAL", "FIRE", 60, 90, 8, "SINGLE", "Fire-based magic attack"),
+            SkillEntity("ice_shard", "Ice Shard", "Fires sharp ice crystals", "MAGICAL", "ICE", 55, 95, 7, "SINGLE", "Ice-based magic attack"),
+            SkillEntity("thunder", "Thunder", "Strikes with lightning", "MAGICAL", "ELECTRIC", 65, 85, 9, "SINGLE", "Electric-based magic attack"),
+            SkillEntity("gust", "Gust", "Creates a powerful wind", "MAGICAL", "AIR", 45, 95, 5, "SINGLE", "Wind-based magic attack"),
+            SkillEntity("bite", "Bite", "Bites the target with fangs", "PHYSICAL", "NORMAL", 50, 95, 3, "SINGLE", "Physical bite attack"),
+            SkillEntity("guard", "Guard", "Raises defense for next turn", "SUPPORT", "NORMAL", 0, 100, 4, "SELF", "Increases defense by 50%"),
+            SkillEntity("sleep", "Sleep", "Puts target to sleep", "STATUS", "NORMAL", 0, 75, 6, "SINGLE", "Inflicts sleep status"),
+            SkillEntity("poison_sting", "Poison Sting", "Stings with poison", "PHYSICAL", "POISON", 35, 90, 4, "SINGLE", "May inflict poison")
+        )
+    }
+}
     
     /**
      * Add monster to farm

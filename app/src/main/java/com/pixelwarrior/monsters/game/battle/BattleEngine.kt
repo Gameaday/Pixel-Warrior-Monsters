@@ -145,7 +145,8 @@ class BattleEngine {
     private fun executeSkill(battleState: BattleState, action: BattleActionData): BattleState {
         val skillId = action.skillId ?: return battleState
         
-        // TODO: Load skill from skill database
+        // Load skill from skill database
+        val skill = loadSkillFromDatabase(skillId) ?: return battleState
         val skill = getSkillById(skillId) ?: return battleState
         
         // Check MP cost
