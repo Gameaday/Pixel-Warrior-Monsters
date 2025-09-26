@@ -146,7 +146,6 @@ class BattleEngine {
         val skillId = action.skillId ?: return battleState
         
         // Load skill from skill database
-        val skill = loadSkillFromDatabase(skillId) ?: return battleState
         val skill = getSkillById(skillId) ?: return battleState
         
         // Check MP cost

@@ -3,7 +3,8 @@ package com.pixelwarrior.monsters.game.endgame
 import com.pixelwarrior.monsters.data.model.Monster
 import com.pixelwarrior.monsters.data.model.MonsterType
 import com.pixelwarrior.monsters.data.model.MonsterFamily
-import com.pixelwarrior.monsters.data.model.Personality
+import com.pixelwarrior.monsters.data.model.MonsterStats
+import com.pixelwarrior.monsters.data.model.GrowthRate
 import kotlin.random.Random
 
 /**
@@ -65,8 +66,8 @@ class EndgameSystem {
         val unlockRequirement: String
     ) {
         SHADOW_REALM("Shadow Realm", "Dark", 70..85, listOf(MonsterType.DARK), "Defeat 50 dark-type monsters"),
-        MECHANICAL_ZONE("Mechanical Zone", "Tech", 75..90, listOf(MonsterType.MATERIAL, MonsterType.ELECTRIC), "Synthesize 20 material-type monsters"),
-        FAIRY_GARDEN("Fairy Garden", "Magic", 65..80, listOf(MonsterType.NATURE), "Breed 100 monsters successfully"),
+        MECHANICAL_ZONE("Mechanical Zone", "Tech", 75..90, listOf(MonsterType.STEEL, MonsterType.ELECTRIC), "Synthesize 20 material-type monsters"),
+        FAIRY_GARDEN("Fairy Garden", "Magic", 65..80, listOf(MonsterType.GRASS), "Breed 100 monsters successfully"),
         ANCIENT_KINGDOM("Ancient Kingdom", "Historic", 80..95, listOf(MonsterType.DRAGON), "Complete all 8 main dungeons"),
         DREAM_DIMENSION("Dream Dimension", "Psychic", 85..99, listOf(MonsterType.PSYCHIC), "Reach maximum friendship with 10 monsters")
     }
@@ -92,8 +93,8 @@ class EndgameSystem {
         ),
         LegendaryMonster(
             species = "Primal Behemoth",
-            type1 = MonsterType.BEAST,
-            type2 = MonsterType.EARTH,
+            type1 = MonsterType.NORMAL,
+            type2 = MonsterType.GROUND,
             family = MonsterFamily.BEAST,
             baseAttack = 220,
             baseDefense = 200,
@@ -109,7 +110,7 @@ class EndgameSystem {
         ),
         LegendaryMonster(
             species = "Celestial Phoenix",
-            type1 = MonsterType.BIRD,
+            type1 = MonsterType.FLYING,
             type2 = MonsterType.FIRE,
             family = MonsterFamily.BIRD,
             baseAttack = 160,
@@ -143,7 +144,7 @@ class EndgameSystem {
         ),
         LegendaryMonster(
             species = "Omega Destroyer",
-            type1 = MonsterType.MATERIAL,
+            type1 = MonsterType.STEEL,
             type2 = MonsterType.DARK,
             family = MonsterFamily.MATERIAL,
             baseAttack = 250,
@@ -249,29 +250,40 @@ class EndgameSystem {
      */
     fun createLegendaryMonster(legendary: LegendaryMonster, level: Int = 85): Monster {
         return Monster(
-            species = legendary.species,
-            nickname = legendary.species,
-            level = level,
-            experience = 0,
+            id = java.util.UUID.randomUUID().toString(),
+            speciesId = legendary.species,
+            name = legendary.species,
             type1 = legendary.type1,
             type2 = legendary.type2,
             family = legendary.family,
-            personality = Personality.HARDY, // Use existing personality
-            baseAttack = legendary.baseAttack,
-            baseDefense = legendary.baseDefense,
-            baseAgility = legendary.baseAgility,
-            baseMagic = legendary.baseMagic,
-            baseWisdom = legendary.baseWisdom,
-            baseHP = legendary.baseHP,
-            baseMP = legendary.baseMP,
-            currentHP = legendary.baseHP,
-            currentMP = legendary.baseMP,
-            skills = listOf("Tackle", "Special Move", legendary.uniqueAbility),
-            traits = listOf("Legendary", "Rare"),
-            plusLevel = 0,
-            synthesisParents = null,
-            learnedSkills = mutableListOf(legendary.uniqueAbility),
-            maxSynthesisLevel = 1 // Legendaries can't be synthesized further
+            level = level,
+            currentHp = legendary.baseHP,
+            currentMp = legendary.baseMP,
+            experience = 0L,
+            experienceToNext = 1000L,
+            baseStats = MonsterStats(
+                attack = legendary.baseAttack,
+                defense = legendary.baseDefense,
+                agility = legendary.baseAgility,
+                magic = legendary.baseMagic,
+                wisdom = legendary.baseWisdom,
+                maxHp = legendary.baseHP,
+                maxMp = legendary.baseMP
+            ),
+            currentStats = MonsterStats(
+                attack = legendary.baseAttack,
+                defense = legendary.baseDefense,
+                agility = legendary.baseAgility,
+                magic = legendary.baseMagic,
+                wisdom = legendary.baseWisdom,
+                maxHp = legendary.baseHP,
+                maxMp = legendary.baseMP
+            ),
+            skills = emptyList(),
+            traits = emptyList(),
+            isWild = true,
+            captureRate = 3, // Very hard to capture
+            growthRate = GrowthRate.SLOW
         )
     }
     
