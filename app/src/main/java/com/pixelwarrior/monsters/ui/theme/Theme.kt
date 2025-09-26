@@ -22,6 +22,9 @@ val PixelDarkGreen = Color(0xFF005500)
 val PixelLightGreen = Color(0xFF66FF66)
 
 val PixelRed = Color(0xFFCC0000)
+val PixelYellow = Color(0xFFFFCC00)
+val PixelGold = Color(0xFFFFAA00)
+val PixelPurple = Color(0xFF8800CC)
 
 // Game specific colors
 val HpRed = Color(0xFFCC0000)

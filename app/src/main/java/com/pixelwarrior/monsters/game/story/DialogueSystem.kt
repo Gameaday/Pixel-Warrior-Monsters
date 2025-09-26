@@ -118,10 +118,10 @@ class DialogueSystem {
     
     private fun createDialogueDatabase(): Map<String, List<DialogueNode>> {
         return mapOf(
-            "master" -> createMasterDialogues(),
-            "librarian" -> createLibrarianDialogues(),
-            "synthesis_expert" -> createSynthesisExpertDialogues(),
-            "arena_master" -> createArenaMasterDialogues()
+            "master" to createMasterDialogues(),
+            "librarian" to createLibrarianDialogues(),
+            "synthesis_expert" to createSynthesisExpertDialogues(),
+            "arena_master" to createArenaMasterDialogues()
         )
     }
     

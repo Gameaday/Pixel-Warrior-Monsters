@@ -1,6 +1,7 @@
 package com.pixelwarrior.monsters.data.repository
 
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.data.database.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +11,9 @@ import java.util.UUID
  * Repository for managing game state and data persistence
  * In a real implementation, this would interface with local database and cloud storage
  */
-class GameRepository {
+class GameRepository(
+    private val database: GameDatabase
+) {
     
     private val _currentGameSave = MutableStateFlow<GameSave?>(null)
     val currentGameSave: Flow<GameSave?> = _currentGameSave.asStateFlow()
@@ -63,7 +66,8 @@ class GameRepository {
             saveDao.insertSave(updatedSave.toEntity())
             
             // Save all monsters
-            val monsterEntities = updatedSave.allMonsters.map { it.toEntity(updatedSave.saveId) }
+            val allMonsters = updatedSave.partyMonsters + updatedSave.farmMonsters
+            val monsterEntities = allMonsters.map { it.toEntity(updatedSave.playerId) }
             monsterDao.insertMonsters(monsterEntities)
             
             // Update in-memory state
@@ -126,7 +130,7 @@ class GameRepository {
             saveDao.deleteSaveById(saveId)
             
             // Clear current save if it was the deleted one
-            if (_currentGameSave.value?.saveId == saveId) {
+            if (_currentGameSave.value?.playerId == saveId) {
                 _currentGameSave.value = null
             }
             
@@ -142,18 +146,20 @@ class GameRepository {
     suspend fun createNewSave(playerName: String): GameSave? {
         return try {
             val newSave = GameSave(
-                saveId = UUID.randomUUID().toString(),
+                playerId = UUID.randomUUID().toString(),
                 playerName = playerName,
-                currentLevel = 1,
-                currentArea = "starting_area",
-                playtimeMinutes = 0,
-                goldAmount = 500,
-                storyProgress = mapOf("game_started" to true),
+                currentLevel = "starting_area",
+                position = Position(0f, 0f),
+                partyMonsters = listOf(generateStartingMonster()),
+                farmMonsters = emptyList(),
                 inventory = mapOf("herb" to 5, "monster_treat" to 3),
-                partyMonsters = emptyList(),
-                allMonsters = emptyList(),
-                lastSaved = System.currentTimeMillis(),
-                gameVersion = "1.0"
+                gold = 500L,
+                playtimeMinutes = 0L,
+                storyProgress = mapOf("game_started" to true),
+                unlockedGates = emptyList(),
+                gameSettings = GameSettings(),
+                saveVersion = 1,
+                lastSaved = System.currentTimeMillis()
             )
             
             if (saveGame(newSave)) {
