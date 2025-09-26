@@ -1,12 +1,14 @@
 package com.pixelwarrior.monsters.game.world
 
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.game.story.StorySystem
 
 /**
  * Central hub world system with progressive story unlocks
  * Manages the Master's Sanctuary and access to different game areas
+ * Integrated with StorySystem for proper progression gates
  */
-class HubWorldSystem {
+class HubWorldSystem(private val storySystem: StorySystem) {
     
     /**
      * Hub areas that unlock as the player progresses
@@ -260,5 +262,54 @@ class HubWorldSystem {
             else -> 
                 "Continue your journey as a Monster Master!"
         }
+    }
+    
+    /**
+     * STORY INTEGRATION - Trigger milestones when entering areas
+     */
+    fun onAreaEntered(area: HubArea): List<String> {
+        val milestones = mutableListOf<String>()
+        val storyProgress = storySystem.currentStoryProgress.value
+        
+        when (area) {
+            HubArea.MONSTER_LIBRARY -> {
+                if (storyProgress["visited_library"] != true) {
+                    storySystem.triggerMilestone("visited_library")
+                    milestones.add("You've discovered the Monster Library!")
+                }
+            }
+            HubArea.SYNTHESIS_LAB -> {
+                if (storyProgress["synthesis_lab_visited"] != true) {
+                    storySystem.triggerMilestone("synthesis_lab_visited") 
+                    milestones.add("The Synthesis Laboratory is now accessible!")
+                }
+            }
+            HubArea.BATTLE_ARENA -> {
+                if (storyProgress["arena_discovered"] != true) {
+                    storySystem.triggerMilestone("arena_discovered")
+                    milestones.add("You can now participate in tournaments!")
+                }
+            }
+            else -> { /* No special milestones for other areas */ }
+        }
+        
+        return milestones
+    }
+    
+    /**
+     * Check if area can be accessed with story system integration
+     */
+    fun canAccessAreaWithStory(area: HubArea, playerSave: GameSave): Boolean {
+        val storyProgress = storySystem.currentStoryProgress.value
+        
+        val storyRequirementMet = area.requiredStoryProgress?.let {
+            storyProgress[it] == true
+        } ?: true
+        
+        val keyItemRequirementMet = area.requiredKeyItem?.let {
+            playerSave.inventory[it]?.let { count -> count > 0 } ?: false
+        } ?: true
+        
+        return storyRequirementMet && keyItemRequirementMet
     }
 }

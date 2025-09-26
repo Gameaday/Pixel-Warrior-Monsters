@@ -339,3 +339,167 @@ sealed class CompletionResult {
     data class Success(val rewards: ScoutRewards, val scoutId: String) : CompletionResult()
     data class Failure(val reason: String) : CompletionResult()
 }
+
+/**
+ * Scout Deployment Interface - Phase 3 Enhancement
+ * Provides user-friendly interface for deploying monsters on scout missions
+ */
+class ScoutDeploymentInterface(
+    private val scoutSystem: ScoutSystem = ScoutSystem()
+) {
+    
+    /**
+     * Get available areas for scouting based on player progress
+     */
+    fun getAvailableScoutAreas(playerLevel: Int): List<ScoutArea> {
+        return listOf(
+            ScoutArea(
+                id = "starting_plains",
+                name = "Starting Plains",
+                description = "Safe grasslands perfect for beginner scouts",
+                unlockLevel = 1,
+                availableMissions = listOf(ScoutMissionType.QUICK_PATROL, ScoutMissionType.MATERIAL_GATHERING),
+                dangerLevel = 1
+            ),
+            ScoutArea(
+                id = "mystic_forest", 
+                name = "Mystic Forest",
+                description = "Ancient woods filled with valuable resources",
+                unlockLevel = 10,
+                availableMissions = listOf(ScoutMissionType.TREASURE_HUNT, ScoutMissionType.MATERIAL_GATHERING),
+                dangerLevel = 3
+            ),
+            ScoutArea(
+                id = "crystal_caves",
+                name = "Crystal Caves",
+                description = "Deep caverns containing rare crystals",
+                unlockLevel = 20,
+                availableMissions = listOf(ScoutMissionType.DEEP_EXPLORATION, ScoutMissionType.TREASURE_HUNT),
+                dangerLevel = 5
+            ),
+            ScoutArea(
+                id = "dragon_peaks",
+                name = "Dragon Peaks",
+                description = "Treacherous mountains where legends are born",
+                unlockLevel = 40,
+                availableMissions = listOf(ScoutMissionType.LEGENDARY_QUEST, ScoutMissionType.MONSTER_RESCUE),
+                dangerLevel = 8
+            )
+        ).filter { it.unlockLevel <= playerLevel }
+    }
+    
+    /**
+     * Deploy scout with user-friendly interface
+     */
+    fun deployScout(
+        monster: Monster,
+        area: ScoutArea,
+        missionType: ScoutMissionType,
+        playerInventory: Map<String, Int>
+    ): ScoutDeploymentResult {
+        
+        // Check if monster is suitable for scouting
+        if (monster.currentHp <= 0) {
+            return ScoutDeploymentResult.Failure("Monster must be healthy to scout")
+        }
+        
+        if (monster.level < area.unlockLevel) {
+            return ScoutDeploymentResult.Failure("Monster level too low for this area")
+        }
+        
+        // Check if mission type is available in this area
+        if (missionType !in area.availableMissions) {
+            return ScoutDeploymentResult.Failure("Mission type not available in this area")
+        }
+        
+        // Check deployment costs
+        val deploymentCost = calculateDeploymentCost(area, missionType)
+        if (!canAffordDeployment(deploymentCost, playerInventory)) {
+            return ScoutDeploymentResult.InsufficientResources(deploymentCost)
+        }
+        
+        // Deploy through scout system
+        val enhancedMonster = EnhancedMonster(monster)
+        val result = scoutSystem.deployScout(enhancedMonster, missionType)
+        
+        return when (result) {
+            is ScoutMissionResult.Success -> {
+                ScoutDeploymentResult.Success(
+                    mission = result.mission,
+                    estimatedReturn = System.currentTimeMillis() + result.mission.type.duration,
+                    deploymentCost = deploymentCost
+                )
+            }
+            is ScoutMissionResult.Failure -> {
+                ScoutDeploymentResult.Failure(result.reason)
+            }
+        }
+    }
+    
+    /**
+     * Get deployment cost for a mission
+     */
+    fun calculateDeploymentCost(area: ScoutArea, missionType: ScoutMissionType): DeploymentCost {
+        val baseCost = when (missionType) {
+            ScoutMissionType.QUICK_PATROL -> 10
+            ScoutMissionType.MATERIAL_GATHERING -> 25
+            ScoutMissionType.TREASURE_HUNT -> 50
+            ScoutMissionType.DEEP_EXPLORATION -> 100
+            ScoutMissionType.MONSTER_RESCUE -> 75
+            ScoutMissionType.LEGENDARY_QUEST -> 200
+        }
+        
+        val areaDifficultyMultiplier = 1.0f + (area.dangerLevel * 0.1f)
+        val finalCost = (baseCost * areaDifficultyMultiplier).toInt()
+        
+        return DeploymentCost(
+            gold = finalCost,
+            provisions = when (missionType) {
+                ScoutMissionType.QUICK_PATROL -> 1
+                ScoutMissionType.MATERIAL_GATHERING -> 2
+                ScoutMissionType.TREASURE_HUNT -> 3
+                ScoutMissionType.DEEP_EXPLORATION -> 5
+                ScoutMissionType.MONSTER_RESCUE -> 4
+                ScoutMissionType.LEGENDARY_QUEST -> 10
+            }
+        )
+    }
+    
+    private fun canAffordDeployment(cost: DeploymentCost, inventory: Map<String, Int>): Boolean {
+        return (inventory["gold"] ?: 0) >= cost.gold &&
+               (inventory["provisions"] ?: 0) >= cost.provisions
+    }
+}
+
+/**
+ * Additional data classes for scout deployment
+ */
+data class ScoutArea(
+    val id: String,
+    val name: String,
+    val description: String,
+    val unlockLevel: Int,
+    val availableMissions: List<ScoutMissionType>,
+    val dangerLevel: Int
+)
+
+data class DeploymentCost(
+    val gold: Int,
+    val provisions: Int
+)
+
+sealed class ScoutDeploymentResult {
+    data class Success(
+        val mission: ScoutMission,
+        val estimatedReturn: Long,
+        val deploymentCost: DeploymentCost
+    ) : ScoutDeploymentResult()
+    
+    data class InsufficientResources(
+        val requiredCost: DeploymentCost
+    ) : ScoutDeploymentResult()
+    
+    data class Failure(
+        val reason: String
+    ) : ScoutDeploymentResult()
+}
