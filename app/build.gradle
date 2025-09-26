@@ -68,6 +68,9 @@ dependencies {
     implementation 'androidx.media3:media3-ui:1.1.1'
     implementation 'androidx.media3:media3-common:1.1.1'
     
+    // Quality tools for linting and code analysis
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:4.6.1'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'

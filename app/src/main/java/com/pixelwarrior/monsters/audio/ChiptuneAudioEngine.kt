@@ -366,12 +366,14 @@ class ChiptuneAudioEngine(private val context: Context) {
     
     /**
      * Core audio generation using procedural synthesis
+     * NOTE: THIS IS A SIMULATION ONLY - Real implementation needed for production
      */
     private suspend fun playChipNote(frequency: Int, durationMs: Int, waveform: ChipWaveform) {
         if (!isActive) return
         
-        // Simulate chiptune playback with delay
-        // In a real implementation, this would generate actual audio samples
+        // STUB: Simulate chiptune playback with delay
+        // TODO: Replace with actual audio synthesis using AudioTrack or MediaPlayer
+        // TODO: Generate real 8-bit waveforms (square, triangle, sawtooth, etc.)
         val adjustedDuration = (durationMs * _musicVolume.value).toLong()
         delay(adjustedDuration.coerceAtLeast(10))
     }
