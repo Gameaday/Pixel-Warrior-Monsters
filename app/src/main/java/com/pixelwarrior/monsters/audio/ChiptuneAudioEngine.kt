@@ -162,15 +162,15 @@ class ChiptuneAudioEngine(private val context: Context) {
     
     private suspend fun playTitleTheme(loop: Boolean) {
         val melody = listOf(
-            com.pixelwarrior.monsters.audio.ChipNote(262.0, 500, ChipWaveform.SQUARE), // C4
-            com.pixelwarrior.monsters.audio.ChipNote(294.0, 500, ChipWaveform.SQUARE), // D4
-            com.pixelwarrior.monsters.audio.ChipNote(330.0, 500, ChipWaveform.SQUARE), // E4
-            com.pixelwarrior.monsters.audio.ChipNote(349.0, 500, ChipWaveform.SQUARE), // F4
-            com.pixelwarrior.monsters.audio.ChipNote(392.0, 1000, ChipWaveform.SQUARE), // G4
-            com.pixelwarrior.monsters.audio.ChipNote(349.0, 500, ChipWaveform.SQUARE), // F4
-            com.pixelwarrior.monsters.audio.ChipNote(330.0, 500, ChipWaveform.SQUARE), // E4
-            com.pixelwarrior.monsters.audio.ChipNote(294.0, 1000, ChipWaveform.SQUARE), // D4
-            com.pixelwarrior.monsters.audio.ChipNote(262.0, 1000, ChipWaveform.SQUARE) // C4
+            ChipNote(262.0, 500, ChipWaveform.SQUARE), // C4
+            ChipNote(294.0, 500, ChipWaveform.SQUARE), // D4
+            ChipNote(330.0, 500, ChipWaveform.SQUARE), // E4
+            ChipNote(349.0, 500, ChipWaveform.SQUARE), // F4
+            ChipNote(392.0, 1000, ChipWaveform.SQUARE), // G4
+            ChipNote(349.0, 500, ChipWaveform.SQUARE), // F4
+            ChipNote(330.0, 500, ChipWaveform.SQUARE), // E4
+            ChipNote(294.0, 1000, ChipWaveform.SQUARE), // D4
+            ChipNote(262.0, 1000, ChipWaveform.SQUARE) // C4
         )
         
         real8BitEngine.playMelody(melody, loop)
@@ -178,115 +178,115 @@ class ChiptuneAudioEngine(private val context: Context) {
     
     private suspend fun playWorldMapTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(392, 400), // G4
-            ChipNote(440, 400), // A4
-            ChipNote(494, 400), // B4
-            ChipNote(523, 800), // C5
-            ChipNote(494, 400), // B4
-            ChipNote(440, 400), // A4
-            ChipNote(392, 800), // G4
-            ChipNote(330, 400), // E4
-            ChipNote(392, 800) // G4
+            ChipNote(392.0, 400, ChipWaveform.TRIANGLE), // G4
+            ChipNote(440.0, 400, ChipWaveform.TRIANGLE), // A4
+            ChipNote(494.0, 400, ChipWaveform.TRIANGLE), // B4
+            ChipNote(523.0, 800, ChipWaveform.TRIANGLE), // C5
+            ChipNote(494.0, 400, ChipWaveform.TRIANGLE), // B4
+            ChipNote(440.0, 400, ChipWaveform.TRIANGLE), // A4
+            ChipNote(392.0, 800, ChipWaveform.TRIANGLE), // G4
+            ChipNote(330.0, 400, ChipWaveform.TRIANGLE), // E4
+            ChipNote(392.0, 800, ChipWaveform.TRIANGLE) // G4
         )
         
         do {
             for (note in melody) {
-                if (!isActive) return
-                playChipNote(note.frequency, note.duration, ChipWaveform.TRIANGLE)
+                if (!scope.isActive) return
+                playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.TRIANGLE)
             }
             if (loop) delay(1000)
-        } while (loop && isActive)
+        } while (loop && scope.isActive)
     }
     
     private suspend fun playBattleTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(523, 300), // C5
-            ChipNote(587, 300), // D5
-            ChipNote(659, 300), // E5
-            ChipNote(523, 300), // C5
-            ChipNote(698, 600), // F5
-            ChipNote(659, 300), // E5
-            ChipNote(587, 300), // D5
-            ChipNote(523, 600) // C5
+            ChipNote(523.0, 300, ChipWaveform.PULSE), // C5
+            ChipNote(587.0, 300, ChipWaveform.PULSE), // D5
+            ChipNote(659.0, 300, ChipWaveform.PULSE), // E5
+            ChipNote(523.0, 300, ChipWaveform.PULSE), // C5
+            ChipNote(698.0, 600, ChipWaveform.PULSE), // F5
+            ChipNote(659.0, 300, ChipWaveform.PULSE), // E5
+            ChipNote(587.0, 300, ChipWaveform.PULSE), // D5
+            ChipNote(523.0, 600, ChipWaveform.PULSE) // C5
         )
         
         do {
             for (note in melody) {
-                if (!isActive) return
-                playChipNote(note.frequency, note.duration, ChipWaveform.PULSE)
+                if (!scope.isActive) return
+                playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.PULSE)
             }
             if (loop) delay(200)
-        } while (loop && isActive)
+        } while (loop && scope.isActive)
     }
     
     private suspend fun playBossTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(196, 400), // G3
-            ChipNote(220, 400), // A3
-            ChipNote(247, 400), // B3
-            ChipNote(196, 400), // G3
-            ChipNote(262, 800), // C4
-            ChipNote(247, 400), // B3
-            ChipNote(220, 400), // A3
-            ChipNote(196, 800) // G3
+            ChipNote(196.0, 400, ChipWaveform.SAWTOOTH), // G3
+            ChipNote(220.0, 400, ChipWaveform.SAWTOOTH), // A3
+            ChipNote(247.0, 400, ChipWaveform.SAWTOOTH), // B3
+            ChipNote(196.0, 400, ChipWaveform.SAWTOOTH), // G3
+            ChipNote(262.0, 800, ChipWaveform.SAWTOOTH), // C4
+            ChipNote(247.0, 400, ChipWaveform.SAWTOOTH), // B3
+            ChipNote(220.0, 400, ChipWaveform.SAWTOOTH), // A3
+            ChipNote(196.0, 800, ChipWaveform.SAWTOOTH) // G3
         )
         
         do {
             for (note in melody) {
-                if (!isActive) return
-                playChipNote(note.frequency, note.duration, ChipWaveform.SAWTOOTH)
+                if (!scope.isActive) return
+                playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.SAWTOOTH)
             }
             if (loop) delay(300)
-        } while (loop && isActive)
+        } while (loop && scope.isActive)
     }
     
     private suspend fun playBreedingTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(349, 600), // F4
-            ChipNote(392, 600), // G4
-            ChipNote(440, 600), // A4
-            ChipNote(523, 1200), // C5
-            ChipNote(440, 600), // A4
-            ChipNote(392, 600), // G4
-            ChipNote(349, 1200) // F4
+            ChipNote(349.0, 600, ChipWaveform.SINE), // F4
+            ChipNote(392.0, 600, ChipWaveform.SINE), // G4
+            ChipNote(440.0, 600, ChipWaveform.SINE), // A4
+            ChipNote(523.0, 1200, ChipWaveform.SINE), // C5
+            ChipNote(440.0, 600, ChipWaveform.SINE), // A4
+            ChipNote(392.0, 600, ChipWaveform.SINE), // G4
+            ChipNote(349.0, 1200, ChipWaveform.SINE) // F4
         )
         
         do {
             for (note in melody) {
-                if (!isActive) return
-                playChipNote(note.frequency, note.duration, ChipWaveform.SINE)
+                if (!scope.isActive) return
+                playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.SINE)
             }
             if (loop) delay(800)
-        } while (loop && isActive)
+        } while (loop && scope.isActive)
     }
     
     private suspend fun playVictoryTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(523, 300), // C5
-            ChipNote(659, 300), // E5
-            ChipNote(784, 300), // G5
-            ChipNote(1047, 600), // C6
-            ChipNote(784, 300), // G5
-            ChipNote(1047, 900) // C6
+            ChipNote(523.0, 300, ChipWaveform.SQUARE), // C5
+            ChipNote(659.0, 300, ChipWaveform.SQUARE), // E5
+            ChipNote(784.0, 300, ChipWaveform.SQUARE), // G5
+            ChipNote(1047.0, 600, ChipWaveform.SQUARE), // C6
+            ChipNote(784.0, 300, ChipWaveform.SQUARE), // G5
+            ChipNote(1047.0, 900, ChipWaveform.SQUARE) // C6
         )
         
         for (note in melody) {
-            if (!isActive) return
-            playChipNote(note.frequency, note.duration, ChipWaveform.SQUARE)
+            if (!scope.isActive) return
+            playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.SQUARE)
         }
     }
     
     private suspend fun playGameOverTheme(loop: Boolean) {
         val melody = listOf(
-            ChipNote(262, 800), // C4
-            ChipNote(247, 800), // B3
-            ChipNote(220, 800), // A3
-            ChipNote(196, 1600) // G3
+            ChipNote(262.0, 800, ChipWaveform.TRIANGLE), // C4
+            ChipNote(247.0, 800, ChipWaveform.TRIANGLE), // B3
+            ChipNote(220.0, 800, ChipWaveform.TRIANGLE), // A3
+            ChipNote(196.0, 1600, ChipWaveform.TRIANGLE) // G3
         )
         
         for (note in melody) {
-            if (!isActive) return
-            playChipNote(note.frequency, note.duration, ChipWaveform.TRIANGLE)
+            if (!scope.isActive) return
+            playChipNote(note.frequency.toInt(), note.duration, ChipWaveform.TRIANGLE)
         }
     }
     
@@ -367,7 +367,7 @@ class ChiptuneAudioEngine(private val context: Context) {
      * Now generates actual audio waveforms instead of delay() simulation
      */
     private suspend fun playChipNote(frequency: Int, durationMs: Int, waveform: ChipWaveform) {
-        if (!isActive || !_isSoundEnabled.value) return
+        if (!scope.isActive || !_isSoundEnabled.value) return
         
         // Use real 8-bit audio engine for authentic sound generation
         val volume = _soundVolume.value
@@ -450,8 +450,4 @@ class ChiptuneAudioEngine(private val context: Context) {
      * Note: Main ChipNote class is now in Real8BitAudioEngine
      */
     private data class LegacyChipNote(val frequency: Int, val duration: Int)
-    
-    private enum class ChipWaveform {
-        SQUARE, TRIANGLE, SAWTOOTH, SINE, PULSE, NOISE
-    }
 }
