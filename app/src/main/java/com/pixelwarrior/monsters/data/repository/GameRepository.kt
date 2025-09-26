@@ -208,7 +208,6 @@ class GameRepository {
             SkillEntity("poison_sting", "Poison Sting", "Stings with poison", "PHYSICAL", "POISON", 35, 90, 4, "SINGLE", "May inflict poison")
         )
     }
-}
     
     /**
      * Add monster to farm
