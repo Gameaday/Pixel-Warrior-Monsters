@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.PixelWarriorMonsters" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/pixel_blue</item>
-        <item name="colorPrimaryDark">@color/pixel_dark_blue</item>
-        <item name="colorAccent">@color/pixel_green</item>
-        
+    <!-- Base application theme using Material3 approach -->
+    <style name="Theme.PixelWarriorMonsters" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Material3 colors will be handled via Compose MaterialTheme -->
         <item name="android:windowBackground">@color/pixel_black</item>
         <item name="android:statusBarColor">@color/pixel_black</item>
         <item name="android:navigationBarColor">@color/pixel_black</item>
