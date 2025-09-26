@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pixelwarrior.monsters.data.model.Monster
 import com.pixelwarrior.monsters.game.synthesis.*
-import com.pixelwarrior.monsters.ui.components.GameComponents
+import com.pixelwarrior.monsters.ui.components.*
 import com.pixelwarrior.monsters.ui.theme.*
 
 /**
@@ -46,10 +46,27 @@ fun SynthesisLabScreen(
             .padding(16.dp)
     ) {
         // Header
-        GameComponents.GameInfoPanel(
-            title = "🧪 Synthesis Laboratory",
-            content = "Advanced Monster Research Facility\nCombine, enhance, and deploy monsters"
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = PixelDarkGray),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "🧪 Synthesis Laboratory",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Advanced Monster Research Facility\nCombine, enhance, and deploy monsters",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = PixelLightGray
+                )
+            }
+        }
         
         Spacer(modifier = Modifier.height(16.dp))
         
