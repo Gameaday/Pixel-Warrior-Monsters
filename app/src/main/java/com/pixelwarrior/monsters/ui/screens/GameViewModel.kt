@@ -7,6 +7,7 @@ import com.pixelwarrior.monsters.data.repository.GameRepository
 import com.pixelwarrior.monsters.game.battle.BattleEngine
 import com.pixelwarrior.monsters.game.breeding.BreedingSystem
 import com.pixelwarrior.monsters.game.world.WorldExplorer
+import com.pixelwarrior.monsters.game.world.HubWorldSystem
 import com.pixelwarrior.monsters.utils.GameUtils
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ class GameViewModel : ViewModel() {
     private val battleEngine = BattleEngine()
     private val breedingSystem = BreedingSystem()
     private val worldExplorer = WorldExplorer()
+    private val hubWorldSystem = HubWorldSystem()
     
     // Game state flows
     private val _gameSave = MutableStateFlow<GameSave?>(null)
@@ -337,6 +339,83 @@ class GameViewModel : ViewModel() {
         viewModelScope.launch {
             delay(3000)
             _gameMessage.value = null
+        }
+    }
+    
+    // Hub World System Functions
+    
+    /**
+     * Get the hub world system instance
+     */
+    fun getHubWorldSystem(): HubWorldSystem {
+        return hubWorldSystem
+    }
+    
+    /**
+     * Award a key item to the player
+     */
+    fun awardKeyItem(keyItem: HubWorldSystem.KeyItem) {
+        viewModelScope.launch {
+            _gameSave.value?.let { save ->
+                val updatedSave = hubWorldSystem.awardKeyItem(keyItem, save)
+                _gameSave.value = updatedSave
+                _gameMessage.value = "Received ${keyItem.displayName}!"
+                clearMessageAfterDelay()
+                
+                // Auto-save
+                gameRepository.saveGame(updatedSave)
+            }
+        }
+    }
+    
+    /**
+     * Complete a story milestone
+     */
+    fun completeStoryMilestone(milestone: HubWorldSystem.StoryMilestone) {
+        viewModelScope.launch {
+            _gameSave.value?.let { save ->
+                val updatedSave = hubWorldSystem.completeStoryMilestone(milestone, save)
+                _gameSave.value = updatedSave
+                _gameMessage.value = "Achievement unlocked: ${milestone.displayName}"
+                clearMessageAfterDelay()
+                
+                // Auto-save
+                gameRepository.saveGame(updatedSave)
+            }
+        }
+    }
+    
+    /**
+     * Handle NPC interaction for story progression
+     */
+    fun interactWithNPC(npc: HubWorldSystem.HubNPC) {
+        viewModelScope.launch {
+            _gameMessage.value = "${npc.name}: ${npc.dialogue.random()}"
+            clearMessageAfterDelay()
+            
+            // Check for quest completion or item awards based on NPC
+            when (npc) {
+                HubWorldSystem.HubNPC.MASTER -> {
+                    // Master might award first key items
+                    _gameSave.value?.let { save ->
+                        if (!save.inventory.containsKey("starter_guidance")) {
+                            val updatedInventory = save.inventory.toMutableMap()
+                            updatedInventory["starter_guidance"] = 1
+                            _gameSave.value = save.copy(inventory = updatedInventory)
+                        }
+                    }
+                }
+                HubWorldSystem.HubNPC.STABLE_KEEPER -> {
+                    // Stable keeper might award breeder license after first breeding
+                    _gameSave.value?.let { save ->
+                        if (save.storyProgress.containsKey("first_breeding") && 
+                            !save.inventory.containsKey("breeder_license")) {
+                            awardKeyItem(HubWorldSystem.KeyItem.BREEDER_LICENSE)
+                        }
+                    }
+                }
+                else -> { /* Other NPCs handled as needed */ }
+            }
         }
     }
     

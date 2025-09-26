@@ -99,8 +99,43 @@ fun MainGameScreen() {
                 audioViewModel.playMenuSelectSound()
                 currentScreen = GameScreen.DUNGEON_EXPLORATION
             },
+            onHubWorld = {
+                audioViewModel.playMenuSelectSound()
+                currentScreen = GameScreen.HUB_WORLD
+            }
+            },
             audioViewModel = audioViewModel
         )
+        
+        GameScreen.HUB_WORLD -> {
+            val currentSave by gameViewModel.gameSave.collectAsState()
+            currentSave?.let { save ->
+                HubWorldScreen(
+                    gameSave = save,
+                    hubWorldSystem = gameViewModel.getHubWorldSystem(),
+                    onAreaSelected = { area ->
+                        audioViewModel.playMenuSelectSound()
+                        // Navigate to appropriate screen based on area
+                        currentScreen = when (area) {
+                            HubWorldSystem.HubArea.BATTLE_ARENA -> GameScreen.BATTLE
+                            HubWorldSystem.HubArea.BREEDING_LAB -> GameScreen.BREEDING
+                            HubWorldSystem.HubArea.MONSTER_LIBRARY -> GameScreen.MONSTER_CODEX
+                            HubWorldSystem.HubArea.GATE_CHAMBER -> GameScreen.DUNGEON_EXPLORATION
+                            else -> GameScreen.WORLD_MAP
+                        }
+                    },
+                    onNPCInteract = { npc ->
+                        audioViewModel.playMenuSelectSound()
+                        gameViewModel.interactWithNPC(npc)
+                    },
+                    onBackPressed = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        
         GameScreen.BATTLE -> {
             val battleState by gameViewModel.battleState.collectAsState()
             battleState?.let { state ->
@@ -264,6 +299,7 @@ fun MainGameScreen() {
 enum class GameScreen {
     MAIN_MENU,
     WORLD_MAP,
+    HUB_WORLD,
     BATTLE,
     MONSTER_MANAGEMENT,
     BREEDING,
@@ -379,6 +415,7 @@ fun WorldMapScreen(
     onSettings: () -> Unit,
     onCodex: () -> Unit,
     onDungeonExploration: () -> Unit,
+    onHubWorld: () -> Unit,
     audioViewModel: AudioViewModel
 ) {
     val gameViewModel: GameViewModel = viewModel()
@@ -452,6 +489,12 @@ fun WorldMapScreen(
                         onClick = onMonsterManagement,
                         modifier = Modifier.weight(1f)
                     )
+                    PixelButton(
+                        text = "Hub World",
+                        onClick = onHubWorld,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)

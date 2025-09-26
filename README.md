@@ -17,6 +17,7 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 - ✅ **Breeding System**: Monster genetics with family compatibility and stat inheritance  
 - ✅ **World Exploration**: Random encounters, area progression, and item discovery
 - ✅ **Advanced Dungeon System**: 8 themed dungeons with multiple floors, boss encounters, and special events
+- ✅ **Hub World System**: Progressive story-driven Master's Sanctuary with 9 unlockable areas and NPCs
 - ✅ **Experience System**: Level progression with multiple growth rate curves
 - ✅ **Save System**: Complete game state persistence with settings and progress tracking
 - ✅ **Chiptune Audio System**: 8-bit style music and sound effects with 7 background tracks and 11 SFX
@@ -111,6 +112,21 @@ app/src/main/java/com/pixelwarrior/monsters/
 - **Random Encounters**: Area-specific encounter rates and monster lists  
 - **Item Discovery**: Find healing items, capture tools, and special treasures
 - **Gate System**: Unlock new areas with key items and story progression
+
+### Hub World System
+- **Master's Sanctuary**: Central hub area with 9 progressive unlockable facilities
+- **Story-Driven Progression**: Areas unlock through key items and story milestones
+- **Interactive NPCs**: 7 unique characters including Master, Librarian, Arena Manager, and more
+- **Hub Facilities**: 
+  - Monster Library (bestiary and breeding info)
+  - Breeding Laboratory (advanced monster genetics)
+  - Battle Arena (tournaments and competitions)
+  - Synthesis Lab (monster combination research)
+  - Item Shop (purchase tools and supplies)
+  - Gate Chamber (portal access to different worlds)
+  - Master's Quarters and Secret Vault (end-game content)
+- **Progressive Unlocks**: Each area requires specific achievements or key items
+- **Dialogue System**: Multi-line conversations with story and gameplay hints
 
 ### Quality of Life Features
 - **Auto-save**: Automatic game state preservation
