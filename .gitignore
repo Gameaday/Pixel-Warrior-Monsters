@@ -32,3 +32,28 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# CI/CD specific files (don't commit these)
+gradle-wrapper.jar
+.gradle/
+*/build/
+build/
+!gradle-wrapper.jar
+
+# Test reports and coverage
+app/build/reports/
+app/build/test-results/
+app/build/outputs/
+*.exec
+
+# Temporary files created during development
+*.tmp
+*.temp
+gradle.properties.backup
+
+# Mac/Linux specific
+.DS_Store
+*~
+
+# Windows specific
+Thumbs.db
