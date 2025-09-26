@@ -19,9 +19,9 @@ class DatabaseConverters {
     @TypeConverter
     fun toStringMap(value: String): Map<String, String> {
         return try {
-            gson.fromJson(value, object : TypeToken<Map<String, String>>() {}.type) ?: emptyMap()
+            gson.fromJson(value, object : TypeToken<Map<String, String>>() {}.type) ?: emptyMap<String, String>()
         } catch (e: Exception) {
-            emptyMap()
+            emptyMap<String, String>()
         }
     }
     
@@ -33,9 +33,9 @@ class DatabaseConverters {
     @TypeConverter
     fun toIntMap(value: String): Map<String, Int> {
         return try {
-            gson.fromJson(value, object : TypeToken<Map<String, Int>>() {}.type) ?: emptyMap()
+            gson.fromJson(value, object : TypeToken<Map<String, Int>>() {}.type) ?: emptyMap<String, Int>()
         } catch (e: Exception) {
-            emptyMap()
+            emptyMap<String, Int>()
         }
     }
     
@@ -47,9 +47,9 @@ class DatabaseConverters {
     @TypeConverter
     fun toBooleanMap(value: String): Map<String, Boolean> {
         return try {
-            gson.fromJson(value, object : TypeToken<Map<String, Boolean>>() {}.type) ?: emptyMap()
+            gson.fromJson(value, object : TypeToken<Map<String, Boolean>>() {}.type) ?: emptyMap<String, Boolean>()
         } catch (e: Exception) {
-            emptyMap()
+            emptyMap<String, Boolean>()
         }
     }
     
@@ -61,9 +61,9 @@ class DatabaseConverters {
     @TypeConverter
     fun toStringList(value: String): List<String> {
         return try {
-            gson.fromJson(value, object : TypeToken<List<String>>() {}.type) ?: emptyList()
+            gson.fromJson(value, object : TypeToken<List<String>>() {}.type) ?: emptyList<String>()
         } catch (e: Exception) {
-            emptyList()
+            emptyList<String>()
         }
     }
     
@@ -87,51 +87,52 @@ class DatabaseConverters {
  */
 fun GameSave.toEntity(): GameSaveEntity {
     return GameSaveEntity(
-        saveId = saveId,
+        saveId = playerId,
         playerName = playerName,
-        currentLevel = currentLevel,
-        currentArea = currentArea,
-        playtimeMinutes = playtimeMinutes,
-        goldAmount = goldAmount,
+        currentLevel = 1, // Map from level string to int
+        currentArea = currentLevel,
+        playtimeMinutes = playtimeMinutes.toInt(),
+        goldAmount = gold.toInt(),
         storyProgress = Gson().toJson(storyProgress),
         inventory = Gson().toJson(inventory),
         partyMonsters = Gson().toJson(partyMonsters.map { it.id }),
-        allMonsters = Gson().toJson(allMonsters.map { it.id }),
+        allMonsters = Gson().toJson((partyMonsters + farmMonsters).map { it.id }),
         lastSaved = lastSaved,
-        gameVersion = gameVersion
+        gameVersion = saveVersion.toString()
     )
 }
 
 fun GameSaveEntity.toDomain(allMonsters: List<Monster>): GameSave {
     val gson = Gson()
     val partyIds: List<String> = try {
-        gson.fromJson(partyMonsters, object : TypeToken<List<String>>() {}.type) ?: emptyList()
-    } catch (e: Exception) { emptyList() }
+        gson.fromJson(partyMonsters, object : TypeToken<List<String>>() {}.type) ?: emptyList<String>()
+    } catch (e: Exception) { emptyList<String>() }
     
     val allMonsterIds: List<String> = try {
-        gson.fromJson(allMonsters, object : TypeToken<List<String>>() {}.type) ?: emptyList()
-    } catch (e: Exception) { emptyList() }
+        gson.fromJson(this.allMonsters, object : TypeToken<List<String>>() {}.type) ?: emptyList<String>()
+    } catch (e: Exception) { emptyList<String>() }
     
-    val partyMonsters = allMonsters.filter { it.id in partyIds }
+    val partyMonstersList = allMonsters.filter { it.id in partyIds }
     val ownedMonsters = allMonsters.filter { it.id in allMonsterIds }
+    val farmMonsters = ownedMonsters - partyMonstersList
     
     return GameSave(
-        saveId = saveId,
+        playerId = saveId,
         playerName = playerName,
-        currentLevel = currentLevel,
-        currentArea = currentArea,
-        playtimeMinutes = playtimeMinutes,
-        goldAmount = goldAmount,
+        currentLevel = currentArea,
+        position = Position(0f, 0f),
+        partyMonsters = partyMonstersList,
+        farmMonsters = farmMonsters,
+        playtimeMinutes = playtimeMinutes.toLong(),
+        gold = goldAmount.toLong(),
         storyProgress = try {
-            gson.fromJson(storyProgress, object : TypeToken<Map<String, Boolean>>() {}.type) ?: emptyMap()
-        } catch (e: Exception) { emptyMap() },
+            gson.fromJson(storyProgress, object : TypeToken<Map<String, Boolean>>() {}.type) ?: emptyMap<String, Boolean>()
+        } catch (e: Exception) { emptyMap<String, Boolean>() },
         inventory = try {
-            gson.fromJson(inventory, object : TypeToken<Map<String, Int>>() {}.type) ?: emptyMap()
-        } catch (e: Exception) { emptyMap() },
-        partyMonsters = partyMonsters,
-        allMonsters = ownedMonsters,
+            gson.fromJson(inventory, object : TypeToken<Map<String, Int>>() {}.type) ?: emptyMap<String, Int>()
+        } catch (e: Exception) { emptyMap<String, Int>() },
         lastSaved = lastSaved,
-        gameVersion = gameVersion
+        saveVersion = try { gameVersion.toInt() } catch (e: Exception) { 1 }
     )
 }
 
@@ -149,40 +150,15 @@ fun Monster.toEntity(saveId: String): MonsterEntity {
         type1 = type1.name,
         type2 = type2?.name,
         family = family.name,
-        personality = personality.name,
+        personality = "NORMAL", // Default personality since Monster model doesn't have this
         baseStats = gson.toJson(baseStats),
         skills = gson.toJson(skills),
         traits = gson.toJson(traits),
-        plusLevel = plusLevel,
-        synthesisParents = synthesisParents?.let { gson.toJson(it) }
+        plusLevel = 0, // Default plus level since Monster model doesn't have this
+        synthesisParents = null // Default since Monster model doesn't have this
     )
 }
 
-/**
- * Simple data classes for the missing models
- */
-data class Skill(
-    val id: String,
-    val name: String,
-    val description: String,
-    val power: Int,
-    val accuracy: Int,
-    val mpCost: Int,
-    val element: String,
-    val targetType: String
-)
-
-data class Personality(
-    val name: String,
-    val displayName: String,
-    val growthModifiers: Map<String, Float>
-) {
-    companion object {
-        fun valueOf(name: String): Personality {
-            return Personality(name, name, emptyMap())
-        }
-    }
-}
 
 fun MonsterEntity.toDomain(): Monster {
     val gson = Gson()
@@ -191,18 +167,12 @@ fun MonsterEntity.toDomain(): Monster {
     } catch (e: Exception) { MonsterStats(0, 0, 0, 0, 0, 0, 0) }
     
     val skillList = try {
-        gson.fromJson(skills, object : TypeToken<List<String>>() {}.type) ?: emptyList()
-    } catch (e: Exception) { emptyList() }
+        gson.fromJson(skills, object : TypeToken<List<String>>() {}.type) ?: emptyList<String>()
+    } catch (e: Exception) { emptyList<String>() }
     
     val traitList = try {
-        gson.fromJson(traits, object : TypeToken<List<String>>() {}.type) ?: emptyList()
-    } catch (e: Exception) { emptyList() }
-    
-    val parentsList = synthesisParents?.let { 
-        try {
-            gson.fromJson(it, object : TypeToken<List<String>>() {}.type)
-        } catch (e: Exception) { null }
-    }
+        gson.fromJson(traits, object : TypeToken<List<String>>() {}.type) ?: emptyList<String>()
+    } catch (e: Exception) { emptyList<String>() }
     
     return Monster(
         id = monsterId,
@@ -215,11 +185,13 @@ fun MonsterEntity.toDomain(): Monster {
         currentHp = currentHp,
         currentMp = currentMp,
         experience = experience,
+        experienceToNext = 1000L, // Default value since not stored in entity
         baseStats = stats,
+        currentStats = stats, // Use same stats for now
         skills = skillList,
         traits = traitList,
-        personality = Personality.valueOf(personality),
-        plusLevel = plusLevel,
-        synthesisParents = parentsList
+        isWild = false,
+        captureRate = 100,
+        growthRate = GrowthRate.MEDIUM_FAST
     )
 }
