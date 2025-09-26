@@ -183,6 +183,8 @@ data class Personality(
         }
     }
 }
+
+fun MonsterEntity.toDomain(): Monster {
     val gson = Gson()
     val stats = try {
         gson.fromJson(baseStats, MonsterStats::class.java) ?: MonsterStats(0, 0, 0, 0, 0, 0, 0)

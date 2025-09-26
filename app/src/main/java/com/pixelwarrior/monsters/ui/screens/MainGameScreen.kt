@@ -102,7 +102,6 @@ fun MainGameScreen() {
             onHubWorld = {
                 audioViewModel.playMenuSelectSound()
                 currentScreen = GameScreen.HUB_WORLD
-            }
             },
             audioViewModel = audioViewModel
         )
