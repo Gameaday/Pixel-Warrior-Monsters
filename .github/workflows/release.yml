@@ -104,24 +104,21 @@ jobs:
       run: ./gradlew bundleRelease
       
     - name: Upload release APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-apk-signed
         path: app/build/outputs/apk/release/*.apk
         
     - name: Upload release AAB
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-aab
         path: app/build/outputs/bundle/release/*.aab
         
     - name: Create GitHub Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
         body: |

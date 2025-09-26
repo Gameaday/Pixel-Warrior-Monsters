@@ -48,7 +48,7 @@ jobs:
       run: ./gradlew lint
       
     - name: Upload lint results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: lint-results
         path: app/build/reports/lint-results*.xml
