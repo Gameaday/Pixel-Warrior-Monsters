@@ -158,7 +158,31 @@ fun Monster.toEntity(saveId: String): MonsterEntity {
     )
 }
 
-fun MonsterEntity.toDomain(): Monster {
+/**
+ * Simple data classes for the missing models
+ */
+data class Skill(
+    val id: String,
+    val name: String,
+    val description: String,
+    val power: Int,
+    val accuracy: Int,
+    val mpCost: Int,
+    val element: String,
+    val targetType: String
+)
+
+data class Personality(
+    val name: String,
+    val displayName: String,
+    val growthModifiers: Map<String, Float>
+) {
+    companion object {
+        fun valueOf(name: String): Personality {
+            return Personality(name, name, emptyMap())
+        }
+    }
+}
     val gson = Gson()
     val stats = try {
         gson.fromJson(baseStats, MonsterStats::class.java) ?: MonsterStats(0, 0, 0, 0, 0, 0, 0)
