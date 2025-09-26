@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.PixelWarriorMonsters" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/pixel_blue</item>
+        <item name="colorOnPrimary">@color/pixel_white</item>
+        <item name="colorPrimaryContainer">@color/pixel_dark_blue</item>
+        <item name="colorOnPrimaryContainer">@color/pixel_light_blue</item>
+        
+        <item name="colorSecondary">@color/pixel_green</item>
+        <item name="colorOnSecondary">@color/pixel_white</item>
+        
+        <item name="android:windowBackground">@color/pixel_black</item>
+        <item name="android:statusBarColor">@color/pixel_black</item>
+        <item name="android:navigationBarColor">@color/pixel_black</item>
+    </style>
+</resources>
