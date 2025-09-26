@@ -52,6 +52,7 @@ android {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
+    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -95,7 +96,6 @@ dependencies {
 
 // Test coverage configuration
 tasks.withType(Test) {
-    useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
 
