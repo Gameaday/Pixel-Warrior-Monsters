@@ -168,6 +168,7 @@ This is a standard Android project using Gradle:
 
 **Requirements:**
 - Android SDK 24+ (Android 7.0)
+- Java 17 or higher
 - Kotlin support
 - Jetpack Compose
 
