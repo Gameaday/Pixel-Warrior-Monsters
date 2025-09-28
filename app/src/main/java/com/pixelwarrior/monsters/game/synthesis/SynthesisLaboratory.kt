@@ -241,7 +241,10 @@ class SynthesisLaboratory(
      */
     fun getAvailableRecipes(): List<SynthesisRecipe> {
         return monsterSynthesis.getAllRecipes()
-            .filter { _discoveredRecipes.value.contains(it.recipeId) }
+            .filter { recipe ->
+                val recipeId = "${recipe.parent1Family.name.lowercase()}_${recipe.parent2Family.name.lowercase()}_${recipe.resultSpeciesId}"
+                _discoveredRecipes.value.contains(recipeId)
+            }
     }
     
     private fun calculateSynthesisCost(parent1: Monster, parent2: Monster): SynthesisCost {

@@ -3,9 +3,7 @@ package com.pixelwarrior.monsters.game.tournament
 import com.pixelwarrior.monsters.data.model.Monster
 import com.pixelwarrior.monsters.data.model.MonsterType
 import com.pixelwarrior.monsters.data.model.MonsterFamily
-import com.pixelwarrior.monsters.data.model.Personality
-import com.pixelwarrior.monsters.game.battle.BattleEngine
-import com.pixelwarrior.monsters.data.model.Battle
+import com.pixelwarrior.monsters.data.model.MonsterStats
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -51,10 +49,10 @@ data class RivalTrainer(
                     createTeam(MonsterType.FIRE, 18), signature = "Always leads with fire attacks"),
                 RivalTrainer("marcus", "Marcus", "Water Guardian", MonsterType.WATER, 4, "Defensive", 
                     createTeam(MonsterType.WATER, 22), signature = "Focuses on healing and defense"),
-                RivalTrainer("aria", "Aria", "Wind Dancer", MonsterType.AIR, 5, "Swift", 
-                    createTeam(MonsterType.AIR, 25), signature = "Emphasizes speed and evasion"),
-                RivalTrainer("zane", "Zane", "Earth Shaker", MonsterType.EARTH, 6, "Sturdy", 
-                    createTeam(MonsterType.EARTH, 28), signature = "Builds defensive walls"),
+                RivalTrainer("aria", "Aria", "Wind Dancer", MonsterType.FLYING, 5, "Swift", 
+                    createTeam(MonsterType.FLYING, 25), signature = "Emphasizes speed and evasion"),
+                RivalTrainer("zane", "Zane", "Earth Shaker", MonsterType.GROUND, 6, "Sturdy", 
+                    createTeam(MonsterType.GROUND, 28), signature = "Builds defensive walls"),
                 RivalTrainer("nova", "Nova", "Spark Master", MonsterType.ELECTRIC, 7, "Energetic", 
                     createTeam(MonsterType.ELECTRIC, 30), signature = "Paralyzes opponents first"),
                 RivalTrainer("ivy", "Ivy", "Nature's Voice", MonsterType.GRASS, 5, "Calm", 
@@ -63,12 +61,12 @@ data class RivalTrainer(
                     createTeam(MonsterType.ICE, 27), signature = "Freezes enemies methodically"),
                 RivalTrainer("shadow", "Shadow", "Dark Whisper", MonsterType.DARK, 8, "Mysterious", 
                     createTeam(MonsterType.DARK, 32), signature = "Unpredictable battle style"),
-                RivalTrainer("luna", "Luna", "Light Bearer", MonsterType.LIGHT, 7, "Noble", 
-                    createTeam(MonsterType.LIGHT, 31), signature = "Heals while dealing damage"),
+                RivalTrainer("luna", "Luna", "Light Bearer", MonsterType.PSYCHIC, 7, "Noble", 
+                    createTeam(MonsterType.PSYCHIC, 31), signature = "Heals while dealing damage"),
                 RivalTrainer("steel", "Steel", "Iron Wall", MonsterType.STEEL, 6, "Methodical", 
                     createTeam(MonsterType.STEEL, 29), signature = "Outlasts opponents"),
-                RivalTrainer("crystal", "Crystal", "Gem Collector", MonsterType.CRYSTAL, 8, "Precise", 
-                    createTeam(MonsterType.CRYSTAL, 33), signature = "Critical hits specialist"),
+                RivalTrainer("crystal", "Crystal", "Gem Collector", MonsterType.ROCK, 8, "Precise", 
+                    createTeam(MonsterType.ROCK, 33), signature = "Critical hits specialist"),
                 RivalTrainer("void", "Void", "Champion of Champions", MonsterType.DARK, 10, "Legendary", 
                     createMasterTeam(), signature = "Adapts to any strategy")
             )
@@ -78,29 +76,31 @@ data class RivalTrainer(
             val team = mutableListOf<Monster>()
             repeat(4) { index ->
                 val level = avgLevel + Random.nextInt(-3, 4)
+                val baseStats = MonsterStats(
+                    attack = Random.nextInt(40, 80),
+                    defense = Random.nextInt(35, 75),
+                    agility = Random.nextInt(30, 70),
+                    magic = Random.nextInt(25, 65),
+                    wisdom = Random.nextInt(25, 65),
+                    maxHp = Random.nextInt(60, 120),
+                    maxMp = Random.nextInt(20, 60)
+                )
                 val monster = Monster(
                     id = "rival_${type.name.lowercase()}_$index",
-                    speciesName = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} ${getSpeciesName(index)}",
-                    type = type,
-                    secondaryType = if (Random.nextFloat() < 0.3f) MonsterType.values().random() else null,
+                    speciesId = "${type.name.lowercase()}_${getSpeciesName(index)}",
+                    name = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} ${getSpeciesName(index)}",
+                    type1 = type,
+                    type2 = if (Random.nextFloat() < 0.3f) MonsterType.values().random() else null,
                     family = MonsterFamily.values().random(),
                     level = level.coerceIn(1, 50),
-                    baseAttack = Random.nextInt(40, 80),
-                    baseDefense = Random.nextInt(35, 75),
-                    baseAgility = Random.nextInt(30, 70),
-                    baseMagic = Random.nextInt(25, 65),
-                    baseWisdom = Random.nextInt(25, 65),
-                    baseHp = Random.nextInt(60, 120),
-                    baseMp = Random.nextInt(20, 60),
-                    currentHp = 0, // Will be calculated
-                    currentMp = 0, // Will be calculated
-                    experience = 0,
-                    personality = Personality.values().random(),
+                    currentHp = baseStats.maxHp,
+                    currentMp = baseStats.maxMp,
+                    experience = 0L,
+                    experienceToNext = calculateExperienceToNext(level.coerceIn(1, 50)),
+                    baseStats = baseStats,
+                    currentStats = baseStats,
                     skills = listOf("Basic Attack", "${type.name} Strike", "Defend")
                 )
-                // Calculate current stats based on level
-                monster.currentHp = monster.maxHp
-                monster.currentMp = monster.maxMp
                 team.add(monster)
             }
             return team
@@ -199,6 +199,10 @@ data class RivalTrainer(
                 3 -> "Champion"
                 else -> "Fighter"
             }
+        }
+        
+        private fun calculateExperienceToNext(level: Int): Long {
+            return (level * level * level).toLong()
         }
     }
 }

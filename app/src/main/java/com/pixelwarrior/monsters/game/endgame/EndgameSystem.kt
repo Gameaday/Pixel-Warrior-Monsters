@@ -388,7 +388,7 @@ class EndgameSystem {
                             parents = listOf(legendary, regular),
                             requiredLevel = 95,
                             fusionMaterial = "Legendary Essence",
-                            resultSpecies = "Ascended ${legendary.species}",
+                            resultSpecies = "Ascended ${legendary.name}",
                             statBonusMultiplier = 2.2
                         )
                     )
