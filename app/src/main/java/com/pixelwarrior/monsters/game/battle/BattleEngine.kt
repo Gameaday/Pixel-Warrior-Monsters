@@ -1,6 +1,7 @@
 package com.pixelwarrior.monsters.game.battle
 
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.utils.GameUtils
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -89,6 +90,11 @@ class BattleEngine {
             // Add delay for animation timing
             delay(500)
             
+            // Check if capture was attempted
+            if (newState.battlePhase == BattlePhase.CAPTURE) {
+                break
+            }
+            
             // Check if battle should end
             if (isBattleOver(newState)) {
                 newState = newState.copy(
@@ -98,7 +104,7 @@ class BattleEngine {
             }
         }
         
-        return if (newState.battlePhase != BattlePhase.VICTORY && newState.battlePhase != BattlePhase.DEFEAT) {
+        return if (newState.battlePhase !in listOf(BattlePhase.VICTORY, BattlePhase.DEFEAT, BattlePhase.CAPTURE)) {
             newState.copy(
                 battlePhase = BattlePhase.SELECTION,
                 turn = newState.turn + 1
@@ -117,6 +123,7 @@ class BattleEngine {
             BattleAction.SKILL -> executeSkill(battleState, action)
             BattleAction.DEFEND -> executeDefend(battleState, action)
             BattleAction.RUN -> executeRun(battleState, action)
+            BattleAction.CAPTURE -> executeCapture(battleState, action)
         }
     }
     
@@ -160,8 +167,11 @@ class BattleEngine {
      * Execute defend action
      */
     private fun executeDefend(battleState: BattleState, action: BattleActionData): BattleState {
-        // TODO: Implement defense boost for next turn
-        return battleState
+        // Defending reduces incoming damage by 50% for this turn
+        // For now, just show a message since we'd need to track the defend status
+        return battleState.copy(
+            lastAction = "${action.actingMonster.name} is defending and takes a defensive stance!"
+        )
     }
     
     /**
@@ -180,6 +190,33 @@ class BattleEngine {
             battleState.copy(battlePhase = BattlePhase.DEFEAT) // Escaped
         } else {
             battleState // Failed to escape
+        }
+    }
+    
+    /**
+     * Execute capture action
+     */
+    private fun executeCapture(battleState: BattleState, action: BattleActionData): BattleState {
+        // Can only capture in wild battles
+        if (!battleState.isWildBattle || !battleState.canCapture) {
+            return battleState.copy(lastAction = "Cannot capture this monster!")
+        }
+        
+        val targetMonster = battleState.enemyMonsters[battleState.currentEnemyMonster]
+        
+        // Calculate capture rate using existing GameUtils
+        val captureItem = action.skillId ?: "basic_capture" // Use skillId to pass capture item
+        val captureChance = GameUtils.calculateCaptureRate(targetMonster, captureItem)
+        
+        return if (Random.nextFloat() < captureChance) {
+            battleState.copy(
+                battlePhase = BattlePhase.CAPTURE,
+                lastAction = "${targetMonster.name} was captured!"
+            )
+        } else {
+            battleState.copy(
+                lastAction = "${targetMonster.name} broke free!"
+            )
         }
     }
     
@@ -280,5 +317,53 @@ class BattleEngine {
             )
             else -> null
         }
+    }
+    
+    /**
+     * Generate AI action for enemy monster
+     */
+    fun generateEnemyAction(battleState: BattleState): BattleActionData {
+        val enemyMonster = battleState.enemyMonsters[battleState.currentEnemyMonster]
+        
+        // Simple AI logic
+        val action = when {
+            // Use skill if MP is high
+            enemyMonster.currentMp > 8 && Random.nextFloat() < 0.4f -> {
+                val availableSkills = listOf("fireball", "heal").filter { skillId ->
+                    getSkillById(skillId)?.let { skill ->
+                        enemyMonster.currentMp >= skill.mpCost
+                    } ?: false
+                }
+                
+                if (availableSkills.isNotEmpty()) {
+                    BattleAction.SKILL
+                } else {
+                    BattleAction.ATTACK
+                }
+            }
+            // Defend if low on HP
+            enemyMonster.currentHp < enemyMonster.currentStats.maxHp * 0.3f && Random.nextFloat() < 0.3f -> {
+                BattleAction.DEFEND
+            }
+            // Default to attack
+            else -> BattleAction.ATTACK
+        }
+        
+        val skillId = if (action == BattleAction.SKILL) {
+            val availableSkills = listOf("fireball", "heal").filter { skillId ->
+                getSkillById(skillId)?.let { skill ->
+                    enemyMonster.currentMp >= skill.mpCost
+                } ?: false
+            }
+            availableSkills.randomOrNull()
+        } else null
+        
+        return BattleActionData(
+            action = action,
+            skillId = skillId,
+            targetIndex = 0,
+            actingMonster = enemyMonster,
+            priority = if (action == BattleAction.SKILL) getSkillById(skillId ?: "")?.priority ?: 0 else 0
+        )
     }
 }

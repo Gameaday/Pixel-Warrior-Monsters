@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
  * Battle action types
  */
 enum class BattleAction {
-    ATTACK, SKILL, DEFEND, RUN
+    ATTACK, SKILL, DEFEND, RUN, CAPTURE
 }
 
 /**
