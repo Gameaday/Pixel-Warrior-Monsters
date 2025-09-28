@@ -154,7 +154,7 @@ fun MainGameScreen() {
                         when (state.battlePhase) {
                             BattlePhase.VICTORY -> audioViewModel.playVictoryMusic()
                             BattlePhase.DEFEAT -> audioViewModel.playGameOverMusic()
-                            BattlePhase.CAPTURE -> audioViewModel.playMonsterCaptureSound()
+                            BattlePhase.MONSTER_JOINED -> audioViewModel.playMonsterCaptureSound() // Reuse the same sound for joining
                             else -> { /* No special music */ }
                         }
                         gameViewModel.endBattle()

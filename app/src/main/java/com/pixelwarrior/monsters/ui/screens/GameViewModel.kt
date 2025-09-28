@@ -60,6 +60,7 @@ class GameViewModel : ViewModel() {
                     storyProgress = mapOf("tutorial" to true),
                     unlockedGates = emptyList(),
                     gameSettings = GameSettings(),
+                    cookingSkill = CookingSkill(),
                     saveVersion = 1,
                     lastSaved = System.currentTimeMillis()
                 )
@@ -158,7 +159,7 @@ class GameViewModel : ViewModel() {
                 lastAction = "A wild ${wildMonster.name} appeared!",
                 isWildBattle = true,
                 canEscape = true,
-                canCapture = true
+                canTreat = true
             )
             _gameMessage.value = "Battle started against ${wildMonster.name}!"
             clearMessageAfterDelay()
@@ -191,8 +192,8 @@ class GameViewModel : ViewModel() {
                         BattlePhase.DEFEAT -> {
                             handleBattleDefeat(newState)
                         }
-                        BattlePhase.CAPTURE -> {
-                            handleMonsterCapture(newState)
+                        BattlePhase.MONSTER_JOINED -> {
+                            handleMonsterJoining(newState)
                         }
                         else -> { /* Battle continues */ }
                     }
@@ -337,16 +338,17 @@ class GameViewModel : ViewModel() {
     }
     
     /**
-     * Handle monster capture
+     * Handle monster joining the party after battle
      */
-    private fun handleMonsterCapture(battleState: BattleState) {
-        val capturedMonster = battleState.enemyMonsters.first().copy(
+    private fun handleMonsterJoining(battleState: BattleState) {
+        val joiningMonster = battleState.enemyMonsters.first().copy(
             isWild = false,
-            currentHp = (battleState.enemyMonsters.first().currentStats.maxHp * 0.8f).toInt()
+            currentHp = (battleState.enemyMonsters.first().currentStats.maxHp * 0.9f).toInt(),
+            affection = (battleState.enemyMonsters.first().affection + 20).coerceAtMost(100) // Higher base affection for joining monsters
         )
         
-        addMonsterToFarm(capturedMonster)
-        _gameMessage.value = "${capturedMonster.name} was captured!"
+        addMonsterToFarm(joiningMonster)
+        _gameMessage.value = "${joiningMonster.name} wants to join your party!"
         clearMessageAfterDelay()
     }
     

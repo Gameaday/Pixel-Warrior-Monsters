@@ -7,14 +7,14 @@ import kotlinx.parcelize.Parcelize
  * Battle action types
  */
 enum class BattleAction {
-    ATTACK, SKILL, DEFEND, RUN, CAPTURE
+    ATTACK, SKILL, DEFEND, RUN, TREAT
 }
 
 /**
  * Battle result outcomes
  */
 enum class BattleResult {
-    VICTORY, DEFEAT, ESCAPE, CAPTURE
+    VICTORY, DEFEAT, ESCAPE, MONSTER_JOINED
 }
 
 /**
@@ -76,7 +76,7 @@ data class BattleState(
     val lastAction: String = "",
     val isWildBattle: Boolean = false,
     val canEscape: Boolean = true,
-    val canCapture: Boolean = false
+    val canTreat: Boolean = false // Renamed from canCapture to reflect new taming system
 ) : Parcelable
 
 /**
@@ -88,7 +88,7 @@ enum class BattlePhase {
     RESOLUTION,   // Resolving effects
     VICTORY,      // Battle won
     DEFEAT,       // Battle lost
-    CAPTURE       // Monster capture attempt
+    MONSTER_JOINED // Monster decided to join after battle
 }
 
 /**

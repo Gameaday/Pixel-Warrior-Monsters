@@ -90,13 +90,25 @@ class BattleEngine {
             // Add delay for animation timing
             delay(500)
             
-            // Check if capture was attempted
-            if (newState.battlePhase == BattlePhase.CAPTURE) {
+            // Check if monster wants to join after battle ends
+            if (newState.battlePhase == BattlePhase.MONSTER_JOINED) {
                 break
             }
             
             // Check if battle should end
             if (isBattleOver(newState)) {
+                // Check if wild monster wants to join after victory
+                if (newState.isWildBattle && isPlayerVictorious(newState)) {
+                    val joinChance = calculateJoinChance(newState.enemyMonsters[newState.currentEnemyMonster])
+                    if (Random.nextFloat() < joinChance) {
+                        newState = newState.copy(
+                            battlePhase = BattlePhase.MONSTER_JOINED,
+                            lastAction = "${newState.enemyMonsters[newState.currentEnemyMonster].name} wants to join your party!"
+                        )
+                        break
+                    }
+                }
+                
                 newState = newState.copy(
                     battlePhase = if (isPlayerVictorious(newState)) BattlePhase.VICTORY else BattlePhase.DEFEAT
                 )
@@ -104,7 +116,7 @@ class BattleEngine {
             }
         }
         
-        return if (newState.battlePhase !in listOf(BattlePhase.VICTORY, BattlePhase.DEFEAT, BattlePhase.CAPTURE)) {
+        return if (newState.battlePhase !in listOf(BattlePhase.VICTORY, BattlePhase.DEFEAT, BattlePhase.MONSTER_JOINED)) {
             newState.copy(
                 battlePhase = BattlePhase.SELECTION,
                 turn = newState.turn + 1
@@ -123,7 +135,7 @@ class BattleEngine {
             BattleAction.SKILL -> executeSkill(battleState, action)
             BattleAction.DEFEND -> executeDefend(battleState, action)
             BattleAction.RUN -> executeRun(battleState, action)
-            BattleAction.CAPTURE -> executeCapture(battleState, action)
+            BattleAction.TREAT -> executeTreat(battleState, action)
         }
     }
     
@@ -194,30 +206,35 @@ class BattleEngine {
     }
     
     /**
-     * Execute capture action
+     * Execute treat action - offer treats to wild monsters to increase joining chance
      */
-    private fun executeCapture(battleState: BattleState, action: BattleActionData): BattleState {
-        // Can only capture in wild battles
-        if (!battleState.isWildBattle || !battleState.canCapture) {
-            return battleState.copy(lastAction = "Cannot capture this monster!")
+    private fun executeTreat(battleState: BattleState, action: BattleActionData): BattleState {
+        // Can only treat in wild battles
+        if (!battleState.isWildBattle || !battleState.canTreat) {
+            return battleState.copy(lastAction = "Cannot offer treats to this monster!")
         }
         
         val targetMonster = battleState.enemyMonsters[battleState.currentEnemyMonster]
         
-        // Calculate capture rate using existing GameUtils
-        val captureItem = action.skillId ?: "basic_capture" // Use skillId to pass capture item
-        val captureChance = GameUtils.calculateCaptureRate(targetMonster, captureItem)
+        // Get treat type from action (skillId represents treat item)
+        val treatId = action.skillId ?: "basic_treat"
+        val treatQuality = getTreatQuality(treatId)
         
-        return if (Random.nextFloat() < captureChance) {
-            battleState.copy(
-                battlePhase = BattlePhase.CAPTURE,
-                lastAction = "${targetMonster.name} was captured!"
-            )
-        } else {
-            battleState.copy(
-                lastAction = "${targetMonster.name} broke free!"
-            )
-        }
+        // Calculate affection increase and joining chance
+        val affectionIncrease = treatQuality.affectionBonus
+        val typeBonus = if (treatPreferredByType(treatId, targetMonster.type1)) 0.1f else 0f
+        val joinChance = treatQuality.joinChanceBonus + typeBonus
+        
+        val updatedMonster = targetMonster.copy(affection = (targetMonster.affection + affectionIncrease).coerceAtMost(100))
+        val updatedBattleState = battleState.copy(
+            enemyMonsters = battleState.enemyMonsters.toMutableList().apply {
+                set(battleState.currentEnemyMonster, updatedMonster)
+            }
+        )
+        
+        return updatedBattleState.copy(
+            lastAction = "${targetMonster.name} seems to like the ${getTreatName(treatId)}! Affection increased by $affectionIncrease."
+        )
     }
     
     /**
@@ -365,5 +382,55 @@ class BattleEngine {
             actingMonster = enemyMonster,
             priority = if (action == BattleAction.SKILL) getSkillById(skillId ?: "")?.priority ?: 0 else 0
         )
+    }
+    
+    /**
+     * Calculate chance for wild monster to want to join after battle
+     */
+    private fun calculateJoinChance(monster: Monster): Float {
+        val baseChance = 0.1f // 10% base chance
+        val affectionBonus = monster.affection * 0.005f // 0.5% per affection point
+        val levelPenalty = (monster.level - 5) * 0.01f // Harder for higher level monsters
+        
+        return (baseChance + affectionBonus - levelPenalty.coerceAtLeast(0f)).coerceIn(0f, 0.8f)
+    }
+    
+    /**
+     * Get treat quality from treat ID
+     */
+    private fun getTreatQuality(treatId: String): TreatQuality {
+        return when (treatId) {
+            "basic_treat", "monster_food" -> TreatQuality.BASIC
+            "quality_treat", "delicious_treat" -> TreatQuality.QUALITY
+            "premium_treat", "gourmet_treat" -> TreatQuality.PREMIUM
+            else -> TreatQuality.BASIC
+        }
+    }
+    
+    /**
+     * Get display name for treat
+     */
+    private fun getTreatName(treatId: String): String {
+        return when (treatId) {
+            "basic_treat", "monster_food" -> "Monster Food"
+            "quality_treat" -> "Quality Treat"
+            "delicious_treat" -> "Delicious Treat"
+            "premium_treat" -> "Premium Treat"
+            "gourmet_treat" -> "Gourmet Treat"
+            else -> "Treat"
+        }
+    }
+    
+    /**
+     * Check if treat is preferred by monster type
+     */
+    private fun treatPreferredByType(treatId: String, monsterType: MonsterType): Boolean {
+        return when (treatId) {
+            "fire_treat" -> monsterType == MonsterType.FIRE
+            "water_treat" -> monsterType == MonsterType.WATER
+            "grass_treat" -> monsterType == MonsterType.GRASS
+            // Generic treats work for all types
+            else -> false
+        }
     }
 }

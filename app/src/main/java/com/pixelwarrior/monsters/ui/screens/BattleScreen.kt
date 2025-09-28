@@ -121,9 +121,9 @@ fun BattleScreen(
                         onContinue = onBattleEnd
                     )
                 }
-                BattlePhase.CAPTURE -> {
+                BattlePhase.MONSTER_JOINED -> {
                     BattleResultDisplay(
-                        result = "Monster Captured!",
+                        result = "Monster Wants to Join!",
                         onContinue = onBattleEnd
                     )
                 }
@@ -370,7 +370,7 @@ fun BattleLogDisplay(
                     BattlePhase.RESOLUTION -> "Calculating results..."
                     BattlePhase.VICTORY -> "You won the battle!"
                     BattlePhase.DEFEAT -> "You were defeated..."
-                    BattlePhase.CAPTURE -> "Monster captured successfully!"
+                    BattlePhase.MONSTER_JOINED -> "Monster wants to join your party!"
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White,
