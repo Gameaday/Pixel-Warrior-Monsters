@@ -6,7 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Gamepad2
+import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
@@ -131,7 +131,7 @@ fun GameSettingsScreen(
         // Gameplay Settings Section
         SettingsSection(
             title = "Gameplay Settings",
-            icon = Icons.Default.Gamepad2
+            icon = Icons.Default.Games
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),

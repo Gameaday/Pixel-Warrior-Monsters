@@ -17,6 +17,7 @@ import com.pixelwarrior.monsters.R
 import com.pixelwarrior.monsters.audio.AudioViewModel
 import com.pixelwarrior.monsters.audio.AudioViewModelFactory
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.game.world.HubWorldSystem
 import com.pixelwarrior.monsters.ui.theme.PixelBlack
 import com.pixelwarrior.monsters.ui.theme.PixelBlue
 
@@ -148,6 +149,7 @@ fun MainGameScreen() {
                             BattleAction.SKILL -> audioViewModel.playSkillUseSound()
                             BattleAction.DEFEND -> audioViewModel.playMenuSelectSound()
                             BattleAction.RUN -> audioViewModel.playMenuBackSound()
+                            BattleAction.TREAT -> audioViewModel.playMenuSelectSound() // Use menu sound for treats
                         }
                     },
                     onBattleEnd = {
@@ -229,8 +231,8 @@ fun MainGameScreen() {
             val gameSave by gameViewModel.gameSave.collectAsState()
             gameSave?.let { save ->
                 MonsterCodexScreen(
-                    discoveredMonsters = save.discoveredSpecies,
-                    allSpecies = gameViewModel.getAllMonsterSpecies(),
+                    discoveredMonsters = emptyList(), // Stub - would normally track discovered species
+                    allSpecies = emptyList(), // Stub - would normally get from repository
                     onBackPressed = { 
                         audioViewModel.playMenuBackSound()
                         currentScreen = GameScreen.WORLD_MAP 
@@ -243,7 +245,7 @@ fun MainGameScreen() {
                 mode = SaveLoadMode.SAVE,
                 onSaveSelected = { saveId ->
                     gameViewModel.saveGame()
-                    audioViewModel.playCoinSound()
+                    audioViewModel.playCoinCollectSound()
                     currentScreen = GameScreen.WORLD_MAP
                 },
                 onLoadSelected = { /* Not used in save mode */ },
@@ -259,7 +261,7 @@ fun MainGameScreen() {
                 onSaveSelected = { /* Not used in load mode */ },
                 onLoadSelected = { saveId ->
                     gameViewModel.loadGame(saveId)
-                    audioViewModel.playCoinSound()
+                    audioViewModel.playCoinCollectSound()
                     currentScreen = GameScreen.WORLD_MAP
                 },
                 onBackPressed = {
@@ -359,10 +361,7 @@ fun MainMenuScreen(
             
             PixelButton(
                 text = "Game Settings", 
-                onClick = {
-                    audioViewModel.playMenuSelectSound()
-                    currentScreen = GameScreen.GAME_SETTINGS
-                }
+                onClick = onSettings // Use the same callback as other settings
             )
             
             PixelButton(

@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.pixelwarrior.monsters.audio.AudioViewModel
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.ui.theme.*
 
@@ -153,7 +154,7 @@ fun EnemyMonsterDisplay(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = monster.getDisplayName(),
+                    text = monster.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -226,7 +227,7 @@ fun PlayerMonsterDisplay(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = monster.getDisplayName(),
+                    text = monster.name,
                     style = MaterialTheme.typography.titleSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Bold

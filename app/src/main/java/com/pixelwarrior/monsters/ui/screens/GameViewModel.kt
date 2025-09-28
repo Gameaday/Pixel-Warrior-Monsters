@@ -362,6 +362,25 @@ class GameViewModel : ViewModel() {
         }
     }
     
+    /**
+     * Add a game message for display
+     */
+    fun addGameMessage(message: String) {
+        _gameMessage.value = message
+        clearMessageAfterDelay()
+    }
+    
+    /**
+     * Update game settings
+     */
+    fun updateGameSettings(newSettings: GameSettings) {
+        _gameSave.value?.let { save ->
+            val updatedSave = save.copy(gameSettings = newSettings)
+            _gameSave.value = updatedSave
+            // In a real app, this would persist to the repository
+        }
+    }
+    
     // Hub World System Functions
     
     /**
@@ -414,7 +433,7 @@ class GameViewModel : ViewModel() {
      */
     fun interactWithNPC(npc: HubWorldSystem.HubNPC) {
         viewModelScope.launch {
-            _gameMessage.value = "${npc.name}: ${npc.dialogue.random()}"
+            _gameMessage.value = "${npc.displayName}: ${npc.dialogue.random()}"
             clearMessageAfterDelay()
             
             // Check for quest completion or item awards based on NPC
