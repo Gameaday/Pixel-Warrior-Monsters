@@ -7,6 +7,7 @@ import com.pixelwarrior.monsters.data.repository.GameRepository
 import com.pixelwarrior.monsters.data.database.GameDatabase
 import com.pixelwarrior.monsters.game.battle.BattleEngine
 import com.pixelwarrior.monsters.game.breeding.BreedingSystem
+import com.pixelwarrior.monsters.game.tournament.TournamentSystem
 import com.pixelwarrior.monsters.game.world.WorldExplorer
 import com.pixelwarrior.monsters.game.world.HubWorldSystem
 import com.pixelwarrior.monsters.game.story.StorySystem
@@ -379,6 +380,13 @@ class GameViewModel : ViewModel() {
             _gameSave.value = updatedSave
             // In a real app, this would persist to the repository
         }
+    }
+    
+    /**
+     * Get tournament system instance (stub)
+     */
+    fun getTournamentSystem(): TournamentSystem {
+        return TournamentSystem() // Create new instance each time for simplicity
     }
     
     // Hub World System Functions

@@ -17,6 +17,7 @@ import com.pixelwarrior.monsters.R
 import com.pixelwarrior.monsters.audio.AudioViewModel
 import com.pixelwarrior.monsters.audio.AudioViewModelFactory
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.game.synthesis.EnhancedMonster
 import com.pixelwarrior.monsters.game.world.HubWorldSystem
 import com.pixelwarrior.monsters.ui.theme.PixelBlack
 import com.pixelwarrior.monsters.ui.theme.PixelBlue
@@ -117,9 +118,10 @@ fun MainGameScreen() {
                         audioViewModel.playMenuSelectSound()
                         // Navigate to appropriate screen based on area
                         currentScreen = when (area) {
-                            HubWorldSystem.HubArea.BATTLE_ARENA -> GameScreen.BATTLE
+                            HubWorldSystem.HubArea.BATTLE_ARENA -> GameScreen.ARENA
                             HubWorldSystem.HubArea.BREEDING_LAB -> GameScreen.BREEDING
                             HubWorldSystem.HubArea.MONSTER_LIBRARY -> GameScreen.MONSTER_CODEX
+                            HubWorldSystem.HubArea.SYNTHESIS_LAB -> GameScreen.SYNTHESIS_LAB
                             HubWorldSystem.HubArea.GATE_CHAMBER -> GameScreen.DUNGEON_EXPLORATION
                             else -> GameScreen.WORLD_MAP
                         }
@@ -204,6 +206,90 @@ fun MainGameScreen() {
                 )
             }
         }
+        GameScreen.COOKING -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                CookingScreen(
+                    playerInventory = save.inventory,
+                    cookingSkill = save.cookingSkill,
+                    onCook = { recipe ->
+                        // This would normally trigger cooking in the game system
+                        gameViewModel.addGameMessage("Cooking ${recipe.name}...")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        GameScreen.MONSTER_DETAIL -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                if (save.partyMonsters.isNotEmpty()) {
+                    MonsterDetailScreen(
+                        monster = save.partyMonsters.first(), // Show first party monster as example
+                        onBack = {
+                            audioViewModel.playMenuBackSound()
+                            currentScreen = GameScreen.MONSTER_MANAGEMENT
+                        },
+                        onRename = { newName ->
+                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} renamed to $newName!")
+                        },
+                        onHeal = {
+                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} was healed!")
+                        },
+                        onGiveTreat = { treatType ->
+                            gameViewModel.addGameMessage("Gave ${treatType.replace("_", " ")} to ${save.partyMonsters.first().name}!")
+                        }
+                    )
+                } else {
+                    // Fallback if no monsters
+                    currentScreen = GameScreen.MONSTER_MANAGEMENT
+                }
+            }
+        }
+        GameScreen.SYNTHESIS_LAB -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                SynthesisLabScreen(
+                    availableMonsters = save.farmMonsters.map { EnhancedMonster(it) },
+                    availableItems = save.inventory.keys.toList(),
+                    onSynthesizeMonsters = { parent1, parent2 ->
+                        gameViewModel.addGameMessage("Synthesizing ${parent1.baseMonster.name} and ${parent2.baseMonster.name}...")
+                    },
+                    onEnhanceMonster = { monster ->
+                        gameViewModel.addGameMessage("Enhancing ${monster.baseMonster.name}...")
+                    },
+                    onStartScoutMission = { monster, missionType ->
+                        gameViewModel.addGameMessage("${monster.baseMonster.name} started a ${missionType.name.lowercase().replace("_", " ")} mission!")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        GameScreen.ARENA -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                ArenaScreen(
+                    tournamentSystem = gameViewModel.getTournamentSystem(),
+                    playerName = save.playerName,
+                    playerGold = save.gold.toInt(),
+                    playtime = save.playtimeMinutes,
+                    playerParty = save.partyMonsters,
+                    onBattleRival = { rival ->
+                        gameViewModel.addGameMessage("Challenging ${rival.name} to battle!")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
         GameScreen.AUDIO_SETTINGS -> {
             AudioSettingsScreen(
                 onBackPressed = { 
@@ -283,6 +369,33 @@ fun MainGameScreen() {
                 }
             )
         }
+        GameScreen.ENDGAME_CONTENT -> {
+            // Stub implementation for endgame content
+            EndgameContentScreen(
+                onBackPressed = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                }
+            )
+        }
+        GameScreen.QUALITY_OF_LIFE -> {
+            // Stub implementation for quality of life features
+            QualityOfLifeScreen(
+                onBackPressed = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                }
+            )
+        }
+        GameScreen.EXPLORATION_HUB -> {
+            // Stub implementation for exploration hub
+            ExplorationHubScreen(
+                onBackPressed = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                }
+            )
+        }
         GameScreen.CREDITS -> {
             CreditsScreen(
                 onBackPressed = { 
@@ -303,14 +416,21 @@ enum class GameScreen {
     HUB_WORLD,
     BATTLE,
     MONSTER_MANAGEMENT,
+    MONSTER_DETAIL,
     BREEDING,
+    COOKING,
+    SYNTHESIS_LAB,
+    ARENA,
     AUDIO_SETTINGS,
     GAME_SETTINGS,
     MONSTER_CODEX,
     CREDITS,
     SAVE_GAME,
     LOAD_GAME,
-    DUNGEON_EXPLORATION
+    DUNGEON_EXPLORATION,
+    ENDGAME_CONTENT,
+    QUALITY_OF_LIFE,
+    EXPLORATION_HUB
 }
 
 /**

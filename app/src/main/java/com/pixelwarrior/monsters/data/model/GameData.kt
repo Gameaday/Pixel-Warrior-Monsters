@@ -155,3 +155,24 @@ data class CookingSkill(
     val experience: Int = 0,
     val knownRecipes: List<String> = emptyList()
 ) : Parcelable
+
+/**
+ * Save/Load screen modes
+ */
+enum class SaveLoadMode {
+    SAVE, LOAD
+}
+
+/**
+ * Individual save slot data
+ */
+@Parcelize
+data class SaveSlot(
+    val id: String,
+    val playerName: String,
+    val playtimeMinutes: Long,
+    val currentLevel: String,
+    val partySize: Int,
+    val lastSaved: Long,
+    val previewImagePath: String? = null
+) : Parcelable
