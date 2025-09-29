@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pixelwarrior.monsters.data.model.Monster
+import com.pixelwarrior.monsters.ui.components.DQMButton
 import com.pixelwarrior.monsters.game.synthesis.*
 import com.pixelwarrior.monsters.ui.components.*
 import com.pixelwarrior.monsters.ui.theme.*
@@ -239,7 +240,9 @@ private fun SynthesisTab(
                         availableItems = availableItems,
                         onSynthesize = {
                             selectedMonster1?.let { m1 ->
-                                onSynthesizeMonsters(m1, preview.partner)
+                                selectedMonster2?.let { m2 ->
+                                    onSynthesizeMonsters(m1, m2)
+                                }
                             }
                         }
                     )
@@ -511,12 +514,12 @@ private fun SynthesisPreviewCard(
     availableItems: List<String>,
     onSynthesize: () -> Unit
 ) {
-    val hasRequiredItem = preview.recipe.requiredItem?.let { availableItems.contains(it) } ?: true
+    val hasRequiredItem = preview.cost.gold <= 1000 // Stub check for available resources
     
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (hasRequiredItem) PixelGreen else PixelGray
+            containerColor = if (preview.isCompatible && hasRequiredItem) PixelGreen else PixelGray
         )
     ) {
         Row(
@@ -528,7 +531,7 @@ private fun SynthesisPreviewCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = preview.recipe.resultSpeciesId.replace("_", " ").uppercase(),
+                    text = if (preview.isCompatible) "Synthesis Result" else "Incompatible",
                     fontSize = 12.sp,
                     color = PixelWhite,
                     fontWeight = FontWeight.Bold
@@ -538,16 +541,16 @@ private fun SynthesisPreviewCard(
                     fontSize = 10.sp,
                     color = PixelLightGray
                 )
-                preview.recipe.requiredItem?.let { item ->
+                if (preview.cost.gold > 0) {
                     Text(
-                        text = "Requires: $item ${if (hasRequiredItem) "✓" else "✗"}",
+                        text = "Cost: ${preview.cost.gold} gold ${if (hasRequiredItem) "✓" else "✗"}",
                         fontSize = 10.sp,
                         color = if (hasRequiredItem) PixelGreen else PixelRed
                     )
                 }
             }
             
-            if (hasRequiredItem) {
+            if (preview.isCompatible && hasRequiredItem) {
                 Button(
                     onClick = onSynthesize,
                     colors = ButtonDefaults.buttonColors(containerColor = PixelYellow)

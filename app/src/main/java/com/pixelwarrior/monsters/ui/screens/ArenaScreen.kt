@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +30,9 @@ import com.pixelwarrior.monsters.data.model.Monster
 @Composable
 fun ArenaScreen(
     tournamentSystem: TournamentSystem,
+    playerName: String = "Player",
     playerGold: Int,
+    playtime: Long = 0,
     playerParty: List<Monster>,
     onBattleRival: (RivalTrainer) -> Unit,
     onBack: () -> Unit
@@ -64,7 +67,9 @@ fun ArenaScreen(
             )
             
             GameInfoPanel(
-                gold = playerGold,
+                playerName = playerName,
+                gold = playerGold.toLong(),
+                playtime = playtime,
                 partySize = playerParty.size,
                 modifier = Modifier.widthIn(max = 120.dp)
             )
@@ -554,12 +559,12 @@ private fun getTypeColor(type: com.pixelwarrior.monsters.data.model.MonsterType)
         com.pixelwarrior.monsters.data.model.MonsterType.GRASS -> Color.Green
         com.pixelwarrior.monsters.data.model.MonsterType.ELECTRIC -> Color.Yellow
         com.pixelwarrior.monsters.data.model.MonsterType.ICE -> Color.Cyan
-        com.pixelwarrior.monsters.data.model.MonsterType.AIR -> Color.White
-        com.pixelwarrior.monsters.data.model.MonsterType.EARTH -> Color(0xFF8B4513) // SaddleBrown
+        com.pixelwarrior.monsters.data.model.MonsterType.FLYING -> Color.White
+        com.pixelwarrior.monsters.data.model.MonsterType.GROUND -> Color(0xFF8B4513) // SaddleBrown
         com.pixelwarrior.monsters.data.model.MonsterType.STEEL -> Color.Gray
         com.pixelwarrior.monsters.data.model.MonsterType.DARK -> Color.Magenta
-        com.pixelwarrior.monsters.data.model.MonsterType.LIGHT -> Color.White
-        com.pixelwarrior.monsters.data.model.MonsterType.CRYSTAL -> Color(0xFFFF69B4) // HotPink
+        com.pixelwarrior.monsters.data.model.MonsterType.PSYCHIC -> Color.White
+        com.pixelwarrior.monsters.data.model.MonsterType.ROCK -> Color(0xFFFF69B4) // HotPink
         else -> Color.White
     }
 }

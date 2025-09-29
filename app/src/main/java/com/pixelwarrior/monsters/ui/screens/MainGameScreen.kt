@@ -17,6 +17,8 @@ import com.pixelwarrior.monsters.R
 import com.pixelwarrior.monsters.audio.AudioViewModel
 import com.pixelwarrior.monsters.audio.AudioViewModelFactory
 import com.pixelwarrior.monsters.data.model.*
+import com.pixelwarrior.monsters.game.synthesis.EnhancedMonster
+import com.pixelwarrior.monsters.game.world.HubWorldSystem
 import com.pixelwarrior.monsters.ui.theme.PixelBlack
 import com.pixelwarrior.monsters.ui.theme.PixelBlue
 
@@ -116,9 +118,10 @@ fun MainGameScreen() {
                         audioViewModel.playMenuSelectSound()
                         // Navigate to appropriate screen based on area
                         currentScreen = when (area) {
-                            HubWorldSystem.HubArea.BATTLE_ARENA -> GameScreen.BATTLE
+                            HubWorldSystem.HubArea.BATTLE_ARENA -> GameScreen.ARENA
                             HubWorldSystem.HubArea.BREEDING_LAB -> GameScreen.BREEDING
                             HubWorldSystem.HubArea.MONSTER_LIBRARY -> GameScreen.MONSTER_CODEX
+                            HubWorldSystem.HubArea.SYNTHESIS_LAB -> GameScreen.SYNTHESIS_LAB
                             HubWorldSystem.HubArea.GATE_CHAMBER -> GameScreen.DUNGEON_EXPLORATION
                             else -> GameScreen.WORLD_MAP
                         }
@@ -148,13 +151,14 @@ fun MainGameScreen() {
                             BattleAction.SKILL -> audioViewModel.playSkillUseSound()
                             BattleAction.DEFEND -> audioViewModel.playMenuSelectSound()
                             BattleAction.RUN -> audioViewModel.playMenuBackSound()
+                            BattleAction.TREAT -> audioViewModel.playMenuSelectSound() // Use menu sound for treats
                         }
                     },
                     onBattleEnd = {
                         when (state.battlePhase) {
                             BattlePhase.VICTORY -> audioViewModel.playVictoryMusic()
                             BattlePhase.DEFEAT -> audioViewModel.playGameOverMusic()
-                            BattlePhase.CAPTURE -> audioViewModel.playMonsterCaptureSound()
+                            BattlePhase.MONSTER_JOINED -> audioViewModel.playMonsterCaptureSound() // Reuse the same sound for joining
                             else -> { /* No special music */ }
                         }
                         gameViewModel.endBattle()
@@ -202,6 +206,90 @@ fun MainGameScreen() {
                 )
             }
         }
+        GameScreen.COOKING -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                CookingScreen(
+                    playerInventory = save.inventory,
+                    cookingSkill = save.cookingSkill,
+                    onCook = { recipe ->
+                        // This would normally trigger cooking in the game system
+                        gameViewModel.addGameMessage("Cooking ${recipe.name}...")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        GameScreen.MONSTER_DETAIL -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                if (save.partyMonsters.isNotEmpty()) {
+                    MonsterDetailScreen(
+                        monster = save.partyMonsters.first(), // Show first party monster as example
+                        onBack = {
+                            audioViewModel.playMenuBackSound()
+                            currentScreen = GameScreen.MONSTER_MANAGEMENT
+                        },
+                        onRename = { newName ->
+                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} renamed to $newName!")
+                        },
+                        onHeal = {
+                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} was healed!")
+                        },
+                        onGiveTreat = { treatType ->
+                            gameViewModel.addGameMessage("Gave ${treatType.replace("_", " ")} to ${save.partyMonsters.first().name}!")
+                        }
+                    )
+                } else {
+                    // Fallback if no monsters
+                    currentScreen = GameScreen.MONSTER_MANAGEMENT
+                }
+            }
+        }
+        GameScreen.SYNTHESIS_LAB -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                SynthesisLabScreen(
+                    availableMonsters = save.farmMonsters.map { EnhancedMonster(it) },
+                    availableItems = save.inventory.keys.toList(),
+                    onSynthesizeMonsters = { parent1, parent2 ->
+                        gameViewModel.addGameMessage("Synthesizing ${parent1.baseMonster.name} and ${parent2.baseMonster.name}...")
+                    },
+                    onEnhanceMonster = { monster ->
+                        gameViewModel.addGameMessage("Enhancing ${monster.baseMonster.name}...")
+                    },
+                    onStartScoutMission = { monster, missionType ->
+                        gameViewModel.addGameMessage("${monster.baseMonster.name} started a ${missionType.name.lowercase().replace("_", " ")} mission!")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        GameScreen.ARENA -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                ArenaScreen(
+                    tournamentSystem = gameViewModel.getTournamentSystem(),
+                    playerName = save.playerName,
+                    playerGold = save.gold.toInt(),
+                    playtime = save.playtimeMinutes,
+                    playerParty = save.partyMonsters,
+                    onBattleRival = { rival ->
+                        gameViewModel.addGameMessage("Challenging ${rival.name} to battle!")
+                    },
+                    onBack = {
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
         GameScreen.AUDIO_SETTINGS -> {
             AudioSettingsScreen(
                 onBackPressed = { 
@@ -229,8 +317,8 @@ fun MainGameScreen() {
             val gameSave by gameViewModel.gameSave.collectAsState()
             gameSave?.let { save ->
                 MonsterCodexScreen(
-                    discoveredMonsters = save.discoveredSpecies,
-                    allSpecies = gameViewModel.getAllMonsterSpecies(),
+                    discoveredMonsters = emptyList(), // Stub - would normally track discovered species
+                    allSpecies = emptyList(), // Stub - would normally get from repository
                     onBackPressed = { 
                         audioViewModel.playMenuBackSound()
                         currentScreen = GameScreen.WORLD_MAP 
@@ -243,7 +331,7 @@ fun MainGameScreen() {
                 mode = SaveLoadMode.SAVE,
                 onSaveSelected = { saveId ->
                     gameViewModel.saveGame()
-                    audioViewModel.playCoinSound()
+                    audioViewModel.playCoinCollectSound()
                     currentScreen = GameScreen.WORLD_MAP
                 },
                 onLoadSelected = { /* Not used in save mode */ },
@@ -259,7 +347,7 @@ fun MainGameScreen() {
                 onSaveSelected = { /* Not used in load mode */ },
                 onLoadSelected = { saveId ->
                     gameViewModel.loadGame(saveId)
-                    audioViewModel.playCoinSound()
+                    audioViewModel.playCoinCollectSound()
                     currentScreen = GameScreen.WORLD_MAP
                 },
                 onBackPressed = {
@@ -278,6 +366,56 @@ fun MainGameScreen() {
                 onBattleStart = { wildMonster ->
                     gameViewModel.startBattleWithWildMonster(wildMonster)
                     currentScreen = GameScreen.BATTLE
+                }
+            )
+        }
+        GameScreen.ENDGAME_CONTENT -> {
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                EndgameContentScreen(
+                    playerLevel = save.partyMonsters.firstOrNull()?.level ?: 1,
+                    completedMainStory = save.storyProgress["main_story_complete"] == true,
+                    defeatedChampion = save.storyProgress["champion_defeated"] == true,
+                    achievements = save.storyProgress.filterValues { it == true }.keys.toList(),
+                    statistics = emptyMap(), // Stub - no statistics field in current GameSave
+                    currentPlaythrough = 1, // Stub - no playthrough tracking in current GameSave
+                    onNavigateToPostGameDungeon = { dungeon ->
+                        audioViewModel.playMenuSelectSound()
+                        // Navigate to specific post-game dungeon
+                        currentScreen = GameScreen.DUNGEON_EXPLORATION
+                    },
+                    onNavigateToAdditionalWorld = { world ->
+                        audioViewModel.playMenuSelectSound()
+                        // Navigate to additional world
+                        currentScreen = GameScreen.WORLD_MAP
+                    },
+                    onStartNewGamePlus = {
+                        audioViewModel.playMenuSelectSound()
+                        gameViewModel.startNewGamePlus()
+                        currentScreen = GameScreen.WORLD_MAP
+                    },
+                    onNavigateBack = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
+        }
+        GameScreen.QUALITY_OF_LIFE -> {
+            QualityOfLifeScreen(
+                qolSystem = gameViewModel.getQoLSystem(),
+                onBackPress = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
+                }
+            )
+        }
+        GameScreen.EXPLORATION_HUB -> {
+            ExplorationHubScreen(
+                explorationSystem = gameViewModel.getExplorationSystem(),
+                onBack = { 
+                    audioViewModel.playMenuBackSound()
+                    currentScreen = GameScreen.WORLD_MAP
                 }
             )
         }
@@ -301,14 +439,21 @@ enum class GameScreen {
     HUB_WORLD,
     BATTLE,
     MONSTER_MANAGEMENT,
+    MONSTER_DETAIL,
     BREEDING,
+    COOKING,
+    SYNTHESIS_LAB,
+    ARENA,
     AUDIO_SETTINGS,
     GAME_SETTINGS,
     MONSTER_CODEX,
     CREDITS,
     SAVE_GAME,
     LOAD_GAME,
-    DUNGEON_EXPLORATION
+    DUNGEON_EXPLORATION,
+    ENDGAME_CONTENT,
+    QUALITY_OF_LIFE,
+    EXPLORATION_HUB
 }
 
 /**
@@ -359,10 +504,7 @@ fun MainMenuScreen(
             
             PixelButton(
                 text = "Game Settings", 
-                onClick = {
-                    audioViewModel.playMenuSelectSound()
-                    currentScreen = GameScreen.GAME_SETTINGS
-                }
+                onClick = onSettings // Use the same callback as other settings
             )
             
             PixelButton(
@@ -542,85 +684,3 @@ fun WorldMapScreen(
     )
 }
 
-/**
- * Credits screen showing game development information
- */
-@Composable
-fun CreditsScreen(
-    onBackPressed: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PixelBlack),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(24.dp)
-        ) {
-            Text(
-                text = "Credits",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = "Pixel Warrior Monsters",
-                style = MaterialTheme.typography.titleMedium,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "An open-source reimagining of classic monster collecting RPGs",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Development:",
-                style = MaterialTheme.typography.titleSmall,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "Game Design & Programming\nOriginal Pixel Art & Music\nAndroid Implementation",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Special Thanks:",
-                style = MaterialTheme.typography.titleSmall,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "Classic monster collecting games for inspiration\nOpen source community\nPixel art and chiptune music communities",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            PixelButton(
-                text = "Back to Menu",
-                onClick = onBackPressed
-            )
-        }
-    }
-}

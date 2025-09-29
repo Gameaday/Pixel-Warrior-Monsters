@@ -36,7 +36,7 @@ class HubWorldSystem(private val storySystem: StorySystem) {
      */
     enum class HubNPC(
         val id: String,
-        val name: String,
+        val displayName: String,
         val title: String,
         val location: HubArea,
         val dialogue: List<String>

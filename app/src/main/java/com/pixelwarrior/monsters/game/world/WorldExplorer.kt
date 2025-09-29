@@ -112,7 +112,18 @@ class WorldExplorer {
             Item("healing_herb", "Healing Herb", "Restores 50 HP", ItemType.HEALING, 10, usableInField = true),
             Item("magic_water", "Magic Water", "Restores 30 MP", ItemType.HEALING, 15, usableInField = true),
             Item("monster_food", "Monster Food", "Increases friendship", ItemType.FOOD, 5),
-            Item("capture_stone", "Capture Stone", "Helps capture wild monsters", ItemType.CAPTURE, 50, usableInBattle = true)
+            
+            // Cooking ingredients  
+            Item("berries", "Fresh Berries", "Sweet berries for cooking treats", ItemType.COOKING_INGREDIENT, 2),
+            Item("grain", "Wild Grain", "Nutritious grain for monster food", ItemType.COOKING_INGREDIENT, 1),
+            Item("herbs", "Aromatic Herbs", "Fragrant herbs that monsters love", ItemType.COOKING_INGREDIENT, 3),
+            Item("honey", "Pure Honey", "Sweet honey for quality treats", ItemType.COOKING_INGREDIENT, 8),
+            Item("spicy_peppers", "Spicy Peppers", "Hot peppers for fire treats", ItemType.COOKING_INGREDIENT, 5),
+            Item("fresh_leaves", "Fresh Leaves", "Tender leaves for grass treats", ItemType.COOKING_INGREDIENT, 2),
+            
+            // Pre-made treats
+            Item("basic_treat", "Basic Monster Treat", "A simple treat that monsters enjoy", ItemType.BASIC_TREAT, 15, usableInBattle = true),
+            Item("quality_treat", "Quality Monster Treat", "A delicious treat that increases affection significantly", ItemType.QUALITY_TREAT, 35, usableInBattle = true)
         )
         return items.randomOrNull()
     }

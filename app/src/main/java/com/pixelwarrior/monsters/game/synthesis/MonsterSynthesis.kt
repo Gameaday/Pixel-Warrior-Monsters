@@ -82,7 +82,7 @@ data class EnhancedMonster(
      * Calculate enhanced stats based on plus level and personality
      */
     fun getEnhancedStats(): MonsterStats {
-        val base = baseMonster.stats
+        val base = baseMonster.currentStats
         val plusMultiplier = plusLevel.statMultiplier
         val personalityBonus = personality.growthBonus
         
@@ -232,12 +232,12 @@ class MonsterSynthesis {
             currentHp = avgStats.maxHp,
             currentMp = avgStats.maxMp,
             experience = 0L,
-            stats = avgStats,
+            experienceToNext = calculateExperienceToNext(level),
+            baseStats = avgStats,
+            currentStats = avgStats,
             skills = (parent1.baseMonster.skills + parent2.baseMonster.skills).distinct().take(6),
             traits = (parent1.baseMonster.traits + parent2.baseMonster.traits).distinct().take(3),
-            growthRate = parent1.baseMonster.growthRate, // Inherit from stronger parent
-            friendship = 50, // Start with neutral friendship
-            isFainted = false
+            growthRate = parent1.baseMonster.growthRate // Inherit from stronger parent
         )
         
         // Create enhanced monster with synthesis data
@@ -276,6 +276,19 @@ class MonsterSynthesis {
     }
     
     /**
+     * Calculate experience needed for next level based on growth rate
+     */
+    private fun calculateExperienceToNext(level: Int, growthRate: GrowthRate = GrowthRate.MEDIUM_FAST): Long {
+        return when (growthRate) {
+            GrowthRate.FAST -> (level * level * level * 0.8).toLong()
+            GrowthRate.MEDIUM_FAST -> (level * level * level).toLong()
+            GrowthRate.MEDIUM_SLOW -> (level * level * level * 1.2).toLong()
+            GrowthRate.SLOW -> (level * level * level * 1.5).toLong()
+            GrowthRate.VERY_FAST -> (level * level * level * 0.6).toLong()
+        }
+    }
+    
+    /**
      * Generate a name for synthesized monster
      */
     private fun generateSynthesisName(parent1Name: String, parent2Name: String): String {
@@ -294,12 +307,13 @@ class MonsterSynthesis {
     fun getPossibleSyntheses(monster: EnhancedMonster, availableMonsters: List<EnhancedMonster>): List<SynthesisPreview> {
         return availableMonsters.mapNotNull { partner ->
             val recipe = findSynthesisRecipe(monster, partner)
-            recipe?.let { 
+            recipe?.let {
+                val successRate = calculateSuccessRate(monster, partner, it)
                 SynthesisPreview(
-                    recipe = it,
-                    partner = partner,
-                    successRate = calculateSuccessRate(monster, partner, it),
-                    requiredLevel = maxOf(it.minimumLevel, partner.baseMonster.level)
+                    isCompatible = true,
+                    possibleOffspring = listOf(it.resultSpeciesId),
+                    successRate = successRate,
+                    cost = SynthesisCost(gold = (monster.baseMonster.level + partner.baseMonster.level) * 100)
                 )
             }
         }
@@ -310,6 +324,55 @@ class MonsterSynthesis {
         val levelBonus = ((monster1.baseMonster.level + monster2.baseMonster.level) / 100f).coerceAtMost(0.2f)
         return (baseChance + levelBonus).coerceAtMost(0.95f)
     }
+    
+    /**
+     * Check if two monsters can be synthesized
+     */
+    fun checkCompatibility(parent1: EnhancedMonster, parent2: EnhancedMonster): CompatibilityResult {
+        // Cannot synthesize same species
+        if (parent1.baseMonster.speciesId == parent2.baseMonster.speciesId) {
+            return CompatibilityResult.SameSpecies
+        }
+        
+        // Check level requirements
+        val minLevel = 10 // Minimum level for synthesis
+        if (parent1.baseMonster.level < minLevel || parent2.baseMonster.level < minLevel) {
+            return CompatibilityResult.LevelTooLow(minLevel)
+        }
+        
+        // Check if families are compatible
+        val recipe = findSynthesisRecipe(parent1, parent2)
+        if (recipe == null) {
+            return CompatibilityResult.IncompatibleFamily
+        }
+        
+        return CompatibilityResult.Compatible(recipe)
+    }
+    
+    /**
+     * Get possible synthesis results for two compatible monsters
+     */
+    fun getPossibleSynthesisResults(parent1: EnhancedMonster, parent2: EnhancedMonster): List<String> {
+        val recipe = findSynthesisRecipe(parent1, parent2) ?: return emptyList()
+        return listOf(recipe.resultSpeciesId)
+    }
+    
+    /**
+     * Get all available recipes
+     */
+    fun getAllRecipes(): List<SynthesisRecipe> {
+        return synthesisRecipes
+    }
+}
+
+/**
+ * Result of compatibility check between two monsters
+ */
+sealed class CompatibilityResult {
+    data class Compatible(val recipe: SynthesisRecipe) : CompatibilityResult()
+    object IncompatibleFamily : CompatibilityResult()
+    data class LevelTooLow(val minimumLevel: Int) : CompatibilityResult()
+    object SameSpecies : CompatibilityResult()
 }
 
 /**
@@ -318,17 +381,8 @@ class MonsterSynthesis {
 sealed class SynthesisResult {
     data class Success(val synthesizedMonster: EnhancedMonster, val usedItem: String?) : SynthesisResult()
     data class Failure(val reason: String) : SynthesisResult()
+    data class InProgress(val process: SynthesisProcess) : SynthesisResult()
 }
-
-/**
- * Preview of possible synthesis
- */
-data class SynthesisPreview(
-    val recipe: SynthesisRecipe,
-    val partner: EnhancedMonster,
-    val successRate: Float,
-    val requiredLevel: Int
-)
 
 /**
  * Plus System for enhancing existing monsters

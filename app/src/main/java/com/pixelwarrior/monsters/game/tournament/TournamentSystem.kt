@@ -3,9 +3,7 @@ package com.pixelwarrior.monsters.game.tournament
 import com.pixelwarrior.monsters.data.model.Monster
 import com.pixelwarrior.monsters.data.model.MonsterType
 import com.pixelwarrior.monsters.data.model.MonsterFamily
-import com.pixelwarrior.monsters.data.model.Personality
-import com.pixelwarrior.monsters.game.battle.BattleEngine
-import com.pixelwarrior.monsters.data.model.Battle
+import com.pixelwarrior.monsters.data.model.MonsterStats
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -51,10 +49,10 @@ data class RivalTrainer(
                     createTeam(MonsterType.FIRE, 18), signature = "Always leads with fire attacks"),
                 RivalTrainer("marcus", "Marcus", "Water Guardian", MonsterType.WATER, 4, "Defensive", 
                     createTeam(MonsterType.WATER, 22), signature = "Focuses on healing and defense"),
-                RivalTrainer("aria", "Aria", "Wind Dancer", MonsterType.AIR, 5, "Swift", 
-                    createTeam(MonsterType.AIR, 25), signature = "Emphasizes speed and evasion"),
-                RivalTrainer("zane", "Zane", "Earth Shaker", MonsterType.EARTH, 6, "Sturdy", 
-                    createTeam(MonsterType.EARTH, 28), signature = "Builds defensive walls"),
+                RivalTrainer("aria", "Aria", "Wind Dancer", MonsterType.FLYING, 5, "Swift", 
+                    createTeam(MonsterType.FLYING, 25), signature = "Emphasizes speed and evasion"),
+                RivalTrainer("zane", "Zane", "Earth Shaker", MonsterType.GROUND, 6, "Sturdy", 
+                    createTeam(MonsterType.GROUND, 28), signature = "Builds defensive walls"),
                 RivalTrainer("nova", "Nova", "Spark Master", MonsterType.ELECTRIC, 7, "Energetic", 
                     createTeam(MonsterType.ELECTRIC, 30), signature = "Paralyzes opponents first"),
                 RivalTrainer("ivy", "Ivy", "Nature's Voice", MonsterType.GRASS, 5, "Calm", 
@@ -63,12 +61,12 @@ data class RivalTrainer(
                     createTeam(MonsterType.ICE, 27), signature = "Freezes enemies methodically"),
                 RivalTrainer("shadow", "Shadow", "Dark Whisper", MonsterType.DARK, 8, "Mysterious", 
                     createTeam(MonsterType.DARK, 32), signature = "Unpredictable battle style"),
-                RivalTrainer("luna", "Luna", "Light Bearer", MonsterType.LIGHT, 7, "Noble", 
-                    createTeam(MonsterType.LIGHT, 31), signature = "Heals while dealing damage"),
+                RivalTrainer("luna", "Luna", "Light Bearer", MonsterType.PSYCHIC, 7, "Noble", 
+                    createTeam(MonsterType.PSYCHIC, 31), signature = "Heals while dealing damage"),
                 RivalTrainer("steel", "Steel", "Iron Wall", MonsterType.STEEL, 6, "Methodical", 
                     createTeam(MonsterType.STEEL, 29), signature = "Outlasts opponents"),
-                RivalTrainer("crystal", "Crystal", "Gem Collector", MonsterType.CRYSTAL, 8, "Precise", 
-                    createTeam(MonsterType.CRYSTAL, 33), signature = "Critical hits specialist"),
+                RivalTrainer("crystal", "Crystal", "Gem Collector", MonsterType.ROCK, 8, "Precise", 
+                    createTeam(MonsterType.ROCK, 33), signature = "Critical hits specialist"),
                 RivalTrainer("void", "Void", "Champion of Champions", MonsterType.DARK, 10, "Legendary", 
                     createMasterTeam(), signature = "Adapts to any strategy")
             )
@@ -78,29 +76,31 @@ data class RivalTrainer(
             val team = mutableListOf<Monster>()
             repeat(4) { index ->
                 val level = avgLevel + Random.nextInt(-3, 4)
+                val baseStats = MonsterStats(
+                    attack = Random.nextInt(40, 80),
+                    defense = Random.nextInt(35, 75),
+                    agility = Random.nextInt(30, 70),
+                    magic = Random.nextInt(25, 65),
+                    wisdom = Random.nextInt(25, 65),
+                    maxHp = Random.nextInt(60, 120),
+                    maxMp = Random.nextInt(20, 60)
+                )
                 val monster = Monster(
                     id = "rival_${type.name.lowercase()}_$index",
-                    speciesName = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} ${getSpeciesName(index)}",
-                    type = type,
-                    secondaryType = if (Random.nextFloat() < 0.3f) MonsterType.values().random() else null,
+                    speciesId = "${type.name.lowercase()}_${getSpeciesName(index)}",
+                    name = "${type.name.lowercase().replaceFirstChar { it.uppercase() }} ${getSpeciesName(index)}",
+                    type1 = type,
+                    type2 = if (Random.nextFloat() < 0.3f) MonsterType.values().random() else null,
                     family = MonsterFamily.values().random(),
                     level = level.coerceIn(1, 50),
-                    baseAttack = Random.nextInt(40, 80),
-                    baseDefense = Random.nextInt(35, 75),
-                    baseAgility = Random.nextInt(30, 70),
-                    baseMagic = Random.nextInt(25, 65),
-                    baseWisdom = Random.nextInt(25, 65),
-                    baseHp = Random.nextInt(60, 120),
-                    baseMp = Random.nextInt(20, 60),
-                    currentHp = 0, // Will be calculated
-                    currentMp = 0, // Will be calculated
-                    experience = 0,
-                    personality = Personality.values().random(),
+                    currentHp = baseStats.maxHp,
+                    currentMp = baseStats.maxMp,
+                    experience = 0L,
+                    experienceToNext = calculateExperienceToNext(level.coerceIn(1, 50)),
+                    baseStats = baseStats,
+                    currentStats = baseStats,
                     skills = listOf("Basic Attack", "${type.name} Strike", "Defend")
                 )
-                // Calculate current stats based on level
-                monster.currentHp = monster.maxHp
-                monster.currentMp = monster.maxMp
                 team.add(monster)
             }
             return team
@@ -108,86 +108,86 @@ data class RivalTrainer(
 
         private fun createMasterTeam(): List<Monster> {
             return listOf(
-                Monster(
-                    id = "void_dragon",
-                    speciesName = "Void Dragon",
-                    type = MonsterType.DARK,
-                    secondaryType = MonsterType.CRYSTAL,
-                    family = MonsterFamily.DRAGON,
-                    level = 50,
-                    baseAttack = 95,
-                    baseDefense = 85,
-                    baseAgility = 80,
-                    baseMagic = 90,
-                    baseWisdom = 85,
-                    baseHp = 150,
-                    baseMp = 80,
-                    currentHp = 0,
-                    currentMp = 0,
-                    experience = 0,
-                    personality = Personality.ADAMANT,
-                    skills = listOf("Void Strike", "Crystal Beam", "Dark Heal", "Dragon Roar")
-                ).apply { currentHp = maxHp; currentMp = maxMp },
-                Monster(
-                    id = "void_phoenix",
-                    speciesName = "Void Phoenix",
-                    type = MonsterType.FIRE,
-                    secondaryType = MonsterType.AIR,
-                    family = MonsterFamily.BIRD,
-                    level = 48,
-                    baseAttack = 85,
-                    baseDefense = 70,
-                    baseAgility = 95,
-                    baseMagic = 90,
-                    baseWisdom = 80,
-                    baseHp = 130,
-                    baseMp = 90,
-                    currentHp = 0,
-                    currentMp = 0,
-                    experience = 0,
-                    personality = Personality.HASTY,
-                    skills = listOf("Phoenix Fire", "Wind Slash", "Regenerate", "Sky Dance")
-                ).apply { currentHp = maxHp; currentMp = maxMp },
-                Monster(
-                    id = "void_leviathan",
-                    speciesName = "Void Leviathan",
-                    type = MonsterType.WATER,
-                    secondaryType = MonsterType.ICE,
-                    family = MonsterFamily.BEAST,
-                    level = 49,
-                    baseAttack = 80,
-                    baseDefense = 95,
-                    baseAgility = 70,
-                    baseMagic = 85,
-                    baseWisdom = 90,
-                    baseHp = 160,
-                    baseMp = 85,
-                    currentHp = 0,
-                    currentMp = 0,
-                    experience = 0,
-                    personality = Personality.BOLD,
-                    skills = listOf("Tidal Wave", "Frost Armor", "Deep Heal", "Leviathan's Wrath")
-                ).apply { currentHp = maxHp; currentMp = maxMp },
-                Monster(
-                    id = "void_titan",
-                    speciesName = "Void Titan",
-                    type = MonsterType.EARTH,
-                    secondaryType = MonsterType.STEEL,
-                    family = MonsterFamily.MATERIAL,
-                    level = 50,
-                    baseAttack = 100,
-                    baseDefense = 100,
-                    baseAgility = 60,
-                    baseMagic = 75,
-                    baseWisdom = 80,
-                    baseHp = 180,
-                    baseMp = 70,
-                    currentHp = 0,
-                    currentMp = 0,
-                    experience = 0,
-                    personality = Personality.HARDY,
-                    skills = listOf("Earthquake", "Steel Fist", "Rock Shield", "Titan's Rage")
-                ).apply { currentHp = maxHp; currentMp = maxMp }
+                // Void Dragon
+                run {
+                    val baseStats = MonsterStats(95, 85, 80, 90, 85, 150, 80)
+                    Monster(
+                        id = "void_dragon",
+                        speciesId = "void_dragon_species",
+                        name = "Void Dragon",
+                        type1 = MonsterType.DARK,
+                        type2 = MonsterType.ROCK, // Crystal -> Rock
+                        family = MonsterFamily.DRAGON,
+                        level = 50,
+                        currentHp = baseStats.maxHp,
+                        currentMp = baseStats.maxMp,
+                        experience = 0,
+                        experienceToNext = calculateExperienceToNext(50),
+                        baseStats = baseStats,
+                        currentStats = baseStats,
+                        skills = listOf("Void Strike", "Crystal Beam", "Dark Heal", "Dragon Roar")
+                    )
+                },
+                // Void Phoenix
+                run {
+                    val baseStats = MonsterStats(85, 70, 95, 90, 80, 130, 90)
+                    Monster(
+                        id = "void_phoenix",
+                        speciesId = "void_phoenix_species",
+                        name = "Void Phoenix",
+                        type1 = MonsterType.FIRE,
+                        type2 = MonsterType.FLYING, // AIR -> FLYING
+                        family = MonsterFamily.BIRD,
+                        level = 48,
+                        currentHp = baseStats.maxHp,
+                        currentMp = baseStats.maxMp,
+                        experience = 0,
+                        experienceToNext = calculateExperienceToNext(48),
+                        baseStats = baseStats,
+                        currentStats = baseStats,
+                        skills = listOf("Phoenix Fire", "Wind Slash", "Regenerate", "Sky Dance")
+                    )
+                },
+                // Void Leviathan  
+                run {
+                    val baseStats = MonsterStats(80, 95, 70, 85, 90, 160, 85)
+                    Monster(
+                        id = "void_leviathan",
+                        speciesId = "void_leviathan_species",
+                        name = "Void Leviathan",
+                        type1 = MonsterType.WATER,
+                        type2 = MonsterType.ICE,
+                        family = MonsterFamily.BEAST,
+                        level = 49,
+                        currentHp = baseStats.maxHp,
+                        currentMp = baseStats.maxMp,
+                        experience = 0,
+                        experienceToNext = calculateExperienceToNext(49),
+                        baseStats = baseStats,
+                        currentStats = baseStats,
+                        skills = listOf("Tidal Wave", "Frost Armor", "Deep Heal", "Leviathan's Wrath")
+                    )
+                },
+                // Void Titan
+                run {
+                    val baseStats = MonsterStats(100, 100, 60, 75, 80, 180, 70)
+                    Monster(
+                        id = "void_titan",
+                        speciesId = "void_titan_species",
+                        name = "Void Titan",
+                        type1 = MonsterType.GROUND, // EARTH -> GROUND
+                        type2 = MonsterType.STEEL,
+                        family = MonsterFamily.MATERIAL,
+                        level = 50,
+                        currentHp = baseStats.maxHp,
+                        currentMp = baseStats.maxMp,
+                        experience = 0,
+                        experienceToNext = calculateExperienceToNext(50),
+                        baseStats = baseStats,
+                        currentStats = baseStats,
+                        skills = listOf("Earthquake", "Steel Fist", "Rock Shield", "Titan's Rage")
+                    )
+                }
             )
         }
 
@@ -199,6 +199,10 @@ data class RivalTrainer(
                 3 -> "Champion"
                 else -> "Fighter"
             }
+        }
+        
+        private fun calculateExperienceToNext(level: Int): Long {
+            return (level * level * level).toLong()
         }
     }
 }
@@ -217,6 +221,21 @@ data class TournamentRecord(
     
     val totalBattles: Int
         get() = wins + losses
+        
+    fun addVictory(rivalId: String): TournamentRecord {
+        return copy(
+            wins = wins + 1,
+            currentStreak = currentStreak + 1,
+            highestStreak = maxOf(highestStreak, currentStreak + 1)
+        )
+    }
+    
+    fun addDefeat(rivalId: String): TournamentRecord {
+        return copy(
+            losses = losses + 1,
+            currentStreak = 0
+        )
+    }
 }
 
 data class SeasonalTournament(
@@ -258,7 +277,6 @@ data class SeasonalTournament(
 
 class TournamentSystem {
     private val rivals = RivalTrainer.createRivalTrainers()
-    private val battleEngine = BattleEngine()
     private var playerRecord = TournamentRecord("player")
     
     fun getTournamentTiers(): List<TournamentTier> = TournamentTier.ALL_TIERS
@@ -283,64 +301,28 @@ class TournamentSystem {
         return avgLevel >= tier.minLevel && minLevel >= (tier.minLevel - 5)
     }
     
-    suspend fun battleRival(playerParty: List<Monster>, rival: RivalTrainer): Battle {
-        // Create battle with advanced AI strategy based on rival personality
-        val battle = Battle(
-            id = "tournament_${rival.id}_${System.currentTimeMillis()}",
-            playerMonsters = playerParty.take(4),
-            enemyMonsters = rival.team,
-            isWildBattle = false,
-            battleType = "Tournament"
-        )
+    suspend fun battleRival(playerParty: List<Monster>, rival: RivalTrainer): TournamentBattleResult {
+        delay(1000) // Simulate battle time
         
-        // Simulate battle with rival AI
-        battle.currentPlayerMonster = battle.playerMonsters.firstOrNull { it.currentHp > 0 }
-        battle.currentEnemyMonster = battle.enemyMonsters.firstOrNull { it.currentHp > 0 }
+        // Simple battle simulation - for now just return a basic result
+        val playerAvgLevel = playerParty.map { it.level }.average()
+        val rivalAvgLevel = rival.team.map { it.level }.average()
         
-        // Apply rival strategy
-        applyRivalStrategy(battle, rival)
+        val playerWins = playerAvgLevel >= rivalAvgLevel * 0.9 && Random.nextFloat() > 0.3
         
-        return battle
-    }
-    
-    private fun applyRivalStrategy(battle: Battle, rival: RivalTrainer) {
-        // Enhance enemy AI based on rival personality and difficulty
-        when (rival.personality) {
-            "Aggressive" -> {
-                // Prefers high-damage attacks, switches for type advantage
-                battle.enemyMonsters.forEach { monster ->
-                    monster.currentHp = (monster.maxHp * 1.1).toInt().coerceAtMost(monster.maxHp)
-                }
-            }
-            "Defensive" -> {
-                // Uses healing and defensive skills more often
-                battle.enemyMonsters.forEach { monster ->
-                    monster.currentHp = monster.maxHp
-                    monster.currentMp = (monster.maxMp * 1.2).toInt()
-                }
-            }
-            "Swift" -> {
-                // Higher agility, focuses on speed
-                battle.enemyMonsters.forEach { monster ->
-                    // Temporary stat boost for battle
-                }
-            }
-            "Mysterious" -> {
-                // Unpredictable, uses varied strategies
-                val boost = Random.nextFloat()
-                battle.enemyMonsters.forEach { monster ->
-                    if (boost > 0.5f) {
-                        monster.currentHp = (monster.maxHp * 1.15).toInt()
-                    }
-                }
-            }
-        }
-        
-        // Apply difficulty scaling
-        val difficultyMultiplier = 1.0f + (rival.difficulty * 0.05f)
-        battle.enemyMonsters.forEach { monster ->
-            // Scale stats based on difficulty (subtle boost)
-            monster.currentHp = (monster.currentHp * difficultyMultiplier).toInt().coerceAtMost(monster.maxHp * 2)
+        return if (playerWins) {
+            playerRecord = playerRecord.addVictory(rival.id)
+            TournamentBattleResult.Victory(
+                rival = rival,
+                rewards = BattleRewards(
+                    experience = rival.difficulty * 100, // Use difficulty instead of difficultyRating
+                    gold = rival.difficulty * 50,
+                    items = if (rival.difficulty >= 8) listOf("Rare Stone") else emptyList()
+                )
+            )
+        } else {
+            playerRecord = playerRecord.addDefeat(rival.id)
+            TournamentBattleResult.Defeat(rival.id)
         }
     }
     
@@ -425,4 +407,21 @@ data class TournamentMatch(
     val participant2: String,
     val winner: String? = null,
     val isComplete: Boolean = false
+)
+
+/**
+ * Result of a tournament battle
+ */
+sealed class TournamentBattleResult {
+    data class Victory(val rival: RivalTrainer, val rewards: BattleRewards) : TournamentBattleResult()
+    data class Defeat(val rivalId: String) : TournamentBattleResult()
+}
+
+/**
+ * Battle rewards
+ */
+data class BattleRewards(
+    val experience: Int,
+    val gold: Int,
+    val items: List<String> = emptyList()
 )

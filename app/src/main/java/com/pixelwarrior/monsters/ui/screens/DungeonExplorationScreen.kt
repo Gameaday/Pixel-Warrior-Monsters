@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.game.world.*
 import com.pixelwarrior.monsters.ui.theme.*
 
@@ -34,12 +35,12 @@ fun DungeonExplorationScreen(
     var eventResult by remember { mutableStateOf<String?>(null) }
     
     val dungeonSystem = remember { DungeonSystem() }
-    val gameState by gameViewModel.gameState.collectAsState()
+    val gameState by gameViewModel.gameSave.collectAsState()
     
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PixelBackground)
+            .background(PixelBlack)
             .padding(16.dp)
     ) {
         // Header
@@ -76,7 +77,7 @@ fun DungeonExplorationScreen(
         if (selectedDungeon == null) {
             // Dungeon selection screen
             DungeonSelectionView(
-                dungeons = dungeonSystem.getAvailableDungeons(gameState.storyProgress),
+                dungeons = dungeonSystem.getAvailableDungeons(gameState?.storyProgress ?: emptyMap()),
                 onDungeonSelected = { dungeon ->
                     selectedDungeon = dungeon
                     currentFloor = dungeonSystem.enterDungeon(dungeon.id)
@@ -89,7 +90,7 @@ fun DungeonExplorationScreen(
                     floor = floor,
                     onExplore = { direction ->
                         // Handle exploration in direction
-                        val encounter = attemptRandomEncounter(floor, gameState.partyMonsters.firstOrNull()?.level ?: 1)
+                        val encounter = attemptRandomEncounter(floor, gameState?.partyMonsters?.firstOrNull()?.level ?: 1)
                         encounter?.let { onBattleStart(it) }
                         
                         // Check for wandering events

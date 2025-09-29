@@ -420,7 +420,7 @@ class ScoutDeploymentInterface(
         
         // Deploy through scout system
         val enhancedMonster = EnhancedMonster(monster)
-        val result = scoutSystem.deployScout(enhancedMonster, missionType)
+        val result = scoutSystem.startScoutMission(enhancedMonster, missionType)
         
         return when (result) {
             is ScoutMissionResult.Success -> {

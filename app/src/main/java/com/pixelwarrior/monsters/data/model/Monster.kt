@@ -55,7 +55,8 @@ data class Monster(
     val traits: List<String> = emptyList(),
     val isWild: Boolean = false,
     val captureRate: Int = 100,
-    val growthRate: GrowthRate = GrowthRate.MEDIUM_FAST
+    val growthRate: GrowthRate = GrowthRate.MEDIUM_FAST,
+    val affection: Int = 0 // New field for monster affection/friendship (0-100)
 ) : Parcelable
 
 /**
