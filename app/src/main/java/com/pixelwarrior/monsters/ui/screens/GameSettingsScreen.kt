@@ -1,12 +1,15 @@
 package com.pixelwarrior.monsters.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Games
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Settings
@@ -371,18 +374,20 @@ private fun <T> SettingsDropdown(
             modifier = Modifier.padding(bottom = 4.dp)
         )
         
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
-        ) {
+        Box {
             OutlinedTextField(
                 value = currentValue.toString().replaceFirstChar { it.uppercase() },
                 onValueChange = { },
                 readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
+                trailingIcon = { 
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Dropdown"
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PixelBlue,
                     unfocusedBorderColor = PixelGray,
@@ -391,7 +396,7 @@ private fun <T> SettingsDropdown(
                 )
             )
             
-            ExposedDropdownMenu(
+            DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
