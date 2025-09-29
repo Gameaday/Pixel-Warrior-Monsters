@@ -370,27 +370,50 @@ fun MainGameScreen() {
             )
         }
         GameScreen.ENDGAME_CONTENT -> {
-            // Stub implementation for endgame content
-            EndgameContentScreen(
-                onBackPressed = { 
-                    audioViewModel.playMenuBackSound()
-                    currentScreen = GameScreen.WORLD_MAP
-                }
-            )
+            val gameSave by gameViewModel.gameSave.collectAsState()
+            gameSave?.let { save ->
+                EndgameContentScreen(
+                    playerLevel = save.partyMonsters.firstOrNull()?.level ?: 1,
+                    completedMainStory = save.storyProgress["main_story_complete"] == true,
+                    defeatedChampion = save.storyProgress["champion_defeated"] == true,
+                    achievements = save.storyProgress.filterValues { it == true }.keys.toList(),
+                    statistics = emptyMap(), // Stub - no statistics field in current GameSave
+                    currentPlaythrough = 1, // Stub - no playthrough tracking in current GameSave
+                    onNavigateToPostGameDungeon = { dungeon ->
+                        audioViewModel.playMenuSelectSound()
+                        // Navigate to specific post-game dungeon
+                        currentScreen = GameScreen.DUNGEON_EXPLORATION
+                    },
+                    onNavigateToAdditionalWorld = { world ->
+                        audioViewModel.playMenuSelectSound()
+                        // Navigate to additional world
+                        currentScreen = GameScreen.WORLD_MAP
+                    },
+                    onStartNewGamePlus = {
+                        audioViewModel.playMenuSelectSound()
+                        gameViewModel.startNewGamePlus()
+                        currentScreen = GameScreen.WORLD_MAP
+                    },
+                    onNavigateBack = { 
+                        audioViewModel.playMenuBackSound()
+                        currentScreen = GameScreen.WORLD_MAP
+                    }
+                )
+            }
         }
         GameScreen.QUALITY_OF_LIFE -> {
-            // Stub implementation for quality of life features
             QualityOfLifeScreen(
-                onBackPressed = { 
+                qolSystem = gameViewModel.getQoLSystem(),
+                onBackPress = { 
                     audioViewModel.playMenuBackSound()
                     currentScreen = GameScreen.WORLD_MAP
                 }
             )
         }
         GameScreen.EXPLORATION_HUB -> {
-            // Stub implementation for exploration hub
             ExplorationHubScreen(
-                onBackPressed = { 
+                explorationSystem = gameViewModel.getExplorationSystem(),
+                onBack = { 
                     audioViewModel.playMenuBackSound()
                     currentScreen = GameScreen.WORLD_MAP
                 }
@@ -661,85 +684,3 @@ fun WorldMapScreen(
     )
 }
 
-/**
- * Credits screen showing game development information
- */
-@Composable
-fun CreditsScreen(
-    onBackPressed: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(PixelBlack),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(24.dp)
-        ) {
-            Text(
-                text = "Credits",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            Text(
-                text = "Pixel Warrior Monsters",
-                style = MaterialTheme.typography.titleMedium,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "An open-source reimagining of classic monster collecting RPGs",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Development:",
-                style = MaterialTheme.typography.titleSmall,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "Game Design & Programming\nOriginal Pixel Art & Music\nAndroid Implementation",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Text(
-                text = "Special Thanks:",
-                style = MaterialTheme.typography.titleSmall,
-                color = PixelBlue,
-                textAlign = TextAlign.Center
-            )
-            
-            Text(
-                text = "Classic monster collecting games for inspiration\nOpen source community\nPixel art and chiptune music communities",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            PixelButton(
-                text = "Back to Menu",
-                onClick = onBackPressed
-            )
-        }
-    }
-}

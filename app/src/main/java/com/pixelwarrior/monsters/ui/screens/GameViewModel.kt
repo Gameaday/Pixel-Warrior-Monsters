@@ -484,6 +484,48 @@ class GameViewModel : ViewModel() {
         }
     }
     
+    /**
+     * Get Quality of Life system for UI
+     */
+    fun getQoLSystem(): com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem {
+        // Stub implementation - return a basic QoL system
+        return com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem()
+    }
+    
+    /**
+     * Get Exploration system for UI
+     */
+    fun getExplorationSystem(): com.pixelwarrior.monsters.game.exploration.ExplorationSystem {
+        // Stub implementation - return a basic exploration system
+        return com.pixelwarrior.monsters.game.exploration.ExplorationSystem()
+    }
+    
+    /**
+     * Start new game plus with enhanced features
+     */
+    fun startNewGamePlus() {
+        _gameSave.value?.let { currentSave ->
+            val newGamePlusSave = GameSave(
+                playerId = currentSave.playerId,
+                playerName = currentSave.playerName,
+                currentLevel = "tutorial_forest", // Start from beginning
+                position = Position(0f, 0f), // Reset position
+                partyMonsters = emptyList(), // Fresh start with monsters
+                farmMonsters = emptyList(),
+                inventory = currentSave.inventory.filterKeys { it.startsWith("key_") }, // Keep key items
+                gold = currentSave.gold / 2, // Keep half gold
+                playtimeMinutes = 0L, // Reset playtime
+                storyProgress = mapOf("new_game_plus" to true),
+                unlockedGates = emptyList(), // Reset progress
+                gameSettings = currentSave.gameSettings,
+                cookingSkill = currentSave.cookingSkill, // Keep cooking progress
+                saveVersion = currentSave.saveVersion,
+                lastSaved = System.currentTimeMillis()
+            )
+            _gameSave.value = newGamePlusSave
+        }
+    }
+    
     override fun onCleared() {
         super.onCleared()
         // Save game when ViewModel is destroyed
