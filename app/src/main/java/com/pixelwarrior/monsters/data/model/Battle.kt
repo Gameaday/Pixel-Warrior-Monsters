@@ -11,6 +11,13 @@ enum class BattleAction {
 }
 
 /**
+ * Battle type classification
+ */
+enum class BattleType {
+    WILD_ENCOUNTER, TRAINER_BATTLE, TOURNAMENT, BOSS_BATTLE, STORY_BATTLE
+}
+
+/**
  * Battle result outcomes
  */
 enum class BattleResult {

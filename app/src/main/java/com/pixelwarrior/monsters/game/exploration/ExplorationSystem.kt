@@ -204,6 +204,26 @@ class ExplorationSystem {
     
     fun getHiddenPassages(): Set<String> = currentState.hiddenPassagesFound.toSet()
     
+    /**
+     * Get current time of day
+     */
+    fun getCurrentTimeOfDay(): String {
+        val hour = currentState.timeOfDay.hour
+        return when {
+            hour < 6 -> "Night"
+            hour < 12 -> "Morning"
+            hour < 18 -> "Afternoon"
+            else -> "Evening"
+        }
+    }
+    
+    /**
+     * Get monster nests information
+     */
+    fun getMonsterNests(): List<MonsterNest> {
+        return allNests
+    }
+    
     // Special Area Access
     fun canAccessSpecialArea(requiredKey: GateKey): Boolean {
         return hasGateKey(requiredKey)

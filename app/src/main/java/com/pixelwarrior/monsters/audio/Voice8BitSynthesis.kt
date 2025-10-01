@@ -39,6 +39,30 @@ class Voice8BitSynthesis(
     }
     
     /**
+     * Speak character line using data model VoiceCharacter
+     */
+    suspend fun speakCharacterLine(
+        character: com.pixelwarrior.monsters.data.model.VoiceCharacter,
+        text: String
+    ) {
+        // Convert data.model.VoiceCharacter to audio.VoiceCharacter
+        val audioCharacter = VoiceCharacter(
+            name = character.id,
+            displayName = character.name,
+            type = when (character.type) {
+                com.pixelwarrior.monsters.data.model.CharacterType.MASTER -> CharacterType.MASTER
+                com.pixelwarrior.monsters.data.model.CharacterType.LIBRARIAN -> CharacterType.LIBRARIAN
+                com.pixelwarrior.monsters.data.model.CharacterType.SYNTHESIS_EXPERT -> CharacterType.SYNTHESIS_EXPERT
+                com.pixelwarrior.monsters.data.model.CharacterType.ARENA_MASTER -> CharacterType.ARENA_MASTER
+                com.pixelwarrior.monsters.data.model.CharacterType.MERCHANT -> CharacterType.MERCHANT
+                com.pixelwarrior.monsters.data.model.CharacterType.RIVAL -> CharacterType.RIVAL
+                else -> CharacterType.MYSTERIOUS_NPC
+            }
+        )
+        speakCharacterLine(audioCharacter, text)
+    }
+    
+    /**
      * Play quick voice acknowledgment (for menu interactions)
      */
     suspend fun playVoiceAck(character: VoiceCharacter, ackType: VoiceAckType) {

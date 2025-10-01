@@ -398,4 +398,62 @@ class EndgameSystem {
         
         return fusionOptions
     }
+    
+    /**
+     * Get legendary encounters
+     */
+    fun getLegendaryEncounters(): List<LegendaryMonster> {
+        return legendaryMonsters
+    }
+    
+    /**
+     * Get perfect breeding options for endgame
+     */
+    fun getPerfectBreedingOptions(): List<Map<String, Any>> {
+        return listOf(
+            mapOf(
+                "name" to "Perfect IV Breeding",
+                "description" to "Breed monsters with perfect stats",
+                "requirement" to "Complete 100 successful breedings"
+            ),
+            mapOf(
+                "name" to "Legendary Trait Inheritance",
+                "description" to "Pass legendary traits to offspring",
+                "requirement" to "Breed with legendary monsters"
+            ),
+            mapOf(
+                "name" to "Advanced Genetics",
+                "description" to "Control offspring type and abilities",
+                "requirement" to "Master rank in breeding"
+            )
+        )
+    }
+    
+    /**
+     * Get New Game Plus features
+     */
+    fun getNewGamePlusFeatures(): List<Map<String, Any>> {
+        return listOf(
+            mapOf(
+                "name" to "Retained Progress",
+                "description" to "Keep gold, items, and achievements",
+                "benefit" to "Start with advantages"
+            ),
+            mapOf(
+                "name" to "Increased Difficulty",
+                "description" to "Enemies are stronger and smarter",
+                "benefit" to "More challenging gameplay"
+            ),
+            mapOf(
+                "name" to "Bonus Starter",
+                "description" to "Choose from rare starter monsters",
+                "benefit" to "Unique team compositions"
+            ),
+            mapOf(
+                "name" to "Unlocked Features",
+                "description" to "Access endgame content from start",
+                "benefit" to "More gameplay options"
+            )
+        )
+    }
 }

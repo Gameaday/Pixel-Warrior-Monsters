@@ -176,3 +176,21 @@ data class SaveSlot(
     val lastSaved: Long,
     val previewImagePath: String? = null
 ) : Parcelable
+
+/**
+ * Voice character for audio system
+ */
+@Parcelize
+data class VoiceCharacter(
+    val id: String,
+    val name: String,
+    val type: CharacterType
+) : Parcelable
+
+/**
+ * Character type classification
+ */
+enum class CharacterType {
+    MASTER, LIBRARIAN, SYNTHESIS_EXPERT, ARENA_MASTER, 
+    MERCHANT, RIVAL, NPC, NARRATOR, MAIN_CHARACTER, SHOPKEEPER
+}

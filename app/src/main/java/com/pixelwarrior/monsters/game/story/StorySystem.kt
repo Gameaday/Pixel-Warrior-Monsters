@@ -148,6 +148,30 @@ class StorySystem {
         }
     }
     
+    /**
+     * Get available quests
+     */
+    fun getAvailableQuests(): List<Quest> {
+        return _activeQuests.value
+    }
+    
+    /**
+     * Get story milestones
+     */
+    fun getStoryMilestones(): List<StoryMilestone> {
+        return storyMilestones
+    }
+    
+    /**
+     * Check if story can progress based on game save
+     */
+    fun canProgressStory(gameSave: com.pixelwarrior.monsters.data.model.GameSave): Boolean {
+        val progress = gameSave.storyProgress
+        // Check if there are any active quests or unlockable milestones
+        return _activeQuests.value.isNotEmpty() || 
+               storyMilestones.any { !it.isUnlocked(progress) }
+    }
+    
     private fun createStoryMilestones(): List<StoryMilestone> {
         return listOf(
             StoryMilestone(

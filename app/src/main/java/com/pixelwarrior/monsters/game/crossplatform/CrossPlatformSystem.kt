@@ -250,6 +250,58 @@ class CrossPlatformSystem {
         delay(1000) // Simulate joining spectator mode
         return SpectateResult.SUCCESS("Joined as spectator")
     }
+    
+    /**
+     * Get multiplayer features available
+     */
+    fun getMultiplayerFeatures(): Map<String, Boolean> {
+        return mapOf(
+            "pvp_battles" to true,
+            "spectate_mode" to true,
+            "matchmaking" to true,
+            "ranked_play" to true,
+            "tournaments" to false // Not yet implemented
+        )
+    }
+    
+    /**
+     * Check if cloud save is supported
+     */
+    fun hasCloudSaveSupport(): Boolean {
+        return true // Cloud save is implemented
+    }
+    
+    /**
+     * Get friend system features
+     */
+    fun getFriendSystemFeatures(): Map<String, Boolean> {
+        return mapOf(
+            "add_friends" to true,
+            "share_monsters" to true,
+            "view_friends_online" to true,
+            "friend_battles" to false // Not yet implemented
+        )
+    }
+    
+    /**
+     * Check if leaderboards are supported
+     */
+    fun hasLeaderboardSupport(): Boolean {
+        return true // Leaderboards are implemented
+    }
+    
+    /**
+     * Get mod support features
+     */
+    fun getModSupportFeatures(): Map<String, Boolean> {
+        return mapOf(
+            "load_mods" to true,
+            "workshop_integration" to true,
+            "mod_validation" to true,
+            "custom_monsters" to false, // Not yet implemented
+            "custom_maps" to false // Not yet implemented
+        )
+    }
 }
 
 /**
