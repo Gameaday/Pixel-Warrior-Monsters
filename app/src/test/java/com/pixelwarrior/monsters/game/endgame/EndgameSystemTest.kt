@@ -1,5 +1,6 @@
 package com.pixelwarrior.monsters.game.endgame
 
+import com.pixelwarrior.monsters.createTestMonster
 import com.pixelwarrior.monsters.data.model.Monster
 import com.pixelwarrior.monsters.data.model.MonsterType
 import com.pixelwarrior.monsters.data.model.MonsterFamily
@@ -54,8 +55,8 @@ class EndgameSystemTest {
     @Test
     fun `legendary encounter conditions work correctly`() {
         val testMonsters = listOf(
-            createTestMonster("Fire Drake", MonsterType.FIRE, MonsterFamily.DRAGON),
-            createTestMonster("Earth Golem", MonsterType.EARTH, MonsterFamily.MATERIAL)
+            createTestMonster(name = "Fire Drake", type1 = MonsterType.FIRE, family = MonsterFamily.DRAGON),
+            createTestMonster(name = "Earth Golem", type1 = MonsterType.EARTH, family = MonsterFamily.MATERIAL)
         )
         
         // Test night time requirement
@@ -183,18 +184,17 @@ class EndgameSystemTest {
     @Test
     fun `advanced fusion options require correct conditions`() {
         val lowLevelMonsters = listOf(
-            createTestMonster("Young Dragon", MonsterType.DRAGON, MonsterFamily.DRAGON, level = 50),
-            createTestMonster("Small Beast", MonsterType.BEAST, MonsterFamily.BEAST, level = 40)
+            createTestMonster(name = "Young Dragon", type1 = MonsterType.DRAGON, family = MonsterFamily.DRAGON, level = 50),
+            createTestMonster(name = "Small Beast", type1 = MonsterType.BEAST, family = MonsterFamily.BEAST, level = 40)
         )
         
         val highLevelMonsters = listOf(
-            createTestMonster("Elder Dragon", MonsterType.DRAGON, MonsterFamily.DRAGON, level = 85),
-            createTestMonster("Ancient Beast", MonsterType.BEAST, MonsterFamily.BEAST, level = 90),
-            createTestMonster("Mystic Bird", MonsterType.BIRD, MonsterFamily.BIRD, level = 88)
+            createTestMonster(name = "Elder Dragon", type1 = MonsterType.DRAGON, family = MonsterFamily.DRAGON, level = 85),
+            createTestMonster(name = "Ancient Beast", type1 = MonsterType.BEAST, family = MonsterFamily.BEAST, level = 90),
+            createTestMonster(name = "Mystic Bird", type1 = MonsterType.BIRD, family = MonsterFamily.BIRD, level = 88)
         )
         
-        val legendaryMonster = createTestMonster("Legendary Dragon", MonsterType.DRAGON, MonsterFamily.DRAGON, level = 95)
-        legendaryMonster.traits = listOf("Legendary", "Rare")
+        val legendaryMonster = createTestMonster(name = "Legendary Dragon", type1 = MonsterType.DRAGON, family = MonsterFamily.DRAGON, level = 95, traits = listOf("Legendary", "Rare"))
         
         // Test with low level monsters
         val lowLevelFusions = endgameSystem.getAdvancedFusionOptions(lowLevelMonsters)
@@ -243,38 +243,5 @@ class EndgameSystemTest {
             assertTrue("World should have valid level range", world.levelRange.first <= world.levelRange.last)
             assertTrue("World should have unique monster types", world.uniqueMonsterTypes.isNotEmpty())
         }
-    }
-    
-    private fun createTestMonster(
-        species: String, 
-        type: MonsterType, 
-        family: MonsterFamily, 
-        level: Int = 50
-    ): Monster {
-        return Monster(
-            species = species,
-            nickname = species,
-            level = level,
-            experience = 0,
-            type1 = type,
-            type2 = null,
-            family = family,
-            personality = Personality.HARDY,
-            baseAttack = 50,
-            baseDefense = 50,
-            baseAgility = 50,
-            baseMagic = 50,
-            baseWisdom = 50,
-            baseHP = 100,
-            baseMP = 50,
-            currentHP = 100,
-            currentMP = 50,
-            skills = listOf("Tackle"),
-            traits = listOf("Normal"),
-            plusLevel = 0,
-            synthesisParents = null,
-            learnedSkills = mutableListOf(),
-            maxSynthesisLevel = 3
-        )
     }
 }
