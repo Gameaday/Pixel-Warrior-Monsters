@@ -8,43 +8,43 @@ plugins {
 }
 
 android {
-    namespace 'com.pixelwarrior.monsters'
-    compileSdk 35
+    namespace = 'com.pixelwarrior.monsters'
+    compileSdk = 35
 
     defaultConfig {
-        applicationId "com.pixelwarrior.monsters"
-        minSdk 24
-        targetSdk 35
-        versionCode 1
-        versionName "1.0.0"
+        applicationId = "com.pixelwarrior.monsters"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
     }
 
     buildTypes {
         debug {
-            minifyEnabled false
-            debuggable true
+            minifyEnabled = false
+            debuggable = true
         }
         release {
-            minifyEnabled true
+            minifyEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable false
-            signingConfig signingConfigs.debug // Will need to be updated for Play Store
+            debuggable = false
+            signingConfig = signingConfigs.debug // Will need to be updated for Play Store
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = '17'
     }
     buildFeatures {
-        compose true
+        compose = true
     }
     packaging {
         resources {
@@ -61,6 +61,7 @@ android {
 dependencies {
     // Compose BOM for version alignment - using latest 2024.12.01 for Kotlin 2.1 compatibility
     implementation platform('androidx.compose:compose-bom:2024.12.01')
+    androidTestImplementation platform('androidx.compose:compose-bom:2024.12.01')
     
     implementation 'androidx.core:core-ktx:1.15.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
@@ -123,9 +124,9 @@ tasks.register('jacocoTestReport', JacocoReport) {
 // Android lint configuration for Play Store compliance
 android {
     lintOptions {
-        checkReleaseBuilds true
-        abortOnError false
-        warningsAsErrors false
+        checkReleaseBuilds = true
+        abortOnError = false
+        warningsAsErrors = false
         
         // Play Store specific checks
         enable 'ContentDescription', 'HardcodedText', 'UnusedResources'

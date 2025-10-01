@@ -212,7 +212,7 @@ private fun MonsterDetailHeader(
                 Spacer(modifier = Modifier.width(8.dp))
                 
                 LinearProgressIndicator(
-                    progress = monster.affection / 100f,
+                    progress = { monster.affection / 100f },
                     modifier = Modifier
                         .weight(1f)
                         .height(8.dp),
@@ -295,7 +295,7 @@ private fun MonsterStatsCard(monster: Monster) {
                 Spacer(modifier = Modifier.width(8.dp))
                 
                 LinearProgressIndicator(
-                    progress = (monster.experience.toFloat() / monster.experienceToNext.toFloat()).coerceIn(0f, 1f),
+                    progress = { (monster.experience.toFloat() / monster.experienceToNext.toFloat()).coerceIn(0f, 1f) },
                     modifier = Modifier
                         .weight(1f)
                         .height(6.dp),
@@ -531,7 +531,7 @@ private fun HPBar(
         }
         
         LinearProgressIndicator(
-            progress = percentage,
+            progress = { percentage },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),
@@ -567,7 +567,7 @@ private fun MPBar(
         }
         
         LinearProgressIndicator(
-            progress = percentage,
+            progress = { percentage },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),

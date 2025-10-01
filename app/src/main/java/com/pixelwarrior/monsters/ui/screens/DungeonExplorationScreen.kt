@@ -234,7 +234,7 @@ private fun DungeonCard(
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Theme: ${dungeon.theme.name.replace("_", " ").lowercase().split(" ").joinToString(" ") { it.capitalize() }}",
+                text = "Theme: ${dungeon.theme.name.replace("_", " ").lowercase().split(" ").joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }}",
                 fontSize = 12.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
@@ -298,7 +298,7 @@ private fun DungeonFloorView(
                     Spacer(modifier = Modifier.height(8.dp))
                     floor.specialFeatures.forEach { feature ->
                         Text(
-                            text = "• ${feature.replace("_", " ").split(" ").joinToString(" ") { it.capitalize() }}",
+                            text = "• ${feature.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }}",
                             fontSize = 12.sp,
                             color = Color.White,
                             modifier = Modifier.padding(start = 16.dp)
@@ -426,7 +426,7 @@ private fun generateDungeonMonster(speciesId: String, playerLevel: Int, theme: D
     return Monster(
         id = java.util.UUID.randomUUID().toString(),
         speciesId = speciesId,
-        name = speciesId.replace("_", " ").split(" ").joinToString(" ") { it.capitalize() },
+        name = speciesId.replace("_", " ").split(" ").joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } },
         type1 = getTypeForTheme(theme),
         type2 = null,
         family = MonsterFamily.BEAST,
