@@ -199,7 +199,7 @@ class Real8BitAudioSystemTest {
     }
 
     @Test
-    fun `syllable breaking works for voice synthesis`() {
+    fun `syllable breaking works for voice synthesis`() = runTest {
         val character = VoiceCharacter("test", "Test", CharacterType.MASTER)
         
         // Test different text lengths and patterns
