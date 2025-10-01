@@ -16,6 +16,11 @@ class SynthesisLaboratory(
     private val monsterSynthesis: MonsterSynthesis = MonsterSynthesis()
 ) {
     
+    /**
+     * Secondary constructor for testing
+     */
+    constructor() : this(StorySystem().apply { initializeStory() })
+    
     private val _isLabUnlocked = MutableStateFlow(false)
     val isLabUnlocked: StateFlow<Boolean> = _isLabUnlocked.asStateFlow()
     
@@ -285,6 +290,42 @@ class SynthesisLaboratory(
         val recipeId = "${parent1.family.name.lowercase()}_${parent2.family.name.lowercase()}_fusion"
         discoverRecipe(recipeId)
     }
+    
+    /**
+     * Get available synthesis combinations for a list of monsters
+     */
+    fun getAvailableSynthesis(monsters: List<Monster>): List<Map<String, Any>> {
+        val synthesesOptions = mutableListOf<Map<String, Any>>()
+        
+        for (i in monsters.indices) {
+            for (j in i+1 until monsters.size) {
+                val monster1 = monsters[i]
+                val monster2 = monsters[j]
+                
+                synthesesOptions.add(mapOf(
+                    "parent1" to monster1.name,
+                    "parent2" to monster2.name,
+                    "resultLevel" to ((monster1.level + monster2.level) / 2),
+                    "resultFamily" to monster1.family
+                ))
+            }
+        }
+        
+        return synthesesOptions
+    }
+    
+    /**
+     * Get learnable skills for a monster
+     */
+    fun getLearnableSkills(monster: Monster): List<String> {
+        return listOf(
+            "Synthesis Boost",
+            "Elemental Infusion",
+            "Stat Transfer",
+            "Trait Inheritance",
+            "Advanced Fusion"
+        ).filter { monster.level >= 10 }
+    }
 }
 
 /**
@@ -331,39 +372,4 @@ enum class SynthesisPhase(val displayName: String) {
     FUSION("Fusing monster essences..."),
     STABILIZATION("Stabilizing new form..."),
     COMPLETION("Synthesis complete!")
-}
-/**
- * Get available synthesis combinations for a list of monsters
- */
-fun getAvailableSynthesis(monsters: List<Monster>): List<Map<String, Any>> {
-    val synthesesOptions = mutableListOf<Map<String, Any>>()
-    
-    for (i in monsters.indices) {
-        for (j in i+1 until monsters.size) {
-            val monster1 = monsters[i]
-            val monster2 = monsters[j]
-            
-            synthesesOptions.add(mapOf(
-                "parent1" to monster1.name,
-                "parent2" to monster2.name,
-                "resultLevel" to ((monster1.level + monster2.level) / 2),
-                "resultFamily" to monster1.family
-            ))
-        }
-    }
-    
-    return synthesesOptions
-}
-
-/**
- * Get learnable skills for a monster
- */
-fun getLearnableSkills(monster: Monster): List<String> {
-    return listOf(
-        "Synthesis Boost",
-        "Elemental Infusion",
-        "Stat Transfer",
-        "Trait Inheritance",
-        "Advanced Fusion"
-    ).filter { monster.level >= 10 }
 }
