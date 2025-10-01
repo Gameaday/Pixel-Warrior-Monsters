@@ -1,5 +1,6 @@
 package com.pixelwarrior.monsters.game.tournament
 
+import com.pixelwarrior.monsters.createTestMonster
 import org.junit.Test
 import org.junit.Assert.*
 import com.pixelwarrior.monsters.data.model.*
@@ -127,9 +128,9 @@ class TournamentSystemTest {
         
         // Create test party
         val testParty = listOf(
-            createTestMonster("test1", level = 10),
-            createTestMonster("test2", level = 12),
-            createTestMonster("test3", level = 8)
+            createTestMonster(id = "test1", level = 10),
+            createTestMonster(id = "test2", level = 12),
+            createTestMonster(id = "test3", level = 8)
         )
         
         // Test successful entry
@@ -145,7 +146,7 @@ class TournamentSystemTest {
             tournamentSystem.canEnterTournament(rookieTier, 100, emptyList()))
         
         // Test party too low level
-        val lowLevelParty = listOf(createTestMonster("low", level = 1))
+        val lowLevelParty = listOf(createTestMonster(id = "low", level = 1))
         assertFalse("Should not allow entry with severely underleveled party",
             tournamentSystem.canEnterTournament(TournamentTier.MASTER, 2000, lowLevelParty))
     }
@@ -154,8 +155,8 @@ class TournamentSystemTest {
     fun testBattleRival() = runBlocking {
         val tournamentSystem = TournamentSystem()
         val testParty = listOf(
-            createTestMonster("player1", level = 20),
-            createTestMonster("player2", level = 22)
+            createTestMonster(id = "player1", level = 20),
+            createTestMonster(id = "player2", level = 22)
         )
         
         val elena = tournamentSystem.getRivalTrainers().find { it.id == "elena" }!!
@@ -287,7 +288,7 @@ class TournamentSystemTest {
     @Test
     fun testRivalAIStrategies() = runBlocking {
         val tournamentSystem = TournamentSystem()
-        val testParty = listOf(createTestMonster("test", level = 25))
+        val testParty = listOf(createTestMonster(id = "test", level = 25))
         
         // Test different rival personalities
         val aggressiveRival = tournamentSystem.getRivalTrainers()
@@ -369,7 +370,7 @@ class TournamentSystemTest {
     @Test
     fun testDifficultyScaling() = runBlocking {
         val tournamentSystem = TournamentSystem()
-        val testParty = listOf(createTestMonster("test", level = 30))
+        val testParty = listOf(createTestMonster(id = "test", level = 30))
         
         // Test low difficulty rival
         val easyRival = tournamentSystem.getRivalTrainers().minBy { it.difficulty }
@@ -383,32 +384,5 @@ class TournamentSystemTest {
         assertTrue("Hard rival should exist", hardRival.difficulty > easyRival.difficulty)
         assertTrue("Both battles should be valid", 
             easyBattle.enemyMonsters.isNotEmpty() && hardBattle.enemyMonsters.isNotEmpty())
-    }
-
-    // Helper function to create test monsters
-    private fun createTestMonster(id: String, level: Int = 10): Monster {
-        return Monster(
-            id = id,
-            speciesName = "Test Monster",
-            type = MonsterType.FIRE,
-            secondaryType = null,
-            family = MonsterFamily.BEAST,
-            level = level,
-            baseAttack = 50,
-            baseDefense = 45,
-            baseAgility = 40,
-            baseMagic = 35,
-            baseWisdom = 35,
-            baseHp = 80,
-            baseMp = 30,
-            currentHp = 0, // Will be calculated
-            currentMp = 0, // Will be calculated
-            experience = level * 100,
-            personality = Personality.HARDY,
-            skills = listOf("Basic Attack", "Fire Strike")
-        ).apply {
-            currentHp = maxHp
-            currentMp = maxMp
-        }
     }
 }
