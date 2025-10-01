@@ -1,5 +1,6 @@
 package com.pixelwarrior.monsters.game.synthesis
 
+import com.pixelwarrior.monsters.createTestMonster
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.game.story.StorySystem
 import kotlinx.coroutines.flow.first
@@ -19,42 +20,50 @@ class MonsterSystemsTest {
     private lateinit var synthesisLab: SynthesisLaboratory
     private lateinit var scoutDeployment: ScoutDeploymentInterface
     
-    private val testMonster1 = Monster(
+    private val testMonster1 = createTestMonster(
         id = "test1",
         speciesId = "fire_drake",
         name = "Blaze",
         type1 = MonsterType.FIRE,
-        type2 = null,
         family = MonsterFamily.DRAGON,
         level = 15,
         currentHp = 50,
+        maxHp = 50,
         currentMp = 30,
+        maxMp = 30,
         experience = 1000,
-        baseStats = MonsterStats(40, 35, 25, 45, 30, 50, 30),
+        attack = 40,
+        defense = 35,
+        agility = 25,
+        magic = 45,
+        wisdom = 30,
         skills = listOf("tackle", "fireball"),
         traits = listOf("fire_affinity"),
         growthRate = GrowthRate.MEDIUM_FAST,
-        friendship = 70,
-        isFainted = false
+        affection = 70
     )
     
-    private val testMonster2 = Monster(
+    private val testMonster2 = createTestMonster(
         id = "test2", 
         speciesId = "water_spirit",
         name = "Aqua",
         type1 = MonsterType.WATER,
-        type2 = null,
         family = MonsterFamily.SLIME,
         level = 12,
         currentHp = 45,
+        maxHp = 45,
         currentMp = 35,
+        maxMp = 35,
         experience = 800,
-        baseStats = MonsterStats(30, 40, 35, 50, 40, 45, 35),
+        attack = 30,
+        defense = 40,
+        agility = 35,
+        magic = 50,
+        wisdom = 40,
         skills = listOf("tackle", "heal"),
         traits = listOf("water_affinity"),
         growthRate = GrowthRate.MEDIUM_SLOW,
-        friendship = 60,
-        isFainted = false
+        affection = 60
     )
 
     @Before
