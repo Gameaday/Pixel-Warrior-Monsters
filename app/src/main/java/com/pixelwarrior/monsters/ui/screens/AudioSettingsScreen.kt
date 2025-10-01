@@ -4,9 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -127,7 +127,7 @@ fun AudioSettingsScreen(
         // Sound Effects Settings
         AudioSettingSection(
             title = "Sound Effects",
-            icon = Icons.Default.VolumeUp
+            icon = Icons.AutoMirrored.Filled.VolumeUp
         ) {
             // Sound Enable/Disable
             AudioToggleRow(
@@ -380,7 +380,7 @@ private fun AudioTestSection(audioViewModel: AudioViewModel) {
                 colors = ButtonDefaults.buttonColors(containerColor = HpRed)
             ) {
                 Icon(
-                    imageVector = Icons.Default.VolumeOff,
+                    imageVector = Icons.AutoMirrored.Filled.VolumeOff,
                     contentDescription = "Stop Music",
                     modifier = Modifier.size(16.dp)
                 )

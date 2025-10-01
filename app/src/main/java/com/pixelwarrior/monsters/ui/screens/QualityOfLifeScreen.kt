@@ -12,6 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -56,7 +58,7 @@ fun QualityOfLifeScreen(
         ) {
             IconButton(onClick = onBackPress) {
                 Icon(
-                    Icons.Default.ArrowBack,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
                     tint = PixelWhite
                 )
@@ -265,7 +267,7 @@ private fun AchievementCard(achievement: Achievement) {
                     }
                     
                     LinearProgressIndicator(
-                        progress = progress,
+                        progress = { progress },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(4.dp),
@@ -373,7 +375,7 @@ private fun StatisticsContent(statistics: GameStatistics) {
         // Progress Statistics
         StatisticsSection(
             title = "Progress Statistics",
-            icon = Icons.Default.TrendingUp,
+            icon = Icons.AutoMirrored.Filled.TrendingUp,
             stats = listOf(
                 StatItem("Dungeons Cleared", statistics.dungeonsCleared.toString(), PixelGold),
                 StatItem("Tournaments Won", statistics.tournamentsWon.toString(), PixelRed),

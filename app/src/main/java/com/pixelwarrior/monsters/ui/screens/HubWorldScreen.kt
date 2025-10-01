@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -295,7 +296,7 @@ fun HubWorldScreen(
 private fun getAreaIcon(area: HubWorldSystem.HubArea): ImageVector {
     return when (area) {
         HubWorldSystem.HubArea.MAIN_HALL -> Icons.Default.Home
-        HubWorldSystem.HubArea.MONSTER_LIBRARY -> Icons.Default.MenuBook
+        HubWorldSystem.HubArea.MONSTER_LIBRARY -> Icons.AutoMirrored.Filled.MenuBook
         HubWorldSystem.HubArea.BREEDING_LAB -> Icons.Default.Science
         HubWorldSystem.HubArea.BATTLE_ARENA -> Icons.Default.Sports
         HubWorldSystem.HubArea.SYNTHESIS_LAB -> Icons.Default.Build
