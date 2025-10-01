@@ -145,11 +145,11 @@ class UIPolishSystemTest {
     
     private fun createMockGameSave(): com.pixelwarrior.monsters.data.model.GameSave {
         return com.pixelwarrior.monsters.data.model.GameSave(
-            id = "test_save",
+            playerId = "test_save",
             playerName = "Test Player",
-            currentLevel = 10,
-            currentArea = "main_hall",
-            monsters = emptyList(),
+            currentLevel = "main_hall",
+            position = com.pixelwarrior.monsters.data.model.Position(0f, 0f),
+            partyMonsters = emptyList(),
             inventory = mapOf("breeder_license" to 1),
             storyProgress = mapOf("first_capture" to true),
             lastSaved = System.currentTimeMillis()
