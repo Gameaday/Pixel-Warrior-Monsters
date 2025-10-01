@@ -1,5 +1,6 @@
 package com.pixelwarrior.monsters.edge_cases
 
+import com.pixelwarrior.monsters.createTestMonster
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.data.repository.GameRepository
 import com.pixelwarrior.monsters.game.battle.BattleEngine
@@ -33,30 +34,42 @@ class EdgeCaseTestSuite {
     @Test
     fun testBoundaryConditions_MonsterStats() = runTest {
         // Test extreme stat values
-        val maxStatsMonster = Monster(
+        val maxStatsMonster = createTestMonster(
             id = "max_stats",
             name = "MaxStatsMonster",
-            type = MonsterType.DRAGON,
+            type1 = MonsterType.DRAGON,
             family = MonsterFamily.DRAGON,
             personality = Personality.HARDY,
-            stats = MonsterStats(999, 999, 999, 999, 999, 999),
+            attack = 999,
+            defense = 999,
+            agility = 999,
+            magic = 999,
+            wisdom = 999,
+            maxHp = 999,
+            maxMp = 999,
             skills = emptyList(),
             level = 99,
             experience = 999999,
-            happiness = 255
+            affection = 255
         )
         
-        val minStatsMonster = Monster(
+        val minStatsMonster = createTestMonster(
             id = "min_stats",
             name = "MinStatsMonster", 
-            type = MonsterType.SLIME,
+            type1 = MonsterType.SLIME,
             family = MonsterFamily.SLIME,
             personality = Personality.HARDY,
-            stats = MonsterStats(1, 1, 1, 1, 1, 1),
+            attack = 1,
+            defense = 1,
+            agility = 1,
+            magic = 1,
+            wisdom = 1,
+            maxHp = 1,
+            maxMp = 1,
             skills = emptyList(),
             level = 1,
             experience = 0,
-            happiness = 0
+            affection = 0
         )
 
         // Verify stats are handled correctly
@@ -173,17 +186,23 @@ class EdgeCaseTestSuite {
     fun testInvalidInputHandling() = runTest {
         // Test with invalid monster types/data
         try {
-            val invalidMonster = Monster(
+            val invalidMonster = createTestMonster(
                 id = "",  // Empty ID
                 name = "",  // Empty name
-                type = MonsterType.DRAGON,
+                type1 = MonsterType.DRAGON,
                 family = MonsterFamily.DRAGON,
                 personality = Personality.HARDY,
-                stats = MonsterStats(-1, -1, -1, -1, -1, -1), // Negative stats
+                attack = -1,
+                defense = -1,
+                agility = -1,
+                magic = -1,
+                wisdom = -1,
+                maxHp = -1,
+                maxMp = -1,
                 skills = emptyList(),
                 level = -5,  // Negative level
                 experience = -100,  // Negative experience
-                happiness = -50  // Negative happiness
+                affection = -50  // Negative affection
             )
             
             // System should handle invalid data gracefully
