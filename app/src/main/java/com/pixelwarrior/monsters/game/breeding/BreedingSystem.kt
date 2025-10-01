@@ -224,7 +224,71 @@ class BreedingSystem {
         val levelSum = parent1.level + parent2.level
         val baseRate = 0.7f
         val levelBonus = (levelSum - 20) * 0.01f // Bonus for higher level parents
-        
         return (baseRate + levelBonus).coerceIn(0.1f, 0.95f)
     }
+    /**
+     * Check breeding compatibility between two monsters
+     */
+    fun checkBreedingCompatibility(monster1: Monster, monster2: Monster): BreedingCompatibility {
+        val canBreed = canBreed(monster1, monster2)
+        val successRate = calculateBreedingSuccessRate(monster1, monster2)
+        
+        return BreedingCompatibility(
+            canBreed = canBreed,
+            successRate = successRate,
+            reason = if (!canBreed) "Monsters cannot breed" else "Compatible for breeding"
+        )
+    }
+    
+    /**
+     * Generate offspring from two parent monsters
+     */
+    fun generateOffspring(parent1: Monster, parent2: Monster): Monster {
+        val offspringLevel = maxOf(1, (parent1.level + parent2.level) / 2 - 5)
+        val offspringFamily = if (kotlin.random.Random.nextFloat() < 0.5f) parent1.family else parent2.family
+        
+        return Monster(
+            id = java.util.UUID.randomUUID().toString(),
+            speciesId = "${parent1.speciesId}_${parent2.speciesId}_offspring",
+            name = "Offspring",
+            type1 = parent1.type1,
+            type2 = parent2.type1,
+            family = offspringFamily,
+            level = offspringLevel,
+            currentHp = 100,
+            currentMp = 50,
+            experience = 0,
+            experienceToNext = (offspringLevel * offspringLevel * offspringLevel).toLong(),
+            baseStats = MonsterStats(
+                attack = (parent1.baseStats.attack + parent2.baseStats.attack) / 2,
+                defense = (parent1.baseStats.defense + parent2.baseStats.defense) / 2,
+                agility = (parent1.baseStats.agility + parent2.baseStats.agility) / 2,
+                magic = (parent1.baseStats.magic + parent2.baseStats.magic) / 2,
+                wisdom = (parent1.baseStats.wisdom + parent2.baseStats.wisdom) / 2,
+                maxHp = (parent1.baseStats.maxHp + parent2.baseStats.maxHp) / 2,
+                maxMp = (parent1.baseStats.maxMp + parent2.baseStats.maxMp) / 2
+            ),
+            currentStats = MonsterStats(
+                attack = (parent1.baseStats.attack + parent2.baseStats.attack) / 2,
+                defense = (parent1.baseStats.defense + parent2.baseStats.defense) / 2,
+                agility = (parent1.baseStats.agility + parent2.baseStats.agility) / 2,
+                magic = (parent1.baseStats.magic + parent2.baseStats.magic) / 2,
+                wisdom = (parent1.baseStats.wisdom + parent2.baseStats.wisdom) / 2,
+                maxHp = (parent1.baseStats.maxHp + parent2.baseStats.maxHp) / 2,
+                maxMp = (parent1.baseStats.maxMp + parent2.baseStats.maxMp) / 2
+            ),
+            skills = listOf("Inherited Skill"),
+            traits = parent1.traits.take(1) + parent2.traits.take(1),
+            personality = if (kotlin.random.Random.nextFloat() < 0.5f) parent1.personality else parent2.personality
+        )
+    }
 }
+
+/**
+ * Breeding compatibility result
+ */
+data class BreedingCompatibility(
+    val canBreed: Boolean,
+    val successRate: Float,
+    val reason: String
+)

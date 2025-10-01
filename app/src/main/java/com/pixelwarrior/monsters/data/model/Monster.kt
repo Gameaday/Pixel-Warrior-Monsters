@@ -56,7 +56,8 @@ data class Monster(
     val isWild: Boolean = false,
     val captureRate: Int = 100,
     val growthRate: GrowthRate = GrowthRate.MEDIUM_FAST,
-    val affection: Int = 0 // New field for monster affection/friendship (0-100)
+    val affection: Int = 0, // New field for monster affection/friendship (0-100)
+    val personality: Personality = Personality.NONE // Monster personality type
 ) : Parcelable
 
 /**
@@ -84,3 +85,10 @@ data class MonsterSpecies(
     val breedingCompatibility: List<MonsterFamily> = emptyList(),
     val description: String = ""
 ) : Parcelable
+/**
+ * Monster personality types that affect behavior in battle
+ */
+enum class Personality {
+    NONE, AGGRESSIVE, DEFENSIVE, CAUTIOUS, BRAVE, TIMID, 
+    HARDY, GENTLE, RECKLESS, CALM, ENERGETIC, LAZY
+}

@@ -11,6 +11,11 @@ import com.pixelwarrior.monsters.game.story.StorySystem
 class HubWorldSystem(private val storySystem: StorySystem) {
     
     /**
+     * Secondary constructor for testing without story system
+     */
+    constructor() : this(StorySystem().apply { initializeStory() })
+    
+    /**
      * Hub areas that unlock as the player progresses
      */
     enum class HubArea(
@@ -311,5 +316,21 @@ class HubWorldSystem(private val storySystem: StorySystem) {
         } ?: true
         
         return storyRequirementMet && keyItemRequirementMet
+}
+    /**
+     * Get NPCs in a specific area
+     */
+    fun getAreaNPCs(area: HubArea): List<String> {
+        return when (area) {
+            HubArea.MAIN_HALL -> listOf("Master Teto", "Apprentice Mira", "Elder Scholar")
+            HubArea.MONSTER_LIBRARY -> listOf("Librarian Yuri", "Research Assistant")
+            HubArea.BREEDING_LAB -> listOf("Dr. Kaine", "Lab Assistant Tom")
+            HubArea.BATTLE_ARENA -> listOf("Champion Rica", "Arena Guard")
+            HubArea.GATE_CHAMBER -> listOf("Gatekeeper Zara")
+            HubArea.SYNTHESIS_LAB -> listOf("Dr. Synthesis", "Lab Tech")
+            HubArea.ITEM_SHOP -> listOf("Merchant Marcus")
+            HubArea.MASTER_QUARTERS -> listOf("Master Teto")
+            HubArea.SECRET_VAULT -> listOf("Guardian Spirit")
+        }
     }
 }
