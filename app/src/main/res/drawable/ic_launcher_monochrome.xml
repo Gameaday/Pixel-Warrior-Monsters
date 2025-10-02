@@ -4,34 +4,27 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Pixel art style monster icon -->
+    <!-- Simplified monochrome version of the monster icon -->
     <!-- Body -->
     <path
-        android:fillColor="#4CAF50"
+        android:fillColor="#FFFFFF"
         android:pathData="M34,34h40v40h-40z"/>
     <!-- Eyes -->
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#000000"
         android:pathData="M42,44h8v8h-8z"/>
     <path
-        android:fillColor="#FFFFFF"
+        android:fillColor="#000000"
         android:pathData="M58,44h8v8h-8z"/>
-    <!-- Pupils -->
-    <path
-        android:fillColor="#000000"
-        android:pathData="M46,48h4v4h-4z"/>
-    <path
-        android:fillColor="#000000"
-        android:pathData="M62,48h4v4h-4z"/>
     <!-- Mouth -->
     <path
         android:fillColor="#000000"
         android:pathData="M42,60h24v4h-24z"/>
     <!-- Horns -->
     <path
-        android:fillColor="#FF5722"
+        android:fillColor="#FFFFFF"
         android:pathData="M30,30h8v8h-8z"/>
     <path
-        android:fillColor="#FF5722"
+        android:fillColor="#FFFFFF"
         android:pathData="M70,30h8v8h-8z"/>
 </vector>
