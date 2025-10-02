@@ -165,7 +165,7 @@ class RoadmapImplementationValidationTest {
         assertTrue("Monster nest system should exist", nestLocations.isNotEmpty())
         
         // Verify Hidden Passages
-        val hiddenPassages = explorationSystem.getHiddenPassages()
+        val hiddenPassages = explorationSystem.getAllPossibleHiddenPassages()
         assertTrue("Hidden passage system should exist", hiddenPassages.isNotEmpty())
     }
 
