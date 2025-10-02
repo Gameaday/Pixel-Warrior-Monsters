@@ -236,29 +236,8 @@ fun Monster.canLevelUp(): Boolean {
 }
 
 /**
- * Get monster's HP percentage
- */
-fun Monster.getHpPercentage(): Float {
-    return if (currentStats.maxHp > 0) currentHp.toFloat() / currentStats.maxHp else 0f
-}
-
-/**
  * Get monster's MP percentage
  */
 fun Monster.getMpPercentage(): Float {
     return if (currentStats.maxMp > 0) currentMp.toFloat() / currentStats.maxMp else 0f
-}
-
-/**
- * Check if monster is fainted (0 HP)
- */
-fun Monster.isFainted(): Boolean {
-    return currentHp <= 0
-}
-
-/**
- * Get display name with level
- */
-fun Monster.getDisplayName(): String {
-    return "$name (Lv.$level)"
 }

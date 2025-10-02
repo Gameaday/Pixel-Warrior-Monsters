@@ -62,7 +62,7 @@ data class Monster(
     /**
      * Get HP percentage (0.0 to 1.0)
      */
-    fun getHpPercentage(): Float = currentHp.toFloat() / baseStats.maxHp.toFloat()
+    fun getHpPercentage(): Float = if (currentStats.maxHp > 0) currentHp.toFloat() / currentStats.maxHp else 0f
     
     /**
      * Check if monster is fainted

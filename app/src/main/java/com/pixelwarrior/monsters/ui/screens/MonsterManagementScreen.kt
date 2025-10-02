@@ -19,10 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.ui.theme.*
-import com.pixelwarrior.monsters.utils.getDisplayName
-import com.pixelwarrior.monsters.utils.getHpPercentage
 import com.pixelwarrior.monsters.utils.getMpPercentage
-import com.pixelwarrior.monsters.utils.isFainted
 
 /**
  * Monster management screen for viewing and organizing the player's monsters
