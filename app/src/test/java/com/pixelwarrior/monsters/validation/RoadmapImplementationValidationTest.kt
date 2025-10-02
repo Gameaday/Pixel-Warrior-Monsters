@@ -43,12 +43,13 @@ class RoadmapImplementationValidationTest {
         battleEngine = BattleEngine()
         breedingSystem = BreedingSystem()
         storySystem = StorySystem()
+        storySystem.initializeStory() // Initialize story with default progress
         hubWorldSystem = HubWorldSystem()
         dungeonSystem = DungeonSystem()
         explorationSystem = ExplorationSystem()
         tournamentSystem = TournamentSystem()
         endgameSystem = EndgameSystem()
-        synthesisLab = SynthesisLaboratory()
+        synthesisLab = SynthesisLaboratory(storySystem)
         qolSystem = QualityOfLifeSystem()
         crossPlatformSystem = CrossPlatformSystem()
     }

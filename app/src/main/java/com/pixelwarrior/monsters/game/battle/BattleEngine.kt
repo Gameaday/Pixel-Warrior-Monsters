@@ -441,6 +441,9 @@ class BattleEngine {
         enemyParty: List<Monster>,
         battleType: BattleType = BattleType.WILD_ENCOUNTER
     ): BattleState {
+        require(playerParty.isNotEmpty()) { "Player party cannot be empty" }
+        require(enemyParty.isNotEmpty()) { "Enemy party cannot be empty" }
+        
         return BattleState(
             playerMonsters = playerParty,
             enemyMonsters = enemyParty,

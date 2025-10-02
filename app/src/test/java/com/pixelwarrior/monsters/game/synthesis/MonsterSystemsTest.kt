@@ -245,8 +245,8 @@ class MonsterSystemsTest {
             dangerLevel = 7
         )
         
-        val easyRate = synthesisLab.getSuccessRate(testMonster1, testMonster1, emptyMap())
-        val hardRate = synthesisLab.getSuccessRate(testMonster1, testMonster1, emptyMap())
+        val easyRate = scoutDeployment.calculateScoutSuccessRate(testMonster1, easyArea)
+        val hardRate = scoutDeployment.calculateScoutSuccessRate(testMonster1, hardArea)
         
         assertTrue("Easy area should have higher success rate", easyRate > hardRate)
         assertTrue("Success rates should be reasonable", easyRate > 0.5f && easyRate <= 1.0f)
