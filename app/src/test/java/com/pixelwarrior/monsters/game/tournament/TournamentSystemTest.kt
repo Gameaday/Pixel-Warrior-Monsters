@@ -296,7 +296,7 @@ class TournamentSystemTest {
         if (aggressiveRival != null) {
             val battle = tournamentSystem.battleRival(testParty, aggressiveRival)
             assertTrue("Aggressive rival should have properly initialized team",
-                battle.enemyMonsters.all { it.currentHp > 0 })
+                aggressiveRival.team.all { it.currentHp > 0 })
         }
         
         val defensiveRival = tournamentSystem.getRivalTrainers()
@@ -304,7 +304,7 @@ class TournamentSystemTest {
         if (defensiveRival != null) {
             val battle = tournamentSystem.battleRival(testParty, defensiveRival)
             assertTrue("Defensive rival should have full HP/MP",
-                battle.enemyMonsters.all { it.currentHp == it.maxHp })
+                defensiveRival.team.all { it.currentHp == it.maxHp })
         }
         
         val mysteriousRival = tournamentSystem.getRivalTrainers()
@@ -312,7 +312,7 @@ class TournamentSystemTest {
         if (mysteriousRival != null) {
             val battle = tournamentSystem.battleRival(testParty, mysteriousRival)
             assertTrue("Mysterious rival should apply random effects",
-                battle.enemyMonsters.isNotEmpty())
+                mysteriousRival.team.isNotEmpty())
         }
     }
 
@@ -383,6 +383,6 @@ class TournamentSystemTest {
         // Hard rival should have stronger stats (though exact comparison depends on implementation)
         assertTrue("Hard rival should exist", hardRival.difficulty > easyRival.difficulty)
         assertTrue("Both battles should be valid", 
-            easyBattle.enemyMonsters.isNotEmpty() && hardBattle.enemyMonsters.isNotEmpty())
+            easyRival.team.isNotEmpty() && hardRival.team.isNotEmpty())
     }
 }
