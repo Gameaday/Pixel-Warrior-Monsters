@@ -48,11 +48,13 @@ class SkillLearningSystemTest {
     )
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         mockGameRepository = mock(GameRepository::class.java)
-        skillLearningSystem = SkillLearningSystem(mockGameRepository)
         
-        // Mock repository responses - suspend functions will be mocked in test contexts
+        // Mock repository responses to return test skills
+        `when`(mockGameRepository.getAllSkills()).thenReturn(testSkills)
+        
+        skillLearningSystem = SkillLearningSystem(mockGameRepository)
     }
 
     @Test
