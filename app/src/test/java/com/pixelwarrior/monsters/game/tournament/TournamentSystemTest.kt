@@ -47,7 +47,7 @@ class TournamentSystemTest {
     @Test
     fun testRivalTrainerCreation() {
         val rivals = RivalTrainer.createRivalTrainers()
-        assertEquals("Should have 12 rival trainers", 12, rivals.size)
+        assertEquals("Should have 14 rival trainers", 14, rivals.size)
         
         // Check each rival has proper data
         rivals.forEach { rival ->
@@ -106,7 +106,7 @@ class TournamentSystemTest {
         assertEquals("Should return all tiers", 5, tiers.size)
         
         val rivals = tournamentSystem.getRivalTrainers()
-        assertEquals("Should return all rivals", 12, rivals.size)
+        assertEquals("Should return all rivals", 14, rivals.size)
         
         // Test tier-specific rivals
         val rookieTier = TournamentTier.ROOKIE
