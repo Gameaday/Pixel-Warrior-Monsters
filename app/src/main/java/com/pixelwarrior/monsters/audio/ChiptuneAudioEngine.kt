@@ -23,11 +23,24 @@ class ChiptuneAudioEngine(private val context: Context) {
     
     private val scope = CoroutineScope(Dispatchers.Default)
     private var currentMusicJob: Job? = null
-    private val soundPool = SoundPool.Builder().setMaxStreams(8).build()
+    private val soundPool: SoundPool? = try {
+        SoundPool.Builder().setMaxStreams(8).build()
+    } catch (e: RuntimeException) {
+        // In unit tests, Android framework is not available
+        null
+    }
     
     // Real 8-bit audio system - Phase 4 Implementation
-    private val real8BitEngine = Real8BitAudioEngine(context)
-    private val voiceSynthesis = Voice8BitSynthesis(context, real8BitEngine)
+    private val real8BitEngine: Real8BitAudioEngine? = try {
+        Real8BitAudioEngine(context)
+    } catch (e: RuntimeException) {
+        null
+    }
+    private val voiceSynthesis: Voice8BitSynthesis? = try {
+        if (real8BitEngine != null) Voice8BitSynthesis(context, real8BitEngine) else null
+    } catch (e: RuntimeException) {
+        null
+    }
     
     private val _isMusicEnabled = MutableStateFlow(true)
     val isMusicEnabled: StateFlow<Boolean> = _isMusicEnabled.asStateFlow()
@@ -173,7 +186,7 @@ class ChiptuneAudioEngine(private val context: Context) {
             ChipNote(262.0, 1000, ChipWaveform.SQUARE) // C4
         )
         
-        real8BitEngine.playMelody(melody, loop)
+        real8BitEngine?.playMelody(melody, loop)
     }
     
     private suspend fun playWorldMapTheme(loop: Boolean) {
@@ -371,7 +384,7 @@ class ChiptuneAudioEngine(private val context: Context) {
         
         // Use real 8-bit audio engine for authentic sound generation
         val volume = _soundVolume.value
-        real8BitEngine.playChipNote(frequency.toDouble(), durationMs, waveform, volume)
+        real8BitEngine?.playChipNote(frequency.toDouble(), durationMs, waveform, volume)
     }
     
     /**
@@ -379,9 +392,9 @@ class ChiptuneAudioEngine(private val context: Context) {
      */
     fun release() {
         stopMusic()
-        soundPool.release()
-        real8BitEngine.release()
-        voiceSynthesis.release()
+        soundPool?.release()
+        real8BitEngine?.release()
+        voiceSynthesis?.release()
     }
     
     /**
@@ -393,7 +406,7 @@ class ChiptuneAudioEngine(private val context: Context) {
         emotion: VoiceEmotion = VoiceEmotion.NEUTRAL
     ) {
         if (!_isSoundEnabled.value) return
-        voiceSynthesis.speakCharacterLine(character, text, emotion)
+        voiceSynthesis?.speakCharacterLine(character, text, emotion)
     }
     
     /**
@@ -401,7 +414,7 @@ class ChiptuneAudioEngine(private val context: Context) {
      */
     suspend fun playVoiceAck(character: VoiceCharacter, ackType: VoiceAckType) {
         if (!_isSoundEnabled.value) return
-        voiceSynthesis.playVoiceAck(character, ackType)
+        voiceSynthesis?.playVoiceAck(character, ackType)
     }
     
     /**
@@ -412,7 +425,7 @@ class ChiptuneAudioEngine(private val context: Context) {
         
         currentMusicJob?.cancel()
         currentMusicJob = scope.launch {
-            real8BitEngine.playBackgroundMusic(context, loop)
+            real8BitEngine?.playBackgroundMusic(context, loop)
         }
     }
     
@@ -421,7 +434,7 @@ class ChiptuneAudioEngine(private val context: Context) {
      */
     suspend fun playMonsterCry(monsterSpecies: String) {
         if (!_isSoundEnabled.value) return
-        real8BitEngine.playMonsterCry(monsterSpecies, _soundVolume.value)
+        real8BitEngine?.playMonsterCry(monsterSpecies, _soundVolume.value)
     }
     
     /**
@@ -450,7 +463,7 @@ class ChiptuneAudioEngine(private val context: Context) {
      */
     suspend fun playCharacterVoice(character: com.pixelwarrior.monsters.data.model.VoiceCharacter, text: String) {
         if (!_isSoundEnabled.value) return
-        voiceSynthesis.speakCharacterLine(character, text)
+        voiceSynthesis?.speakCharacterLine(character, text)
     }
     
     /**
@@ -468,10 +481,10 @@ class ChiptuneAudioEngine(private val context: Context) {
         _soundVolume.value = soundVolume.coerceIn(0f, 1f)
         
         // Update engines
-        real8BitEngine.setEnabled(musicEnabled || soundEnabled)
-        real8BitEngine.setVolume(maxOf(musicVolume, soundVolume))
-        voiceSynthesis.setVoiceEnabled(soundEnabled)
-        voiceSynthesis.setVoiceVolume(soundVolume)
+        real8BitEngine?.setEnabled(musicEnabled || soundEnabled)
+        real8BitEngine?.setVolume(maxOf(musicVolume, soundVolume))
+        voiceSynthesis?.setVoiceEnabled(soundEnabled)
+        voiceSynthesis?.setVoiceVolume(soundVolume)
     }
     
     /**
