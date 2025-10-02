@@ -66,7 +66,11 @@ class SynthesisLaboratory(
         playerInventory: Map<String, Int>
     ): SynthesisResult {
         
-        if (!_isLabUnlocked.value) {
+        // Check current story progress for lab unlock
+        val storyProgress = storySystem.currentStoryProgress.value
+        val isUnlocked = storyProgress["synthesis_lab_visited"] == true || _isLabUnlocked.value
+        
+        if (!isUnlocked) {
             return SynthesisResult.Failure("Synthesis Laboratory is not yet accessible")
         }
         
