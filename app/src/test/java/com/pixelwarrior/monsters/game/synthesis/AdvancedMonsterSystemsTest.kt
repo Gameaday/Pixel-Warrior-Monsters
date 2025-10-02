@@ -121,15 +121,15 @@ class AdvancedMonsterSystemsTest {
         
         // Brave personality should boost attack and reduce agility
         assertTrue("Brave personality should boost attack", 
-            braveStats.attack > testMonster1.baseMonster.stats.attack)
+            braveStats.attack > testMonster1.attack)
         assertTrue("Brave personality should reduce agility",
-            braveStats.agility < testMonster1.baseMonster.stats.agility)
+            braveStats.agility < testMonster1.agility)
         
         // Modest personality should boost magic and reduce attack
         assertTrue("Modest personality should boost magic",
-            modestStats.magic > testMonster2.baseMonster.stats.magic)
+            modestStats.magic > testMonster2.magic)
         assertTrue("Modest personality should reduce attack",
-            modestStats.attack < testMonster2.baseMonster.stats.attack)
+            modestStats.attack < testMonster2.attack)
     }
     
     @Test

@@ -56,7 +56,7 @@ class EndgameSystemTest {
     fun `legendary encounter conditions work correctly`() {
         val testMonsters = listOf(
             createTestMonster(name = "Fire Drake", type1 = MonsterType.FIRE, family = MonsterFamily.DRAGON),
-            createTestMonster(name = "Earth Golem", type1 = MonsterType.EARTH, family = MonsterFamily.MATERIAL)
+            createTestMonster(name = "Earth Golem", type1 = MonsterType.NORMAL, family = MonsterFamily.MATERIAL)
         )
         
         // Test night time requirement
