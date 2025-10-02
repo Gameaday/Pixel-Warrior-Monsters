@@ -112,8 +112,8 @@ class EndgameSystemTest {
         
         assertEquals("Legendary should have correct species", "Test Legendary", legendary.name)
         assertEquals("Legendary should have correct level", 90, legendary.level)
-        assertEquals("Legendary should have correct attack stat", 200, legendary.baseStats.attack)
-        assertEquals("Legendary should have correct HP", 350, legendary.baseStats.hp)
+        assertEquals("Legendary should have correct attack stat", 200, legendary.currentStats.attack)
+        assertEquals("Legendary should have correct HP", 350, legendary.currentStats.maxHp)
         assertTrue("Legendary should have legendary trait", legendary.traits.contains("Legendary"))
         assertTrue("Legendary should know unique ability", legendary.skills.contains("Test Ability"))
         // maxSynthesisLevel is not a property on Monster - skip this assertion
