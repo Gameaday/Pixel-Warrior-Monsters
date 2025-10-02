@@ -454,4 +454,31 @@ class BattleEngine {
             canTreat = battleType == BattleType.WILD_ENCOUNTER
         )
     }
+    
+    /**
+     * Process a battle action and update battle state
+     */
+    fun processBattleAction(
+        battleState: BattleState,
+        action: BattleActionData
+    ): BattleState {
+        return when (action.action) {
+            BattleAction.ATTACK, BattleAction.SKILL -> {
+                if (action.skillId != null) {
+                    executeAttack(battleState, action)
+                } else {
+                    battleState
+                }
+            }
+            BattleAction.DEFEND -> {
+                battleState // Defend handled elsewhere
+            }
+            BattleAction.RUN -> {
+                executeRun(battleState, action)
+            }
+            BattleAction.TREAT -> {
+                executeTreat(battleState, action)
+            }
+        }
+    }
 }

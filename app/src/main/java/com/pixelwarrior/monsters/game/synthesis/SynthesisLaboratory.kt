@@ -326,6 +326,35 @@ class SynthesisLaboratory(
             "Advanced Fusion"
         ).filter { monster.level >= 10 }
     }
+    
+    /**
+     * Calculate synthesis success rate based on factors
+     */
+    fun getSuccessRate(parent1: Monster, parent2: Monster, conditions: Map<String, Any> = emptyMap()): Int {
+        var baseRate = 85
+        
+        // Level factor
+        val avgLevel = (parent1.level + parent2.level) / 2
+        val levelBonus = (avgLevel / 10) * 2
+        baseRate += levelBonus
+        
+        // Affection factor (higher affection = higher success)
+        val avgAffection = (parent1.affection + parent2.affection) / 2
+        val affectionBonus = (avgAffection / 20)
+        baseRate += affectionBonus
+        
+        // Family compatibility bonus
+        if (parent1.family == parent2.family) {
+            baseRate += 10
+        }
+        
+        // Environmental conditions bonus
+        if (conditions["full_moon"] == true) baseRate += 5
+        if (conditions["special_catalyst"] == true) baseRate += 10
+        
+        // Cap at 95%
+        return minOf(95, maxOf(50, baseRate))
+    }
 }
 
 /**
