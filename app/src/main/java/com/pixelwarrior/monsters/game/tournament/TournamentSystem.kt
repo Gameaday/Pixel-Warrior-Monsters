@@ -45,6 +45,12 @@ data class RivalTrainer(
     companion object {
         fun createRivalTrainers(): List<RivalTrainer> {
             return listOf(
+                // Rookie tier trainers (level 1-15)
+                RivalTrainer("bobby", "Bobby", "Beginner", MonsterType.NORMAL, 1, "Eager", 
+                    createTeam(MonsterType.NORMAL, 8), signature = "Learning the basics"),
+                RivalTrainer("sarah", "Sarah", "Novice Trainer", MonsterType.GRASS, 2, "Careful", 
+                    createTeam(MonsterType.GRASS, 12), signature = "Takes it slow and steady"),
+                // Intermediate trainers
                 RivalTrainer("elena", "Elena", "Fire Tamer", MonsterType.FIRE, 3, "Aggressive", 
                     createTeam(MonsterType.FIRE, 18), signature = "Always leads with fire attacks"),
                 RivalTrainer("marcus", "Marcus", "Water Guardian", MonsterType.WATER, 4, "Defensive", 

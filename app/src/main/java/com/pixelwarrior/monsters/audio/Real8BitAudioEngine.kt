@@ -25,7 +25,12 @@ class Real8BitAudioEngine(private val context: Context) {
     private val sampleRate = 22050 // Lower sample rate for authentic 8-bit feel
     private val channels = AudioFormat.CHANNEL_OUT_MONO
     private val encoding = AudioFormat.ENCODING_PCM_16BIT
-    private val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channels, encoding) * 2
+    private val bufferSize = try {
+        AudioTrack.getMinBufferSize(sampleRate, channels, encoding) * 2
+    } catch (e: RuntimeException) {
+        // In unit tests, Android framework is not available
+        4096 // Default buffer size for tests
+    }
     
     private val _isEnabled = MutableStateFlow(true)
     val isEnabled: StateFlow<Boolean> = _isEnabled.asStateFlow()

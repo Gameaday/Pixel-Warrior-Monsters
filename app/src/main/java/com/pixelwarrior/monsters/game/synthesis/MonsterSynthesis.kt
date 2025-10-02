@@ -113,6 +113,7 @@ class MonsterSynthesis {
         SynthesisRecipe(MonsterFamily.SLIME, MonsterFamily.SLIME, "king_slime", 12, 0.85f),
         SynthesisRecipe(MonsterFamily.SLIME, MonsterFamily.MATERIAL, "metal_slime", 25, 0.6f),
         SynthesisRecipe(MonsterFamily.SLIME, MonsterFamily.PLANT, "moss_slime", 10, 0.9f),
+        SynthesisRecipe(MonsterFamily.SLIME, MonsterFamily.DRAGON, "dragon_slime", 20, 0.7f),
         
         // Dragon family combinations
         SynthesisRecipe(MonsterFamily.DRAGON, MonsterFamily.DRAGON, "elder_dragon", 30, 0.5f),
@@ -263,6 +264,7 @@ class MonsterSynthesis {
             "king_slime" -> Triple(MonsterType.NORMAL, null, MonsterFamily.SLIME)
             "metal_slime" -> Triple(MonsterType.STEEL, null, MonsterFamily.MATERIAL)
             "moss_slime" -> Triple(MonsterType.GRASS, MonsterType.WATER, MonsterFamily.PLANT)
+            "dragon_slime" -> Triple(MonsterType.DRAGON, MonsterType.WATER, MonsterFamily.SLIME)
             "elder_dragon" -> Triple(MonsterType.DRAGON, MonsterType.PSYCHIC, MonsterFamily.DRAGON)
             "shadow_dragon" -> Triple(MonsterType.DRAGON, MonsterType.GHOST, MonsterFamily.DEMON)
             "crystal_dragon" -> Triple(MonsterType.DRAGON, MonsterType.ROCK, MonsterFamily.MATERIAL)

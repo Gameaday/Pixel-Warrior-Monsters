@@ -77,9 +77,9 @@ class GameSystemsTest {
 
     @Test
     fun testBreedingSystem_Compatibility() {
-        val parent1 = createTestMonster(name = "Parent1", family = MonsterFamily.BEAST, level = 15)
-        val parent2 = createTestMonster(name = "Parent2", family = MonsterFamily.BIRD, level = 12)
-        val incompatible = createTestMonster(name = "Incompatible", family = MonsterFamily.UNDEAD, level = 20)
+        val parent1 = createTestMonster(name = "Parent1", speciesId = "beast_species", family = MonsterFamily.BEAST, level = 15)
+        val parent2 = createTestMonster(name = "Parent2", speciesId = "bird_species", family = MonsterFamily.BIRD, level = 12)
+        val incompatible = createTestMonster(name = "Incompatible", speciesId = "undead_species", family = MonsterFamily.UNDEAD, level = 20)
 
         val breedingSystem = BreedingSystem()
 
@@ -90,8 +90,8 @@ class GameSystemsTest {
 
     @Test
     fun testBreedingSystem_OffspringGeneration() {
-        val parent1 = createTestMonster(name = "Parent1", family = MonsterFamily.BEAST, level = 15)
-        val parent2 = createTestMonster(name = "Parent2", family = MonsterFamily.BIRD, level = 12)
+        val parent1 = createTestMonster(name = "Parent1", speciesId = "beast_species", family = MonsterFamily.BEAST, level = 15)
+        val parent2 = createTestMonster(name = "Parent2", speciesId = "bird_species", family = MonsterFamily.BIRD, level = 12)
 
         val breedingSystem = BreedingSystem()
         val offspring = breedingSystem.breedMonsters(parent1, parent2)

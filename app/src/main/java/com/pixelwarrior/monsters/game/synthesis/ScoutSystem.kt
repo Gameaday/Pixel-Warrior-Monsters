@@ -78,6 +78,13 @@ class ScoutSystem {
     /**
      * Start a scout mission with a monster
      */
+    fun startScoutMission(monster: Monster, missionType: ScoutMissionType): ScoutMissionResult {
+        return startScoutMission(EnhancedMonster(monster), missionType)
+    }
+    
+    /**
+     * Start a scout mission with an enhanced monster
+     */
     fun startScoutMission(monster: EnhancedMonster, missionType: ScoutMissionType): ScoutMissionResult {
         // Check if monster is already on a mission
         if (isMonsterOnMission(monster.baseMonster.id)) {

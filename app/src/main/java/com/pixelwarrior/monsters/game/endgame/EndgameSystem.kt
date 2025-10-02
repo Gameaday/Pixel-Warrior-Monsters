@@ -279,8 +279,8 @@ class EndgameSystem {
                 maxHp = legendary.baseHP,
                 maxMp = legendary.baseMP
             ),
-            skills = emptyList(),
-            traits = emptyList(),
+            skills = listOf(legendary.uniqueAbility),
+            traits = listOf("Legendary"),
             isWild = true,
             captureRate = 3, // Very hard to capture
             growthRate = GrowthRate.SLOW
@@ -296,17 +296,18 @@ class EndgameSystem {
         playerItems: List<String>,
         achievements: List<String>
     ): NewGamePlusData {
+        val nextPlaythrough = currentPlaythrough + 1
         val retainedGoldPercentage = minOf(50 + (currentPlaythrough * 10), 90)
         val retainedGold = (playerGold * retainedGoldPercentage) / 100
         
-        val bonusLevel = minOf(currentPlaythrough * 5, 25)
-        val difficultyMultiplier = 1.0 + (currentPlaythrough * 0.15)
+        val bonusLevel = minOf(nextPlaythrough * 5, 25)
+        val difficultyMultiplier = 1.0 + (nextPlaythrough * 0.15)
         
         val unlockedFeatures = mutableListOf<String>()
-        if (currentPlaythrough >= 1) unlockedFeatures.add("Advanced Breeding Options")
-        if (currentPlaythrough >= 2) unlockedFeatures.add("Legendary Starter Choice")
-        if (currentPlaythrough >= 3) unlockedFeatures.add("Master Difficulty Mode")
-        if (currentPlaythrough >= 5) unlockedFeatures.add("Ultimate Challenge Mode")
+        if (nextPlaythrough >= 2) unlockedFeatures.add("Advanced Breeding Options")
+        if (nextPlaythrough >= 3) unlockedFeatures.add("Legendary Starter Choice")
+        if (nextPlaythrough >= 4) unlockedFeatures.add("Master Difficulty Mode")
+        if (nextPlaythrough >= 5) unlockedFeatures.add("Ultimate Challenge Mode")
         
         // Retain key items and special tools
         val retainedItems = playerItems.filter { item ->
@@ -314,7 +315,7 @@ class EndgameSystem {
         }
         
         return NewGamePlusData(
-            playthrough = currentPlaythrough + 1,
+            playthrough = nextPlaythrough,
             retainedGold = retainedGold,
             retainedItems = retainedItems,
             bonusStarterLevel = bonusLevel,
@@ -377,22 +378,21 @@ class EndgameSystem {
         
         // Legendary fusion - requires legendary + regular monster
         val legendaries = monsters.filter { it.traits.contains("Legendary") }
-        val regulars = monsters.filter { !it.traits.contains("Legendary") && it.level >= 90 }
+        val regulars = monsters.filter { !it.traits.contains("Legendary") && it.level >= 85 }
         
         for (legendary in legendaries) {
             for (regular in regulars) {
-                if (legendary.family == regular.family) {
-                    fusionOptions.add(
-                        FusionTree(
-                            generation = 4,
-                            parents = listOf(legendary, regular),
-                            requiredLevel = 95,
-                            fusionMaterial = "Legendary Essence",
-                            resultSpecies = "Ascended ${legendary.name}",
-                            statBonusMultiplier = 2.2
-                        )
+                // Accept any fusion with legendary, but prefer same family
+                fusionOptions.add(
+                    FusionTree(
+                        generation = 4,
+                        parents = listOf(legendary, regular),
+                        requiredLevel = 95,
+                        fusionMaterial = "Legendary Essence",
+                        resultSpecies = "Ascended ${legendary.name}",
+                        statBonusMultiplier = if (legendary.family == regular.family) 2.5 else 2.2
                     )
-                }
+                )
             }
         }
         

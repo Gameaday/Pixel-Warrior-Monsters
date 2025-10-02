@@ -29,23 +29,44 @@ class QualityOfLifeSystem {
     // Achievement System
     fun checkAchievement(trigger: AchievementTrigger, value: Int = 1) {
         val currentAchievements = _achievements.value.toMutableList()
-        val newAchievements = mutableListOf<Achievement>()
+        val updatedAchievements = mutableListOf<Achievement>()
+        var hasChanges = false
 
         availableAchievements.forEach { achievement ->
-            if (!currentAchievements.contains(achievement) && achievement.trigger == trigger) {
-                val currentProgress = achievement.progress + value
-                if (currentProgress >= achievement.requirement) {
-                    achievement.progress = achievement.requirement
-                    achievement.isUnlocked = true
-                    newAchievements.add(achievement)
+            if (achievement.trigger == trigger) {
+                val existingAchievement = currentAchievements.find { it.id == achievement.id }
+                
+                if (existingAchievement != null) {
+                    // Update existing achievement progress
+                    if (!existingAchievement.isUnlocked) {
+                        val newProgress = existingAchievement.progress + value
+                        val updatedAchievement = existingAchievement.copy(
+                            progress = minOf(newProgress, existingAchievement.requirement),
+                            isUnlocked = newProgress >= existingAchievement.requirement
+                        )
+                        updatedAchievements.add(updatedAchievement)
+                        hasChanges = true
+                    } else {
+                        updatedAchievements.add(existingAchievement)
+                    }
                 } else {
-                    achievement.progress = currentProgress
+                    // Add new achievement with progress
+                    val newProgress = achievement.progress + value
+                    val newAchievement = achievement.copy(
+                        progress = minOf(newProgress, achievement.requirement),
+                        isUnlocked = newProgress >= achievement.requirement
+                    )
+                    updatedAchievements.add(newAchievement)
+                    hasChanges = true
                 }
+            } else {
+                // Keep non-matching achievements as-is
+                currentAchievements.find { it.id == achievement.id }?.let { updatedAchievements.add(it) }
             }
         }
 
-        if (newAchievements.isNotEmpty()) {
-            _achievements.value = currentAchievements + newAchievements
+        if (hasChanges) {
+            _achievements.value = updatedAchievements
         }
     }
 
@@ -116,17 +137,17 @@ class QualityOfLifeSystem {
     private fun checkStatisticAchievements(type: StatisticType, stats: GameStatistics) {
         when (type) {
             StatisticType.BATTLES_WON -> {
-                if (stats.battlesWon >= 100) checkAchievement(AchievementTrigger.BATTLES_WON_100)
-                if (stats.battlesWon >= 500) checkAchievement(AchievementTrigger.BATTLES_WON_500)
-                if (stats.battlesWon >= 1000) checkAchievement(AchievementTrigger.BATTLES_WON_1000)
+                if (stats.battlesWon >= 100) checkAchievement(AchievementTrigger.BATTLES_WON_100, stats.battlesWon)
+                if (stats.battlesWon >= 500) checkAchievement(AchievementTrigger.BATTLES_WON_500, stats.battlesWon)
+                if (stats.battlesWon >= 1000) checkAchievement(AchievementTrigger.BATTLES_WON_1000, stats.battlesWon)
             }
             StatisticType.MONSTERS_CAUGHT -> {
-                if (stats.monstersCaught >= 50) checkAchievement(AchievementTrigger.MONSTERS_CAUGHT_50)
-                if (stats.monstersCaught >= 150) checkAchievement(AchievementTrigger.MONSTERS_CAUGHT_150)
+                if (stats.monstersCaught >= 50) checkAchievement(AchievementTrigger.MONSTERS_CAUGHT_50, stats.monstersCaught)
+                if (stats.monstersCaught >= 150) checkAchievement(AchievementTrigger.MONSTERS_CAUGHT_150, stats.monstersCaught)
             }
             StatisticType.MONSTERS_BRED -> {
-                if (stats.monstersBred >= 25) checkAchievement(AchievementTrigger.MONSTERS_BRED_25)
-                if (stats.monstersBred >= 100) checkAchievement(AchievementTrigger.MONSTERS_BRED_100)
+                if (stats.monstersBred >= 25) checkAchievement(AchievementTrigger.MONSTERS_BRED_25, stats.monstersBred)
+                if (stats.monstersBred >= 100) checkAchievement(AchievementTrigger.MONSTERS_BRED_100, stats.monstersBred)
             }
             else -> { /* Other statistic triggers */ }
         }

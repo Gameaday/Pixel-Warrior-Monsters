@@ -66,7 +66,11 @@ class SynthesisLaboratory(
         playerInventory: Map<String, Int>
     ): SynthesisResult {
         
-        if (!_isLabUnlocked.value) {
+        // Check current story progress for lab unlock
+        val storyProgress = storySystem.currentStoryProgress.value
+        val isUnlocked = storyProgress["synthesis_lab_visited"] == true || _isLabUnlocked.value
+        
+        if (!isUnlocked) {
             return SynthesisResult.Failure("Synthesis Laboratory is not yet accessible")
         }
         
@@ -330,7 +334,7 @@ class SynthesisLaboratory(
     /**
      * Calculate synthesis success rate based on factors
      */
-    fun getSuccessRate(parent1: Monster, parent2: Monster, conditions: Map<String, Any> = emptyMap()): Int {
+    fun getSuccessRate(parent1: Monster, parent2: Monster, conditions: Map<String, Any> = emptyMap()): Float {
         var baseRate = 85
         
         // Level factor
@@ -352,8 +356,8 @@ class SynthesisLaboratory(
         if (conditions["full_moon"] == true) baseRate += 5
         if (conditions["special_catalyst"] == true) baseRate += 10
         
-        // Cap at 95%
-        return minOf(95, maxOf(50, baseRate))
+        // Cap at 95% and return as float (0.0-1.0)
+        return minOf(95, maxOf(50, baseRate)) / 100.0f
     }
 }
 
