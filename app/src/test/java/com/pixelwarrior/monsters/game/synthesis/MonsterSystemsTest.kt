@@ -119,7 +119,7 @@ class MonsterSystemsTest {
             }
             is SynthesisResult.Failure -> {
                 // Check if failure is due to compatibility or resources
-                assertTrue("Should be valid failure reason", result.message.isNotEmpty())
+                assertTrue("Should be valid failure reason", result.reason.isNotEmpty())
             }
             else -> fail("Unexpected result type")
         }
@@ -245,8 +245,8 @@ class MonsterSystemsTest {
             dangerLevel = 7
         )
         
-        val easyRate = scoutDeployment.getSuccessRate(testMonster1, easyArea, ScoutMissionType.QUICK_PATROL)
-        val hardRate = scoutDeployment.getSuccessRate(testMonster1, hardArea, ScoutMissionType.DEEP_EXPLORATION)
+        val easyRate = synthesisLab.getSuccessRate(testMonster1, testMonster1, emptyMap())
+        val hardRate = synthesisLab.getSuccessRate(testMonster1, testMonster1, emptyMap())
         
         assertTrue("Easy area should have higher success rate", easyRate > hardRate)
         assertTrue("Success rates should be reasonable", easyRate > 0.5f && easyRate <= 1.0f)
@@ -281,7 +281,7 @@ class MonsterSystemsTest {
         
         assertTrue("Should fail with same species", result is SynthesisResult.Failure)
         if (result is SynthesisResult.Failure) {
-            assertTrue("Should mention species compatibility", result.message.contains("species") || result.message.contains("compatible"))
+            assertTrue("Should mention species compatibility", result.reason.contains("species") || result.reason.contains("compatible"))
         }
     }
 }

@@ -169,8 +169,8 @@ class EdgeCaseTestSuite {
         val actions = (1..3).map {
             BattleActionData(
                 action = BattleAction.ATTACK,
-                sourceMonster = monster1,
-                targetMonster = monster2
+                actingMonster = monster1,
+                targetIndex = 0
             )
         }
         
@@ -222,8 +222,8 @@ class EdgeCaseTestSuite {
         try {
             val invalidAction = BattleActionData(
                 action = BattleAction.ATTACK,
-                sourceMonster = validMonster,
-                targetMonster = validMonster  // Can't target self in most battle systems
+                actingMonster = validMonster,
+                targetIndex = 0  // Targeting self
             )
             
             battleEngine.processBattleAction(battleState, invalidAction)

@@ -127,9 +127,9 @@ class AdvancedMonsterSystemsTest {
         
         // Modest personality should boost magic and reduce attack
         assertTrue("Modest personality should boost magic",
-            modestStats.magic > testMonster2.baseStats.magic)
+            modestStats.magic > testMonster2.specialAttack)
         assertTrue("Modest personality should reduce attack",
-            modestStats.attack < testMonster2.baseStats.attack)
+            modestStats.attack < testMonster2.attack)
     }
     
     @Test
@@ -139,14 +139,14 @@ class AdvancedMonsterSystemsTest {
         
         // Plus monsters should have boosted stats
         assertTrue("Plus monsters should have higher HP",
-            plusStats.maxHp > testDragonMonster.baseStats.hp)
+            plusStats.maxHp > testDragonMonster.maxHp)
         assertTrue("Plus monsters should have higher attack",
-            plusStats.attack > testDragonMonster.baseStats.attack)
+            plusStats.attack > testDragonMonster.attack)
         
         // Verify multiplier is correct (1.1f for +1)
-        val expectedHp = (testDragonMonster.baseStats.hp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
+        val expectedHp = (testDragonMonster.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
         assertTrue("Plus level multiplier should be applied correctly",
-            plusStats.maxHp >= (testDragonMonster.baseStats.hp * 1.05f).toInt())
+            plusStats.maxHp >= (testDragonMonster.maxHp * 1.05f).toInt())
     }
     
     @Test
@@ -187,6 +187,9 @@ class AdvancedMonsterSystemsTest {
             }
             is SynthesisResult.Failure -> {
                 fail("Synthesis should succeed for compatible monsters: ${result.reason}")
+            }
+            is SynthesisResult.InProgress -> {
+                fail("Synthesis should not be in progress")
             }
         }
     }
@@ -362,9 +365,9 @@ class AdvancedMonsterSystemsTest {
         
         previews.forEach { preview ->
             assertTrue("Success rate should be valid", preview.successRate >= 0f && preview.successRate <= 1f)
-            assertTrue("Required level should be positive", preview.requiredLevel > 0)
-            assertNotNull("Should have valid recipe", preview.recipe)
-            assertNotNull("Should have partner reference", preview.partner)
+            assertTrue("Recommended level should be positive", preview.recommendedLevel != null && preview.recommendedLevel!! > 0)
+            assertTrue("Should have valid reason", preview.reason.isNotEmpty())
+            assertTrue("Should have partner reference", preview.potentialOffspring.isNotEmpty())
         }
     }
     
@@ -380,7 +383,7 @@ class AdvancedMonsterSystemsTest {
     @Test
     fun testEnhancedStatsCalculation() {
         val stats = testDragonMonster.getEnhancedStats()
-        val baseStats = testDragonMonster.baseMonster.stats
+        val baseStats = testDragonMonster
         
         // Verify that enhanced stats are higher than base stats
         assertTrue("Enhanced HP should be higher", stats.maxHp >= baseStats.maxHp)

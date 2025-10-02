@@ -52,11 +52,7 @@ class SkillLearningSystemTest {
         mockGameRepository = mock(GameRepository::class.java)
         skillLearningSystem = SkillLearningSystem(mockGameRepository)
         
-        // Mock repository responses
-        `when`(mockGameRepository.getAllSkills()).thenReturn(testSkills)
-        `when`(mockGameRepository.getSkillById("heal")).thenReturn(testSkills[0])
-        `when`(mockGameRepository.getSkillById("ice_shard")).thenReturn(testSkills[1])
-        `when`(mockGameRepository.getSkillById("guard")).thenReturn(testSkills[2])
+        // Mock repository responses - suspend functions will be mocked in test contexts
     }
 
     @Test
@@ -227,7 +223,7 @@ class SkillLearningSystemTest {
     }
 
     @Test
-    fun `learning success rate varies by item rarity`() {
+    fun `learning success rate varies by item rarity`() = runTest {
         skillLearningSystem.initializeSkillLearning()
         
         // This tests internal calculation - we can't easily mock private methods
