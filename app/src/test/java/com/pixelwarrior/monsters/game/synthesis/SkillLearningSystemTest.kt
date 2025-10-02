@@ -54,6 +54,11 @@ class SkillLearningSystemTest {
         // Mock repository responses to return test skills
         `when`(mockGameRepository.getAllSkills()).thenReturn(testSkills)
         
+        // Mock getSkillById for individual skill lookups
+        testSkills.forEach { skill ->
+            `when`(mockGameRepository.getSkillById(skill.skillId)).thenReturn(skill)
+        }
+        
         skillLearningSystem = SkillLearningSystem(mockGameRepository)
     }
 
@@ -126,8 +131,10 @@ class SkillLearningSystemTest {
         skillLearningSystem.initializeSkillLearning()
         
         // Create monster with many skills to trigger replacement
+        // Use PLANT family to be compatible with HEALING skills
         val fullSkillsMonster = testMonster.copy(
             level = 10, // Lower level = fewer max skills
+            family = MonsterFamily.PLANT, // Compatible with HEALING skills
             skills = listOf("tackle", "fireball") // Already at capacity for low level
         )
         
