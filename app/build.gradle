@@ -121,7 +121,7 @@ tasks.register('jacocoTestReport', JacocoReport) {
     ])
 }
 
-// Android lint configuration for Play Store compliance
+// Android lint configuration for Play Store compliance and code quality
 android {
     lintOptions {
         checkReleaseBuilds = true
@@ -138,5 +138,23 @@ android {
         
         // Performance checks  
         enable 'UnusedResources', 'IconDensities', 'MissingDefaultResource'
+        
+        // Code quality checks
+        enable 'ObsoleteSdkInt', 'OldTargetApi', 'ExpiredTargetSdkVersion'
+        enable 'UnusedIds', 'IconLauncherShape'
+        enable 'Overdraw', 'DrawAllocation', 'Wakelock', 'Recycle'
+        
+        // Kotlin specific checks
+        enable 'KotlinPropertyAccess', 'KotlinNullnessAnnotation'
+        
+        // Accessibility checks
+        enable 'ClickableViewAccessibility', 'KeyboardInaccessibleWidget'
+        
+        // Internationalization
+        enable 'MissingTranslation', 'ExtraTranslation'
+        
+        htmlReport = true
+        xmlReport = true
+        textReport = true
     }
 }
