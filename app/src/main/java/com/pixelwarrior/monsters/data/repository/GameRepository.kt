@@ -258,6 +258,11 @@ class GameRepository(
     private fun generateStartingMonster(): Monster {
         val species = _monsterSpeciesDatabase.value.first { it.id == "starter_slime" }
         
+        // Select a random personality for variety (excluding NONE)
+        val personalities = com.pixelwarrior.monsters.data.model.Personality.values()
+            .filter { it != com.pixelwarrior.monsters.data.model.Personality.NONE }
+        val randomPersonality = personalities.random()
+        
         return Monster(
             id = UUID.randomUUID().toString(),
             speciesId = species.id,
@@ -276,7 +281,8 @@ class GameRepository(
             traits = listOf("Friendly"),
             isWild = false,
             captureRate = 100,
-            growthRate = species.growthRate
+            growthRate = species.growthRate,
+            personality = randomPersonality
         )
     }
     

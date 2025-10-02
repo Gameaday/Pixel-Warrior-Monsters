@@ -77,6 +77,15 @@ class ExplorationSystem {
         MonsterNest("Shadow Nook", "Dark corner", "Dark-type breeding variety +40%", null, 0.85, 0.12)
     )
     
+    // Predefined Hidden Passages
+    private val allHiddenPassages = listOf(
+        "Secret Tunnel - Forest to Cave",
+        "Hidden Stairway - Mountain Peak",
+        "Underwater Passage - Ocean Depths",
+        "Ancient Portal - Ruins Chamber",
+        "Crystal Gateway - Cave System"
+    )
+    
     // Day/Night Cycle Effects
     fun isNightTime(): Boolean {
         val hour = currentState.timeOfDay.hour
@@ -205,6 +214,8 @@ class ExplorationSystem {
     fun getCurrentWeather(): WeatherType = currentState.currentWeather
     
     fun getHiddenPassages(): Set<String> = currentState.hiddenPassagesFound.toSet()
+    
+    fun getAllPossibleHiddenPassages(): List<String> = allHiddenPassages
     
     /**
      * Get current time of day

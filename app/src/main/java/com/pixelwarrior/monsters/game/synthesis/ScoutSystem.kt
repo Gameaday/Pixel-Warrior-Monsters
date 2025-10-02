@@ -1,6 +1,7 @@
 package com.pixelwarrior.monsters.game.synthesis
 
 import com.pixelwarrior.monsters.data.model.Monster
+import com.pixelwarrior.monsters.data.model.Personality
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.delay
@@ -475,6 +476,37 @@ class ScoutDeploymentInterface(
     private fun canAffordDeployment(cost: DeploymentCost, inventory: Map<String, Int>): Boolean {
         return (inventory["gold"] ?: 0) >= cost.gold &&
                (inventory["provisions"] ?: 0) >= cost.provisions
+    }
+    
+    /**
+     * Calculate success rate for a scout mission based on area danger level and monster stats
+     */
+    fun calculateScoutSuccessRate(monster: Monster, area: ScoutArea): Float {
+        // Base success rate starts at 50%
+        var successRate = 0.5f
+        
+        // Level factor - higher level monsters have better success rates
+        val levelBonus = (monster.level.toFloat() / 100f) * 2f
+        successRate += levelBonus
+        
+        // Danger level penalty
+        val dangerPenalty = (area.dangerLevel.toFloat() / 10f) * 0.3f
+        successRate -= dangerPenalty
+        
+        // Affection bonus - monsters with higher affection try harder
+        val affectionBonus = (monster.affection.toFloat() / 100f) * 0.15f
+        successRate += affectionBonus
+        
+        // Personality bonus based on scout-related personalities
+        val personalityBonus = when (monster.personality) {
+            Personality.BRAVE, Personality.RECKLESS -> 0.1f
+            Personality.CAUTIOUS, Personality.CALM -> 0.05f
+            else -> 0f
+        }
+        successRate += personalityBonus
+        
+        // Clamp between 0.1 and 0.95 (always some risk, never guaranteed)
+        return successRate.coerceIn(0.1f, 0.95f)
     }
 }
 

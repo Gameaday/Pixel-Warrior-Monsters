@@ -43,12 +43,13 @@ class RoadmapImplementationValidationTest {
         battleEngine = BattleEngine()
         breedingSystem = BreedingSystem()
         storySystem = StorySystem()
+        storySystem.initializeStory() // Initialize story with default progress
         hubWorldSystem = HubWorldSystem()
         dungeonSystem = DungeonSystem()
         explorationSystem = ExplorationSystem()
         tournamentSystem = TournamentSystem()
         endgameSystem = EndgameSystem()
-        synthesisLab = SynthesisLaboratory()
+        synthesisLab = SynthesisLaboratory(storySystem)
         qolSystem = QualityOfLifeSystem()
         crossPlatformSystem = CrossPlatformSystem()
     }
@@ -164,7 +165,7 @@ class RoadmapImplementationValidationTest {
         assertTrue("Monster nest system should exist", nestLocations.isNotEmpty())
         
         // Verify Hidden Passages
-        val hiddenPassages = explorationSystem.getHiddenPassages()
+        val hiddenPassages = explorationSystem.getAllPossibleHiddenPassages()
         assertTrue("Hidden passage system should exist", hiddenPassages.isNotEmpty())
     }
 

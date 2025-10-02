@@ -345,14 +345,15 @@ class AdvancedMonsterSystemsTest {
     @Test
     fun testScoutMissionPersonalityBonuses() {
         // Test that different personalities get bonuses for appropriate missions
-        val braveScout = testMonster1 // Already has Brave personality
+        val braveScout = testMonster1 // Already has Brave personality, level 20
         val carefulScout = testMonster2.copy(personality = MonsterPersonality.CAREFUL)
         
         // Both should be able to start missions, but personality affects success rates
-        val braveResult = scoutSystem.startScoutMission(braveScout, ScoutMissionType.DEEP_EXPLORATION)
+        // Use MONSTER_RESCUE (requires level 20) instead of DEEP_EXPLORATION (requires level 25)
+        val braveResult = scoutSystem.startScoutMission(braveScout, ScoutMissionType.MONSTER_RESCUE)
         val carefulResult = scoutSystem.startScoutMission(carefulScout, ScoutMissionType.TREASURE_HUNT)
         
-        assertTrue("Brave monster should start deep exploration", braveResult is ScoutMissionResult.Success)
+        assertTrue("Brave monster should start monster rescue", braveResult is ScoutMissionResult.Success)
         assertTrue("Careful monster should start treasure hunt", carefulResult is ScoutMissionResult.Success)
     }
     

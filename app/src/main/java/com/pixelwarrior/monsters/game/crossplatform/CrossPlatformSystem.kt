@@ -207,7 +207,7 @@ class CrossPlatformSystem {
             LeaderboardEntry(
                 rank = rank,
                 playerName = "Player$rank",
-                score = 1000 - (rank * 50),
+                score = 1000 - ((rank - 1) * 50),
                 category = category
             )
         }

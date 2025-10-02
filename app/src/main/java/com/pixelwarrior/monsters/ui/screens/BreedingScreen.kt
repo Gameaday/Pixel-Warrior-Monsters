@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import com.pixelwarrior.monsters.data.model.*
 import com.pixelwarrior.monsters.game.breeding.BreedingSystem
 import com.pixelwarrior.monsters.ui.theme.*
-import com.pixelwarrior.monsters.utils.getDisplayName
 
 /**
  * Breeding screen for monster genetics and reproduction
