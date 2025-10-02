@@ -121,15 +121,15 @@ class AdvancedMonsterSystemsTest {
         
         // Brave personality should boost attack and reduce agility
         assertTrue("Brave personality should boost attack", 
-            braveStats.attack > testMonster1.baseStats.attack)
+            braveStats.attack > testMonster1.baseMonster.baseStats.attack)
         assertTrue("Brave personality should reduce agility",
-            braveStats.agility < testMonster1.baseStats.agility)
+            braveStats.agility < testMonster1.baseMonster.baseStats.agility)
         
         // Modest personality should boost magic and reduce attack
         assertTrue("Modest personality should boost magic",
-            modestStats.magic > testMonster2.specialAttack)
+            modestStats.magic > testMonster2.baseMonster.currentStats.magic)
         assertTrue("Modest personality should reduce attack",
-            modestStats.attack < testMonster2.attack)
+            modestStats.attack < testMonster2.baseMonster.currentStats.attack)
     }
     
     @Test
@@ -139,14 +139,14 @@ class AdvancedMonsterSystemsTest {
         
         // Plus monsters should have boosted stats
         assertTrue("Plus monsters should have higher HP",
-            plusStats.maxHp > testDragonMonster.maxHp)
+            plusStats.maxHp > testDragonMonster.baseMonster.currentStats.maxHp)
         assertTrue("Plus monsters should have higher attack",
-            plusStats.attack > testDragonMonster.attack)
+            plusStats.attack > testDragonMonster.baseMonster.currentStats.attack)
         
         // Verify multiplier is correct (1.1f for +1)
-        val expectedHp = (testDragonMonster.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
+        val expectedHp = (testDragonMonster.baseMonster.currentStats.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
         assertTrue("Plus level multiplier should be applied correctly",
-            plusStats.maxHp >= (testDragonMonster.maxHp * 1.05f).toInt())
+            plusStats.maxHp >= (testDragonMonster.baseMonster.currentStats.maxHp * 1.05f).toInt())
     }
     
     @Test
@@ -365,9 +365,8 @@ class AdvancedMonsterSystemsTest {
         
         previews.forEach { preview ->
             assertTrue("Success rate should be valid", preview.successRate >= 0f && preview.successRate <= 1f)
-            assertTrue("Recommended level should be positive", preview.recommendedLevel != null && preview.recommendedLevel!! > 0)
-            assertTrue("Should have valid reason", preview.reason.isNotEmpty())
-            assertTrue("Should have partner reference", preview.potentialOffspring.isNotEmpty())
+            assertTrue("Should have valid compatibility status", preview.isCompatible)
+            assertTrue("Should have possible offspring", preview.possibleOffspring.isNotEmpty())
         }
     }
     
@@ -383,7 +382,7 @@ class AdvancedMonsterSystemsTest {
     @Test
     fun testEnhancedStatsCalculation() {
         val stats = testDragonMonster.getEnhancedStats()
-        val baseStats = testDragonMonster
+        val baseStats = testDragonMonster.baseMonster.currentStats
         
         // Verify that enhanced stats are higher than base stats
         assertTrue("Enhanced HP should be higher", stats.maxHp >= baseStats.maxHp)

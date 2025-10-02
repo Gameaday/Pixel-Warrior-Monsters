@@ -39,6 +39,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
         jvmTarget = '17'
@@ -59,7 +60,7 @@ android {
 }
 
 dependencies {
-    // Compose BOM for version alignment - using latest 2024.12.01 for Kotlin 2.1 compatibility
+    // Compose BOM for version alignment - using compatible version with AGP 8.7.3
     implementation platform('androidx.compose:compose-bom:2024.12.01')
     androidTestImplementation platform('androidx.compose:compose-bom:2024.12.01')
     
@@ -92,6 +93,9 @@ dependencies {
     // Quality tools for linting and code analysis
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
     
+    // Core library desugaring for java.time support on API < 26
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-core:5.14.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0'
@@ -121,7 +125,7 @@ tasks.register('jacocoTestReport', JacocoReport) {
     ])
 }
 
-// Android lint configuration for Play Store compliance
+// Android lint configuration for Play Store compliance and code quality
 android {
     lintOptions {
         checkReleaseBuilds = true
@@ -138,5 +142,23 @@ android {
         
         // Performance checks  
         enable 'UnusedResources', 'IconDensities', 'MissingDefaultResource'
+        
+        // Code quality checks
+        enable 'ObsoleteSdkInt', 'OldTargetApi', 'ExpiredTargetSdkVersion'
+        enable 'UnusedIds', 'IconLauncherShape'
+        enable 'Overdraw', 'DrawAllocation', 'Wakelock', 'Recycle'
+        
+        // Kotlin specific checks
+        enable 'KotlinPropertyAccess', 'KotlinNullnessAnnotation'
+        
+        // Accessibility checks
+        enable 'ClickableViewAccessibility', 'KeyboardInaccessibleWidget'
+        
+        // Internationalization
+        enable 'MissingTranslation', 'ExtraTranslation'
+        
+        htmlReport = true
+        xmlReport = true
+        textReport = true
     }
 }

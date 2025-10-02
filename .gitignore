@@ -50,6 +50,7 @@ app/build/outputs/
 *.tmp
 *.temp
 gradle.properties.backup
+.kotlin/
 
 # Mac/Linux specific
 .DS_Store
