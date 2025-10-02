@@ -121,15 +121,15 @@ class AdvancedMonsterSystemsTest {
         
         // Brave personality should boost attack and reduce agility
         assertTrue("Brave personality should boost attack", 
-            braveStats.attack > testMonster1.attack)
+            braveStats.attack > testMonster1.baseStats.attack)
         assertTrue("Brave personality should reduce agility",
-            braveStats.agility < testMonster1.agility)
+            braveStats.agility < testMonster1.baseStats.agility)
         
         // Modest personality should boost magic and reduce attack
         assertTrue("Modest personality should boost magic",
-            modestStats.magic > testMonster2.magic)
+            modestStats.magic > testMonster2.baseStats.magic)
         assertTrue("Modest personality should reduce attack",
-            modestStats.attack < testMonster2.attack)
+            modestStats.attack < testMonster2.baseStats.attack)
     }
     
     @Test
@@ -139,14 +139,14 @@ class AdvancedMonsterSystemsTest {
         
         // Plus monsters should have boosted stats
         assertTrue("Plus monsters should have higher HP",
-            plusStats.maxHp > testDragonMonster.baseMonster.stats.maxHp)
+            plusStats.maxHp > testDragonMonster.baseStats.hp)
         assertTrue("Plus monsters should have higher attack",
-            plusStats.attack > testDragonMonster.baseMonster.stats.attack)
+            plusStats.attack > testDragonMonster.baseStats.attack)
         
         // Verify multiplier is correct (1.1f for +1)
-        val expectedHp = (testDragonMonster.baseMonster.stats.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
+        val expectedHp = (testDragonMonster.baseStats.hp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
         assertTrue("Plus level multiplier should be applied correctly",
-            plusStats.maxHp >= (testDragonMonster.baseMonster.stats.maxHp * 1.05f).toInt())
+            plusStats.maxHp >= (testDragonMonster.baseStats.hp * 1.05f).toInt())
     }
     
     @Test

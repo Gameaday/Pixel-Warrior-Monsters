@@ -73,8 +73,8 @@ class EdgeCaseTestSuite {
         )
 
         // Verify stats are handled correctly
-        assertTrue("Max stats monster should be valid", maxStatsMonster.attack > 0)
-        assertTrue("Min stats monster should be valid", minStatsMonster.attack > 0)
+        assertTrue("Max stats monster should be valid", maxStatsMonster.baseStats.attack > 0)
+        assertTrue("Min stats monster should be valid", minStatsMonster.baseStats.attack > 0)
 
         // Test battle with extreme stat differences
         val battleState = battleEngine.initiateBattle(
