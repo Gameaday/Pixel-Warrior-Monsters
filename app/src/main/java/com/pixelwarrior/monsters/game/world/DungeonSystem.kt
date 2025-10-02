@@ -30,6 +30,13 @@ class DungeonSystem {
     }
     
     /**
+     * Get available dungeons for a player based on their GameSave
+     */
+    fun getAvailableDungeons(gameSave: com.pixelwarrior.monsters.data.model.GameSave): List<Dungeon> {
+        return getAvailableDungeons(gameSave.storyProgress)
+    }
+    
+    /**
      * Enter a dungeon and get the first floor
      */
     fun enterDungeon(dungeonId: String): DungeonFloor? {

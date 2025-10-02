@@ -49,7 +49,8 @@ class ExplorationSystem {
         val gateKeysCollected: Set<GateKey>,
         val activeNests: List<MonsterNest>,
         val hiddenPassagesFound: Set<String>,
-        val weatherChangeTime: LocalDateTime
+        val weatherChangeTime: LocalDateTime,
+        val availableAreas: List<String> = listOf("Forest", "Cave", "Mountain", "Desert", "Ocean")
     )
     
     private var currentState = ExplorationState(
@@ -58,7 +59,8 @@ class ExplorationSystem {
         gateKeysCollected = emptySet(),
         activeNests = emptyList(),
         hiddenPassagesFound = emptySet(),
-        weatherChangeTime = LocalDateTime.now().plusHours(2)
+        weatherChangeTime = LocalDateTime.now().plusHours(2),
+        availableAreas = listOf("Forest", "Cave")
     )
     
     // Predefined Monster Nests
@@ -203,6 +205,26 @@ class ExplorationSystem {
     fun getCurrentWeather(): WeatherType = currentState.currentWeather
     
     fun getHiddenPassages(): Set<String> = currentState.hiddenPassagesFound.toSet()
+    
+    /**
+     * Get current time of day
+     */
+    fun getCurrentTimeOfDay(): String {
+        val hour = currentState.timeOfDay.hour
+        return when {
+            hour < 6 -> "Night"
+            hour < 12 -> "Morning"
+            hour < 18 -> "Afternoon"
+            else -> "Evening"
+        }
+    }
+    
+    /**
+     * Get monster nests information
+     */
+    fun getMonsterNests(): List<MonsterNest> {
+        return allNests
+    }
     
     // Special Area Access
     fun canAccessSpecialArea(requiredKey: GateKey): Boolean {

@@ -378,6 +378,40 @@ class TournamentSystem {
     }
     
     fun isSeasonalTournamentActive(): Boolean = getCurrentSeasonalTournament() != null
+    
+    /**
+     * Get available tournaments for a player based on their save data
+     */
+    fun getAvailableTournaments(gameSave: com.pixelwarrior.monsters.data.model.GameSave): List<TournamentTier> {
+        return getTournamentTiers().filter { tier ->
+            canEnterTournament(tier, gameSave.gold.toInt(), gameSave.partyMonsters)
+        }
+    }
+    
+    /**
+     * Get available rivals based on game save
+     */
+    fun getAvailableRivals(gameSave: com.pixelwarrior.monsters.data.model.GameSave): List<RivalTrainer> {
+        val playerLevel = gameSave.partyMonsters.firstOrNull()?.level ?: 1
+        return rivals.filter { rival ->
+            val avgLevel = rival.team.map { it.level }.average()
+            avgLevel <= playerLevel + 10 // Rivals within 10 levels
+        }
+    }
+    
+    /**
+     * Check if player can enter a tournament based on their save
+     */
+    fun canEnterTournament(gameSave: com.pixelwarrior.monsters.data.model.GameSave, tournament: TournamentTier): Boolean {
+        return canEnterTournament(tournament, gameSave.gold.toInt(), gameSave.partyMonsters)
+    }
+    
+    /**
+     * Get master-level tournaments for endgame content
+     */
+    fun getMasterTournaments(): List<TournamentTier> {
+        return listOf(TournamentTier.GOLD, TournamentTier.MASTER)
+    }
 }
 
 data class TournamentReward(

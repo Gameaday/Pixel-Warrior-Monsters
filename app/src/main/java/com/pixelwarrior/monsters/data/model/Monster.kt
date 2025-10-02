@@ -56,8 +56,24 @@ data class Monster(
     val isWild: Boolean = false,
     val captureRate: Int = 100,
     val growthRate: GrowthRate = GrowthRate.MEDIUM_FAST,
-    val affection: Int = 0 // New field for monster affection/friendship (0-100)
-) : Parcelable
+    val affection: Int = 0, // New field for monster affection/friendship (0-100)
+    val personality: Personality = Personality.NONE // Monster personality type
+) : Parcelable {
+    /**
+     * Get HP percentage (0.0 to 1.0)
+     */
+    fun getHpPercentage(): Float = currentHp.toFloat() / baseStats.maxHp.toFloat()
+    
+    /**
+     * Check if monster is fainted
+     */
+    fun isFainted(): Boolean = currentHp <= 0
+    
+    /**
+     * Get display name (same as name for now)
+     */
+    fun getDisplayName(): String = name
+}
 
 /**
  * Monster growth rates determine experience required for leveling
@@ -84,3 +100,10 @@ data class MonsterSpecies(
     val breedingCompatibility: List<MonsterFamily> = emptyList(),
     val description: String = ""
 ) : Parcelable
+/**
+ * Monster personality types that affect behavior in battle
+ */
+enum class Personality {
+    NONE, AGGRESSIVE, DEFENSIVE, CAUTIOUS, BRAVE, TIMID, 
+    HARDY, GENTLE, RECKLESS, CALM, ENERGETIC, LAZY
+}

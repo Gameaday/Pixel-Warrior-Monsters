@@ -16,6 +16,11 @@ class SynthesisLaboratory(
     private val monsterSynthesis: MonsterSynthesis = MonsterSynthesis()
 ) {
     
+    /**
+     * Secondary constructor for testing
+     */
+    constructor() : this(StorySystem().apply { initializeStory() })
+    
     private val _isLabUnlocked = MutableStateFlow(false)
     val isLabUnlocked: StateFlow<Boolean> = _isLabUnlocked.asStateFlow()
     
@@ -284,6 +289,71 @@ class SynthesisLaboratory(
     private fun discoverRecipeFromSynthesis(parent1: Monster, parent2: Monster) {
         val recipeId = "${parent1.family.name.lowercase()}_${parent2.family.name.lowercase()}_fusion"
         discoverRecipe(recipeId)
+    }
+    
+    /**
+     * Get available synthesis combinations for a list of monsters
+     */
+    fun getAvailableSynthesis(monsters: List<Monster>): List<Map<String, Any>> {
+        val synthesesOptions = mutableListOf<Map<String, Any>>()
+        
+        for (i in monsters.indices) {
+            for (j in i+1 until monsters.size) {
+                val monster1 = monsters[i]
+                val monster2 = monsters[j]
+                
+                synthesesOptions.add(mapOf(
+                    "parent1" to monster1.name,
+                    "parent2" to monster2.name,
+                    "resultLevel" to ((monster1.level + monster2.level) / 2),
+                    "resultFamily" to monster1.family
+                ))
+            }
+        }
+        
+        return synthesesOptions
+    }
+    
+    /**
+     * Get learnable skills for a monster
+     */
+    fun getLearnableSkills(monster: Monster): List<String> {
+        return listOf(
+            "Synthesis Boost",
+            "Elemental Infusion",
+            "Stat Transfer",
+            "Trait Inheritance",
+            "Advanced Fusion"
+        ).filter { monster.level >= 10 }
+    }
+    
+    /**
+     * Calculate synthesis success rate based on factors
+     */
+    fun getSuccessRate(parent1: Monster, parent2: Monster, conditions: Map<String, Any> = emptyMap()): Int {
+        var baseRate = 85
+        
+        // Level factor
+        val avgLevel = (parent1.level + parent2.level) / 2
+        val levelBonus = (avgLevel / 10) * 2
+        baseRate += levelBonus
+        
+        // Affection factor (higher affection = higher success)
+        val avgAffection = (parent1.affection + parent2.affection) / 2
+        val affectionBonus = (avgAffection / 20)
+        baseRate += affectionBonus
+        
+        // Family compatibility bonus
+        if (parent1.family == parent2.family) {
+            baseRate += 10
+        }
+        
+        // Environmental conditions bonus
+        if (conditions["full_moon"] == true) baseRate += 5
+        if (conditions["special_catalyst"] == true) baseRate += 10
+        
+        // Cap at 95%
+        return minOf(95, maxOf(50, baseRate))
     }
 }
 

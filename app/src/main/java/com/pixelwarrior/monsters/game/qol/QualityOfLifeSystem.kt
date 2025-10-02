@@ -214,6 +214,46 @@ class QualityOfLifeSystem {
             reward = AchievementReward.TITLE("Supreme Collector")
         )
     )
+    
+    /**
+     * Get all achievements
+     */
+    fun getAllAchievements(): List<Achievement> {
+        return availableAchievements
+    }
+    
+    /**
+     * Get player statistics
+     */
+    fun getPlayerStatistics(): GameStatistics {
+        return _statistics.value
+    }
+    
+    /**
+     * Get auto-battle options
+     */
+    fun getAutoBattleOptions(): Map<String, Boolean> {
+        return mapOf(
+            "auto_attack" to true,
+            "auto_skill" to true,
+            "auto_item" to true,
+            "fast_forward" to true,
+            "skip_animations" to true
+        )
+    }
+    
+    /**
+     * Get UI enhancements
+     */
+    fun getUIEnhancements(): Map<String, Boolean> {
+        return mapOf(
+            "quick_menus" to true,
+            "hotkeys" to true,
+            "custom_themes" to true,
+            "advanced_filters" to true,
+            "batch_operations" to true
+        )
+    }
 }
 
 // Advanced AI System

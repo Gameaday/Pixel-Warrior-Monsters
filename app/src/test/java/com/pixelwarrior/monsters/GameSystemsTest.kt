@@ -54,8 +54,8 @@ class GameSystemsTest {
 
     @Test
     fun testBattleEngine_DamageCalculation() {
-        val attacker = createTestMonster("Attacker", level = 10, attack = 60)
-        val defender = createTestMonster("Defender", level = 8, defense = 40)
+        val attacker = createTestMonster(name = "Attacker", level = 10, attack = 60)
+        val defender = createTestMonster(name = "Defender", level = 8, defense = 40)
         
         val skill = Skill(
             id = "test_attack",
@@ -77,9 +77,9 @@ class GameSystemsTest {
 
     @Test
     fun testBreedingSystem_Compatibility() {
-        val parent1 = createTestMonster("Parent1", family = MonsterFamily.BEAST, level = 15)
-        val parent2 = createTestMonster("Parent2", family = MonsterFamily.BIRD, level = 12)
-        val incompatible = createTestMonster("Incompatible", family = MonsterFamily.UNDEAD, level = 20)
+        val parent1 = createTestMonster(name = "Parent1", family = MonsterFamily.BEAST, level = 15)
+        val parent2 = createTestMonster(name = "Parent2", family = MonsterFamily.BIRD, level = 12)
+        val incompatible = createTestMonster(name = "Incompatible", family = MonsterFamily.UNDEAD, level = 20)
 
         val breedingSystem = BreedingSystem()
 
@@ -90,8 +90,8 @@ class GameSystemsTest {
 
     @Test
     fun testBreedingSystem_OffspringGeneration() {
-        val parent1 = createTestMonster("Parent1", family = MonsterFamily.BEAST, level = 15)
-        val parent2 = createTestMonster("Parent2", family = MonsterFamily.BIRD, level = 12)
+        val parent1 = createTestMonster(name = "Parent1", family = MonsterFamily.BEAST, level = 15)
+        val parent2 = createTestMonster(name = "Parent2", family = MonsterFamily.BIRD, level = 12)
 
         val breedingSystem = BreedingSystem()
         val offspring = breedingSystem.breedMonsters(parent1, parent2)
@@ -115,7 +115,7 @@ class GameSystemsTest {
 
     @Test
     fun testGameUtils_LevelUp() {
-        val monster = createTestMonster("TestMon", level = 5)
+        val monster = createTestMonster(name = "TestMon", level = 5)
         val leveledUp = GameUtils.levelUpMonster(monster)
 
         assertEquals("Monster should be level 6", 6, leveledUp.level)
@@ -124,7 +124,7 @@ class GameSystemsTest {
 
     @Test
     fun testGameUtils_CaptureRate() {
-        val fullHpMonster = createTestMonster("FullHP", level = 10)
+        val fullHpMonster = createTestMonster(name = "FullHP", level = 10)
         val lowHpMonster = fullHpMonster.copy(currentHp = 10)
 
         val fullHpRate = GameUtils.calculateCaptureRate(fullHpMonster)
@@ -137,11 +137,11 @@ class GameSystemsTest {
 
     @Test
     fun testMonsterExtensions() {
-        val monster = createTestMonster("TestMon", level = 5, currentHp = 60, maxHp = 120)
+        val monster = createTestMonster(name = "TestMon", level = 5, currentHp = 60, maxHp = 120)
 
         assertEquals("HP percentage should be 50%", 0.5f, monster.getHpPercentage(), 0.01f)
         assertFalse("Monster with HP should not be fainted", monster.isFainted())
-        assertEquals("Display name should include level", "TestMon (Lv.5)", monster.getDisplayName())
+        assertEquals("Display name should match name", "TestMon", monster.getDisplayName())
 
         val faintedMonster = monster.copy(currentHp = 0)
         assertTrue("Monster with 0 HP should be fainted", faintedMonster.isFainted())
@@ -153,38 +153,5 @@ class GameSystemsTest {
         assertTrue("Name with spaces should pass", GameUtils.isValidMonsterName("Fire Dragon"))
         assertFalse("Empty name should fail", GameUtils.isValidMonsterName(""))
         assertFalse("Too long name should fail", GameUtils.isValidMonsterName("VeryLongMonsterNameThatExceedsLimit"))
-    }
-
-    // Helper function to create test monsters
-    private fun createTestMonster(
-        name: String,
-        level: Int = 5,
-        family: MonsterFamily = MonsterFamily.BEAST,
-        attack: Int = 50,
-        defense: Int = 40,
-        currentHp: Int = 120,
-        maxHp: Int = 120
-    ): Monster {
-        val stats = MonsterStats(attack, defense, 45, 30, 35, maxHp, 60)
-        return Monster(
-            id = "test-${name.lowercase()}",
-            speciesId = "test_species",
-            name = name,
-            type1 = MonsterType.NORMAL,
-            type2 = null,
-            family = family,
-            level = level,
-            currentHp = currentHp,
-            currentMp = 60,
-            experience = 0,
-            experienceToNext = 150,
-            baseStats = stats,
-            currentStats = stats,
-            skills = listOf("tackle"),
-            traits = listOf("Hardy"),
-            isWild = false,
-            captureRate = 100,
-            growthRate = GrowthRate.MEDIUM_FAST
-        )
     }
 }

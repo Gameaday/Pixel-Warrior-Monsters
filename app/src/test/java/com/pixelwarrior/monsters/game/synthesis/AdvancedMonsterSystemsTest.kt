@@ -1,5 +1,6 @@
 package com.pixelwarrior.monsters.game.synthesis
 
+import com.pixelwarrior.monsters.createTestMonster
 import com.pixelwarrior.monsters.data.model.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -26,9 +27,7 @@ class AdvancedMonsterSystemsTest {
         scoutSystem = ScoutSystem()
         
         // Create test monsters
-        val baseStats = MonsterStats(50, 45, 60, 40, 35, 100, 50)
-        
-        val baseMonster1 = Monster(
+        val baseMonster1 = createTestMonster(
             id = "test_1",
             speciesId = "forest_wolf",
             name = "Fenrir",
@@ -36,17 +35,22 @@ class AdvancedMonsterSystemsTest {
             family = MonsterFamily.BEAST,
             level = 20,
             currentHp = 100,
+            maxHp = 100,
             currentMp = 50,
+            maxMp = 50,
             experience = 8000L,
-            stats = baseStats,
+            attack = 50,
+            defense = 45,
+            agility = 60,
+            magic = 40,
+            wisdom = 35,
             skills = listOf("Bite", "Howl"),
             traits = listOf("Loyal"),
             growthRate = GrowthRate.MEDIUM_FAST,
-            friendship = 75,
-            isFainted = false
+            affection = 75
         )
         
-        val baseMonster2 = Monster(
+        val baseMonster2 = createTestMonster(
             id = "test_2",
             speciesId = "flame_sprite",
             name = "Ignis",
@@ -54,17 +58,22 @@ class AdvancedMonsterSystemsTest {
             family = MonsterFamily.BEAST,
             level = 18,
             currentHp = 90,
+            maxHp = 100,
             currentMp = 60,
+            maxMp = 50,
             experience = 6500L,
-            stats = baseStats.copy(magic = 55, attack = 40),
+            attack = 40,
+            defense = 45,
+            agility = 60,
+            magic = 55,
+            wisdom = 35,
             skills = listOf("Fireball", "Burn"),
             traits = listOf("Fiery"),
             growthRate = GrowthRate.MEDIUM_FAST,
-            friendship = 60,
-            isFainted = false
+            affection = 60
         )
         
-        val dragonMonster = Monster(
+        val dragonMonster = createTestMonster(
             id = "test_dragon",
             speciesId = "young_dragon",
             name = "Draco",
@@ -72,14 +81,19 @@ class AdvancedMonsterSystemsTest {
             family = MonsterFamily.DRAGON,
             level = 25,
             currentHp = 150,
+            maxHp = 150,
             currentMp = 80,
+            maxMp = 80,
             experience = 15000L,
-            stats = baseStats.copy(attack = 70, defense = 60, maxHp = 150, maxMp = 80),
+            attack = 70,
+            defense = 60,
+            agility = 60,
+            magic = 40,
+            wisdom = 35,
             skills = listOf("Dragon Breath", "Roar"),
             traits = listOf("Proud", "Ancient"),
             growthRate = GrowthRate.SLOW,
-            friendship = 80,
-            isFainted = false
+            affection = 80
         )
         
         testMonster1 = EnhancedMonster(
@@ -107,15 +121,15 @@ class AdvancedMonsterSystemsTest {
         
         // Brave personality should boost attack and reduce agility
         assertTrue("Brave personality should boost attack", 
-            braveStats.attack > testMonster1.baseMonster.stats.attack)
+            braveStats.attack > testMonster1.baseStats.attack)
         assertTrue("Brave personality should reduce agility",
-            braveStats.agility < testMonster1.baseMonster.stats.agility)
+            braveStats.agility < testMonster1.baseStats.agility)
         
         // Modest personality should boost magic and reduce attack
         assertTrue("Modest personality should boost magic",
-            modestStats.magic > testMonster2.baseMonster.stats.magic)
+            modestStats.magic > testMonster2.specialAttack)
         assertTrue("Modest personality should reduce attack",
-            modestStats.attack < testMonster2.baseMonster.stats.attack)
+            modestStats.attack < testMonster2.attack)
     }
     
     @Test
@@ -125,14 +139,14 @@ class AdvancedMonsterSystemsTest {
         
         // Plus monsters should have boosted stats
         assertTrue("Plus monsters should have higher HP",
-            plusStats.maxHp > testDragonMonster.baseMonster.stats.maxHp)
+            plusStats.maxHp > testDragonMonster.maxHp)
         assertTrue("Plus monsters should have higher attack",
-            plusStats.attack > testDragonMonster.baseMonster.stats.attack)
+            plusStats.attack > testDragonMonster.attack)
         
         // Verify multiplier is correct (1.1f for +1)
-        val expectedHp = (testDragonMonster.baseMonster.stats.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
+        val expectedHp = (testDragonMonster.maxHp * 1.1f * 1.2f).toInt() // 1.2f from Adamant attack bonus
         assertTrue("Plus level multiplier should be applied correctly",
-            plusStats.maxHp >= (testDragonMonster.baseMonster.stats.maxHp * 1.05f).toInt())
+            plusStats.maxHp >= (testDragonMonster.maxHp * 1.05f).toInt())
     }
     
     @Test
@@ -173,6 +187,9 @@ class AdvancedMonsterSystemsTest {
             }
             is SynthesisResult.Failure -> {
                 fail("Synthesis should succeed for compatible monsters: ${result.reason}")
+            }
+            is SynthesisResult.InProgress -> {
+                fail("Synthesis should not be in progress")
             }
         }
     }
@@ -348,9 +365,9 @@ class AdvancedMonsterSystemsTest {
         
         previews.forEach { preview ->
             assertTrue("Success rate should be valid", preview.successRate >= 0f && preview.successRate <= 1f)
-            assertTrue("Required level should be positive", preview.requiredLevel > 0)
-            assertNotNull("Should have valid recipe", preview.recipe)
-            assertNotNull("Should have partner reference", preview.partner)
+            assertTrue("Recommended level should be positive", preview.recommendedLevel != null && preview.recommendedLevel!! > 0)
+            assertTrue("Should have valid reason", preview.reason.isNotEmpty())
+            assertTrue("Should have partner reference", preview.potentialOffspring.isNotEmpty())
         }
     }
     
@@ -366,7 +383,7 @@ class AdvancedMonsterSystemsTest {
     @Test
     fun testEnhancedStatsCalculation() {
         val stats = testDragonMonster.getEnhancedStats()
-        val baseStats = testDragonMonster.baseMonster.stats
+        val baseStats = testDragonMonster
         
         // Verify that enhanced stats are higher than base stats
         assertTrue("Enhanced HP should be higher", stats.maxHp >= baseStats.maxHp)

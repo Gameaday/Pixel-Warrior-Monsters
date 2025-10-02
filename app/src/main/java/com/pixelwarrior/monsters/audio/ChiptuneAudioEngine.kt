@@ -425,6 +425,35 @@ class ChiptuneAudioEngine(private val context: Context) {
     }
     
     /**
+     * Play battle music
+     */
+    suspend fun playBattleMusic(loop: Boolean = true) {
+        playContextualMusic(MusicContext.BATTLE, loop)
+    }
+    
+    /**
+     * Play menu music
+     */
+    suspend fun playMenuMusic(loop: Boolean = true) {
+        playContextualMusic(MusicContext.HUB_WORLD, loop)
+    }
+    
+    /**
+     * Play victory music
+     */
+    suspend fun playVictoryMusic(loop: Boolean = false) {
+        playContextualMusic(MusicContext.VICTORY, loop)
+    }
+    
+    /**
+     * Play character voice line
+     */
+    suspend fun playCharacterVoice(character: com.pixelwarrior.monsters.data.model.VoiceCharacter, text: String) {
+        if (!_isSoundEnabled.value) return
+        voiceSynthesis.speakCharacterLine(character, text)
+    }
+    
+    /**
      * Update audio settings
      */
     fun updateAudioSettings(

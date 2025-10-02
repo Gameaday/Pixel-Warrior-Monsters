@@ -12,8 +12,13 @@ import java.util.UUID
  * In a real implementation, this would interface with local database and cloud storage
  */
 class GameRepository(
-    private val database: GameDatabase
+    private val database: GameDatabase?
 ) {
+    
+    /**
+     * Secondary constructor for testing without database
+     */
+    constructor() : this(null)
     
     private val _currentGameSave = MutableStateFlow<GameSave?>(null)
     val currentGameSave: Flow<GameSave?> = _currentGameSave.asStateFlow()
@@ -58,17 +63,19 @@ class GameRepository(
         return try {
             val updatedSave = gameSave.copy(lastSaved = System.currentTimeMillis())
             
-            // Save to database
-            val saveDao = database.gameSaveDao()
-            val monsterDao = database.monsterDao()
-            
-            // Save game state
-            saveDao.insertSave(updatedSave.toEntity())
-            
-            // Save all monsters
-            val allMonsters = updatedSave.partyMonsters + updatedSave.farmMonsters
-            val monsterEntities = allMonsters.map { it.toEntity(updatedSave.playerId) }
-            monsterDao.insertMonsters(monsterEntities)
+            // Save to database if available
+            database?.let { db ->
+                val saveDao = db.gameSaveDao()
+                val monsterDao = db.monsterDao()
+                
+                // Save game state
+                saveDao.insertSave(updatedSave.toEntity())
+                
+                // Save all monsters
+                val allMonsters = updatedSave.partyMonsters + updatedSave.farmMonsters
+                val monsterEntities = allMonsters.map { it.toEntity(updatedSave.playerId) }
+                monsterDao.insertMonsters(monsterEntities)
+            }
             
             // Update in-memory state
             _currentGameSave.value = updatedSave
@@ -83,16 +90,18 @@ class GameRepository(
      */
     suspend fun loadGame(saveId: String): GameSave? {
         return try {
-            val saveDao = database.gameSaveDao()
-            val monsterDao = database.monsterDao()
-            
-            val saveEntity = saveDao.getSaveById(saveId) ?: return null
-            val monsterEntities = monsterDao.getMonstersForSave(saveId)
-            val monsters = monsterEntities.map { it.toDomain() }
-            
-            val gameSave = saveEntity.toDomain(monsters)
-            _currentGameSave.value = gameSave
-            gameSave
+            database?.let { db ->
+                val saveDao = db.gameSaveDao()
+                val monsterDao = db.monsterDao()
+                
+                val saveEntity = saveDao.getSaveById(saveId) ?: return null
+                val monsterEntities = monsterDao.getMonstersForSave(saveId)
+                val monsters = monsterEntities.map { it.toDomain() }
+                
+                val gameSave = saveEntity.toDomain(monsters)
+                _currentGameSave.value = gameSave
+                gameSave
+            } ?: _currentGameSave.value.takeIf { it?.playerId == saveId }
         } catch (e: Exception) {
             null
         }
@@ -103,14 +112,16 @@ class GameRepository(
      */
     suspend fun getAllSaves(): List<GameSave> {
         return try {
-            val saveDao = database.gameSaveDao()
-            val monsterDao = database.monsterDao()
-            
-            val saveEntities = saveDao.getAllSaves()
-            saveEntities.map { saveEntity ->
-                val monsters = monsterDao.getMonstersForSave(saveEntity.saveId).map { it.toDomain() }
-                saveEntity.toDomain(monsters)
-            }
+            database?.let { db ->
+                val saveDao = db.gameSaveDao()
+                val monsterDao = db.monsterDao()
+                
+                val saveEntities = saveDao.getAllSaves()
+                saveEntities.map { saveEntity ->
+                    val monsters = monsterDao.getMonstersForSave(saveEntity.saveId).map { it.toDomain() }
+                    saveEntity.toDomain(monsters)
+                }
+            } ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
@@ -121,13 +132,15 @@ class GameRepository(
      */
     suspend fun deleteSave(saveId: String): Boolean {
         return try {
-            val saveDao = database.gameSaveDao()
-            val monsterDao = database.monsterDao()
-            
-            // Delete monsters first (foreign key relationship)
-            monsterDao.deleteMonstersForSave(saveId)
-            // Delete save
-            saveDao.deleteSaveById(saveId)
+            database?.let { db ->
+                val saveDao = db.gameSaveDao()
+                val monsterDao = db.monsterDao()
+                
+                // Delete monsters first (foreign key relationship)
+                monsterDao.deleteMonstersForSave(saveId)
+                // Delete save
+                saveDao.deleteSaveById(saveId)
+            }
             
             // Clear current save if it was the deleted one
             if (_currentGameSave.value?.playerId == saveId) {
@@ -176,14 +189,14 @@ class GameRepository(
      * Get all skills from database
      */
     suspend fun getAllSkills(): List<SkillEntity> {
-        return database.skillDao().getAllSkills()
+        return database?.skillDao()?.getAllSkills() ?: emptyList()
     }
     
     /**
      * Get skill by ID from database
      */
     suspend fun getSkillById(skillId: String): SkillEntity? {
-        return database.skillDao().getSkillById(skillId)
+        return database?.skillDao()?.getSkillById(skillId)
     }
     
     /**
@@ -434,6 +447,44 @@ class GameRepository(
                 power = 50,
                 accuracy = 95
             )
+        )
+    }
+    
+    /**
+     * Get available save slots
+     */
+    suspend fun getAvailableSaveSlots(): List<Int> {
+        val allSaves = getAllSaves()
+        val usedSlots = allSaves.size
+        val totalSlots = 5
+        return (1..totalSlots).filter { it > usedSlots }
+    }
+    
+    /**
+     * Generate a wild monster for encounters
+     */
+    fun generateWildMonster(area: String, level: Int): Monster {
+        val species = _monsterSpeciesDatabase.value.random()
+        
+        return Monster(
+            id = UUID.randomUUID().toString(),
+            speciesId = species.id,
+            name = species.name,
+            type1 = species.type1,
+            type2 = species.type2,
+            family = species.family,
+            level = level,
+            currentHp = species.baseStats.maxHp,
+            currentMp = species.baseStats.maxMp,
+            experience = 0,
+            experienceToNext = (level * level * level).toLong(),
+            baseStats = species.baseStats,
+            currentStats = species.baseStats,
+            skills = listOf("tackle"),
+            traits = species.possibleTraits.take(1),
+            isWild = true,
+            captureRate = species.captureRate,
+            growthRate = species.growthRate
         )
     }
 }

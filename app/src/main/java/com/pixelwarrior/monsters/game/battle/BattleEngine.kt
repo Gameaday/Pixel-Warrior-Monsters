@@ -433,4 +433,52 @@ class BattleEngine {
             else -> false
         }
     }
+    /**
+     * Initiate a new battle
+     */
+    fun initiateBattle(
+        playerParty: List<Monster>,
+        enemyParty: List<Monster>,
+        battleType: BattleType = BattleType.WILD_ENCOUNTER
+    ): BattleState {
+        return BattleState(
+            playerMonsters = playerParty,
+            enemyMonsters = enemyParty,
+            currentPlayerMonster = 0,
+            currentEnemyMonster = 0,
+            turn = 1,
+            battlePhase = BattlePhase.SELECTION,
+            lastAction = "Battle started!",
+            isWildBattle = battleType == BattleType.WILD_ENCOUNTER,
+            canEscape = battleType == BattleType.WILD_ENCOUNTER || battleType == BattleType.TRAINER_BATTLE,
+            canTreat = battleType == BattleType.WILD_ENCOUNTER
+        )
+    }
+    
+    /**
+     * Process a battle action and update battle state
+     */
+    fun processBattleAction(
+        battleState: BattleState,
+        action: BattleActionData
+    ): BattleState {
+        return when (action.action) {
+            BattleAction.ATTACK, BattleAction.SKILL -> {
+                if (action.skillId != null) {
+                    executeAttack(battleState, action)
+                } else {
+                    battleState
+                }
+            }
+            BattleAction.DEFEND -> {
+                battleState // Defend handled elsewhere
+            }
+            BattleAction.RUN -> {
+                executeRun(battleState, action)
+            }
+            BattleAction.TREAT -> {
+                executeTreat(battleState, action)
+            }
+        }
+    }
 }
