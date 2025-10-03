@@ -2,6 +2,18 @@
 
 An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizing pixel-based graphics, animation, and written to run on Android. This project aims to recreate all the core systems and features of the original game while avoiding copyright infringement through original assets and generic monster designs.
 
+## 🎮 Alpha Testing Now Available!
+
+**Download and test the game on your Android device!**
+
+### Quick Download
+1. Go to [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions)
+2. Click on the latest successful "CI/CD Pipeline" workflow
+3. Download `app-debug-apk` from the Artifacts section
+4. Install on your Android 7.0+ device
+
+📖 **Full instructions:** See [ALPHA_TESTING.md](ALPHA_TESTING.md) for detailed installation guide and testing checklist.
+
 ## Project Goals
 
 - **Core Gameplay**: Recreate the turn-based battle system, monster breeding mechanics, and exploration features
@@ -148,17 +160,20 @@ This project is designed to avoid copyright infringement:
 
 ## Development Status
 
-The project foundation is complete with all core systems implemented and tested. The codebase follows Android best practices and is ready for further development in areas such as:
+✅ **Alpha Testing Ready** - All core systems implemented and tested!
 
-- Enhanced UI screens for monster management and breeding
-- Advanced battle animations and visual effects  
-- Expanded monster roster and skill library
-- Story mode and quest system implementation
-- Audio system with music and sound effects
-- Additional quality-of-life features
+The project is currently in alpha testing phase with:
+- ✅ 200+ unit tests passing
+- ✅ Full CI/CD pipeline with automated builds
+- ✅ All major features implemented and functional
+- ✅ Complete game loop from start to endgame
+- ✅ Debug APK available for Android device testing
+
+**Current Version:** 1.0.0-alpha (versionCode: 1)
 
 ## Building the Project
 
+### For Development
 This is a standard Android project using Gradle:
 
 1. Clone the repository
@@ -171,6 +186,31 @@ This is a standard Android project using Gradle:
 - Java 17 or higher
 - Kotlin support
 - Jetpack Compose
+
+### Building APK Files
+
+**Development/Alpha Build (for testing):**
+```bash
+./gradlew assembleDebug
+```
+Output: `app/build/outputs/apk/debug/app-debug.apk` (~23MB)
+
+**Production Release Build:**
+```bash
+./gradlew assembleRelease bundleRelease
+```
+Output: 
+- APK: `app/build/outputs/apk/release/app-release.apk` (~3MB)
+- AAB: `app/build/outputs/bundle/release/app-release.aab` (~4MB)
+
+### Automated Builds
+
+GitHub Actions automatically builds and tests the project on every push:
+- **Debug APK**: Available as `app-debug-apk` artifact in workflow runs
+- **Release Builds**: Created when version tags are pushed
+- **All Tests**: Run automatically with coverage reporting
+
+See [releases/README.md](releases/README.md) for more information about accessing builds.
 
 ## Testing
 
@@ -186,6 +226,43 @@ The test suite covers:
 - Breeding compatibility and offspring generation
 - Experience and level progression
 - Utility functions and validations
+- Audio system and synthesis
+- All advanced systems (dungeons, synthesis, plus enhancement, scout missions)
+
+**Test Coverage:** 200+ unit tests with comprehensive coverage of all game mechanics.
+
+## Deployment & Release Process
+
+### Alpha Testing (Current Phase)
+- ✅ Debug APK builds available via GitHub Actions
+- ✅ Automated testing and quality checks
+- ✅ All features implemented and testable
+- 📖 See [ALPHA_TESTING.md](ALPHA_TESTING.md) for testing guide
+
+### Production Release Preparation
+The project is preparing for Google Play Store launch:
+- ✅ CI/CD pipeline configured
+- ✅ Release build system operational
+- ✅ ProGuard/R8 optimization enabled
+- ⏳ Release keystore configuration (pending)
+- ⏳ Play Store assets and listings (in progress)
+
+📋 **Checklists:**
+- [DEPLOYMENT_STATUS.md](DEPLOYMENT_STATUS.md) - Current deployment roadmap
+- [PLAY_STORE_PREPARATION.md](PLAY_STORE_PREPARATION.md) - Play Store submission checklist
+
+### Release Builds
+
+**For Developers:** Production builds will be available through GitHub Releases once a version tag is created:
+```bash
+git tag -a v1.0.0 -m "Release version 1.0.0"
+git push origin v1.0.0
+```
+
+**For Users:** 
+- Alpha: Download from [GitHub Actions artifacts](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions)
+- Beta: Will be available through Google Play Console (coming soon)
+- Production: Google Play Store (coming soon)
 
 ## License
 
