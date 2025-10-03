@@ -14,6 +14,13 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 
 📖 **Full instructions:** See [ALPHA_TESTING.md](ALPHA_TESTING.md) for detailed installation guide and testing checklist.
 
+### 📚 Documentation
+- **[QUICK_START.md](QUICK_START.md)** - Fast track to downloading and installing
+- **[ALPHA_TESTING.md](ALPHA_TESTING.md)** - Complete testing guide with checklist
+- **[releases/README.md](releases/README.md)** - Build distribution info
+- **[DEPLOYMENT_STATUS.md](DEPLOYMENT_STATUS.md)** - Deployment roadmap
+- **[PRODUCTION_BUNDLE.md](PRODUCTION_BUNDLE.md)** - Play Store preparation guide
+
 ## Project Goals
 
 - **Core Gameplay**: Recreate the turn-based battle system, monster breeding mechanics, and exploration features
