@@ -101,7 +101,7 @@ data class EnhancedMonster(
 /**
  * Monster Synthesis System implementation
  */
-class MonsterSynthesis {
+class MonsterSynthesis(private val random: Random = Random.Default) {
     
     private val synthesisRecipes = listOf(
         // Beast family combinations
@@ -178,7 +178,7 @@ class MonsterSynthesis {
         val levelBonus = ((monster1.baseMonster.level + monster2.baseMonster.level) / 100f).coerceAtMost(0.2f)
         val finalChance = (baseChance + levelBonus).coerceAtMost(0.95f)
         
-        if (Random.nextFloat() > finalChance) {
+        if (random.nextFloat() > finalChance) {
             return SynthesisResult.Failure("Synthesis failed - monsters were not compatible")
         }
         
@@ -212,18 +212,18 @@ class MonsterSynthesis {
         val parent1Stats = parent1.getEnhancedStats()
         val parent2Stats = parent2.getEnhancedStats()
         val avgStats = MonsterStats(
-            attack = (parent1Stats.attack + parent2Stats.attack) / 2 + Random.nextInt(-5, 6),
-            defense = (parent1Stats.defense + parent2Stats.defense) / 2 + Random.nextInt(-5, 6),
-            agility = (parent1Stats.agility + parent2Stats.agility) / 2 + Random.nextInt(-5, 6),
-            magic = (parent1Stats.magic + parent2Stats.magic) / 2 + Random.nextInt(-5, 6),
-            wisdom = (parent1Stats.wisdom + parent2Stats.wisdom) / 2 + Random.nextInt(-5, 6),
-            maxHp = (parent1Stats.maxHp + parent2Stats.maxHp) / 2 + Random.nextInt(-10, 11),
-            maxMp = (parent1Stats.maxMp + parent2Stats.maxMp) / 2 + Random.nextInt(-10, 11)
+            attack = (parent1Stats.attack + parent2Stats.attack) / 2 + random.nextInt(-5, 6),
+            defense = (parent1Stats.defense + parent2Stats.defense) / 2 + random.nextInt(-5, 6),
+            agility = (parent1Stats.agility + parent2Stats.agility) / 2 + random.nextInt(-5, 6),
+            magic = (parent1Stats.magic + parent2Stats.magic) / 2 + random.nextInt(-5, 6),
+            wisdom = (parent1Stats.wisdom + parent2Stats.wisdom) / 2 + random.nextInt(-5, 6),
+            maxHp = (parent1Stats.maxHp + parent2Stats.maxHp) / 2 + random.nextInt(-10, 11),
+            maxMp = (parent1Stats.maxMp + parent2Stats.maxMp) / 2 + random.nextInt(-10, 11)
         )
         
         // Create base monster
         val baseMonster = Monster(
-            id = "synth_${System.currentTimeMillis()}_${Random.nextInt(1000)}",
+            id = "synth_${System.currentTimeMillis()}_${random.nextInt(1000)}",
             speciesId = speciesId,
             name = generateSynthesisName(parent1.baseMonster.name, parent2.baseMonster.name),
             type1 = type1,
@@ -245,7 +245,7 @@ class MonsterSynthesis {
         return EnhancedMonster(
             baseMonster = baseMonster,
             plusLevel = PlusLevel.PLUS_1, // Synthesized monsters start at +1
-            personality = listOf(parent1.personality, parent2.personality, MonsterPersonality.values().random()).random(),
+            personality = listOf(parent1.personality, parent2.personality, MonsterPersonality.values().random(random)).random(random),
             synthesisParent1 = parent1.baseMonster.id,
             synthesisParent2 = parent2.baseMonster.id,
             learnedSkills = (parent1.learnedSkills + parent2.learnedSkills).distinct(),
@@ -298,9 +298,9 @@ class MonsterSynthesis {
         val combinations = listOf(
             "${parent1Name.take(3)}${parent2Name.takeLast(3)}",
             "${parent2Name.take(3)}${parent1Name.takeLast(3)}",
-            "${prefixes.random()} ${listOf(parent1Name, parent2Name).random()}"
+            "${prefixes.random(random)} ${listOf(parent1Name, parent2Name).random(random)}"
         )
-        return combinations.random()
+        return combinations.random(random)
     }
     
     /**

@@ -5,6 +5,7 @@ import com.pixelwarrior.monsters.data.model.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import kotlin.random.Random
 
 /**
  * Comprehensive test suite for Phase 2 Advanced Monster Systems
@@ -22,7 +23,9 @@ class AdvancedMonsterSystemsTest {
     
     @Before
     fun setUp() {
-        monsterSynthesis = MonsterSynthesis()
+        // Use seeded Random for deterministic tests
+        val testRandom = Random(42)
+        monsterSynthesis = MonsterSynthesis(testRandom)
         plusSystem = PlusSystem()
         scoutSystem = ScoutSystem()
         
