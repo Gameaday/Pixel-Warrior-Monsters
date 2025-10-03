@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp' version '2.1.0-1.0.29'
     id 'jacoco'
+    id 'io.gitlab.arturbosch.detekt'
 }
 
 android {
@@ -127,38 +128,59 @@ tasks.register('jacocoTestReport', JacocoReport) {
 
 // Android lint configuration for Play Store compliance and code quality
 android {
-    lintOptions {
+    lint {
         checkReleaseBuilds = true
         abortOnError = false
         warningsAsErrors = false
         
         // Play Store specific checks
-        enable 'ContentDescription', 'HardcodedText', 'UnusedResources'
-        enable 'IconMissingDensityFolder', 'IconDuplicates', 'GradleDependency'
-        enable 'NewerVersionAvailable', 'GoogleAppIndexingWarning'
+        enable += ['ContentDescription', 'HardcodedText', 'UnusedResources']
+        enable += ['IconMissingDensityFolder', 'IconDuplicates', 'GradleDependency']
+        enable += ['NewerVersionAvailable', 'GoogleAppIndexingWarning']
         
         // Security checks
-        enable 'HardcodedDebugMode', 'SetJavaScriptEnabled', 'TrustAllX509TrustManager'
+        enable += ['HardcodedDebugMode', 'SetJavaScriptEnabled', 'TrustAllX509TrustManager']
         
         // Performance checks  
-        enable 'UnusedResources', 'IconDensities', 'MissingDefaultResource'
+        enable += ['UnusedResources', 'IconDensities', 'MissingDefaultResource']
         
         // Code quality checks
-        enable 'ObsoleteSdkInt', 'OldTargetApi', 'ExpiredTargetSdkVersion'
-        enable 'UnusedIds', 'IconLauncherShape'
-        enable 'Overdraw', 'DrawAllocation', 'Wakelock', 'Recycle'
+        enable += ['ObsoleteSdkInt', 'OldTargetApi', 'ExpiredTargetSdkVersion']
+        enable += ['UnusedIds', 'IconLauncherShape']
+        enable += ['Overdraw', 'DrawAllocation', 'Wakelock', 'Recycle']
         
         // Kotlin specific checks
-        enable 'KotlinPropertyAccess', 'KotlinNullnessAnnotation'
+        enable += ['KotlinPropertyAccess', 'KotlinNullnessAnnotation']
         
         // Accessibility checks
-        enable 'ClickableViewAccessibility', 'KeyboardInaccessibleWidget'
+        enable += ['ClickableViewAccessibility', 'KeyboardInaccessibleWidget']
         
         // Internationalization
-        enable 'MissingTranslation', 'ExtraTranslation'
+        enable += ['MissingTranslation', 'ExtraTranslation']
         
         htmlReport = true
         xmlReport = true
         textReport = true
     }
+}
+
+// Detekt configuration for static code analysis
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/detekt-config.yml"))
+    baseline = file("$rootDir/detekt-baseline.xml")
+    ignoreFailures = true  // Don't fail build on issues, just report them
+    
+    reports {
+        html.required = true
+        xml.required = true
+        txt.required = false
+    }
+}
+
+tasks.register("detektAll") {
+    dependsOn "detekt"
+    description = "Run detekt on all modules"
+    group = "verification"
 }

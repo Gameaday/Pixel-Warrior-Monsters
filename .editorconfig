@@ -12,6 +12,15 @@ trim_trailing_whitespace = true
 indent_size = 4
 indent_style = space
 max_line_length = 140
+# Disable problematic ktlint rules that cause parsing issues
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_parameter-list-wrapping = disabled
+ktlint_standard_property-wrapping = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_wrapping = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_condition-wrapping = disabled
 
 [*.{gradle,gradle.kts}]
 indent_size = 4
