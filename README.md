@@ -15,6 +15,7 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 📖 **Full instructions:** See [ALPHA_TESTING.md](ALPHA_TESTING.md) for detailed installation guide and testing checklist.
 
 ### 📚 Documentation
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
 - **[QUICK_START.md](QUICK_START.md)** - Fast track to downloading and installing
 - **[ALPHA_TESTING.md](ALPHA_TESTING.md)** - Complete testing guide with checklist
 - **[releases/README.md](releases/README.md)** - Build distribution info
