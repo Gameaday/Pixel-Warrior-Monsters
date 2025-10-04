@@ -28,6 +28,11 @@ Technical documentation for contributors:
 - **[README.md#building-the-project](README.md#building-the-project)** - Build instructions
 - **[README.md#testing](README.md#testing)** - Testing information
 
+### CI/CD & Artifacts
+- **[ARTIFACT_REPOSITORY.md](ARTIFACT_REPOSITORY.md)** - Complete guide to CI/CD artifacts and downloads
+- **[GITHUB_ACCESS.md](GITHUB_ACCESS.md)** - GitHub access and artifact retrieval
+- **[README.md#cicd-status](README.md#cicd-status)** - CI/CD status and badges
+
 ### Development Guides
 - **[ROADMAP.md](ROADMAP.md)** - Feature roadmap and implementation status
 - **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Technical implementation details

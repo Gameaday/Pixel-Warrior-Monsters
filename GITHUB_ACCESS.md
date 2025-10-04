@@ -2,6 +2,8 @@
 
 This document lists everything accessible on GitHub for alpha testing and development.
 
+**📦 For detailed artifact information, see [ARTIFACT_REPOSITORY.md](ARTIFACT_REPOSITORY.md)**
+
 ## 🎮 Alpha Testing APK
 
 ### How to Download
