@@ -95,20 +95,41 @@ jobs:
     - name: Build debug APK
       run: ./gradlew assembleDebug
       
-    - name: Build release APK (unsigned)
-      run: ./gradlew assembleRelease
+    - name: Build release APK and AAB
+      run: ./gradlew assembleRelease bundleRelease
       
-    - name: Upload debug APK for alpha testing
+    - name: Upload debug APK (Development Build)
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
+        name: development-apk
         path: app/build/outputs/apk/debug/*.apk
+        retention-days: 90
         
-    - name: Upload release APK
-      uses: actions/upload-artifact@v4  
+    - name: Prepare production bundle
+      run: |
+        mkdir -p production-bundle
+        cp app/build/outputs/apk/release/*.apk production-bundle/
+        cp app/build/outputs/bundle/release/*.aab production-bundle/
+        if [ -f app/build/outputs/mapping/release/mapping.txt ]; then
+          cp app/build/outputs/mapping/release/mapping.txt production-bundle/
+        fi
+        echo "# Production Build - Ready for Play Store" > production-bundle/README.md
+        echo "" >> production-bundle/README.md
+        echo "## Contents" >> production-bundle/README.md
+        echo "- **app-release.apk**: Release APK for sideloading" >> production-bundle/README.md
+        echo "- **app-release.aab**: Android App Bundle for Google Play Store" >> production-bundle/README.md
+        echo "- **mapping.txt**: ProGuard/R8 mapping file (if available)" >> production-bundle/README.md
+        echo "" >> production-bundle/README.md
+        echo "## Installation" >> production-bundle/README.md
+        echo "Upload the .aab file to Google Play Console for distribution." >> production-bundle/README.md
+        echo "Or install the .apk file directly on devices for testing." >> production-bundle/README.md
+        
+    - name: Upload production bundle (Play Store Ready)
+      uses: actions/upload-artifact@v4
       with:
-        name: release-apk-unsigned
-        path: app/build/outputs/apk/release/*.apk
+        name: production-bundle
+        path: production-bundle/
+        retention-days: 180
 
   integration-tests:
     needs: build

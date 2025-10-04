@@ -13,9 +13,9 @@ Development builds for internal alpha testing. These APKs are:
 
 **To download the latest alpha build:**
 1. Go to the [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions) page
-2. Click on the latest successful "Android CI" workflow run
+2. Click on the latest successful "CI/CD Pipeline - Testing and Build" workflow run
 3. Scroll down to "Artifacts" section
-4. Download `app-debug-apk`
+4. Download `development-apk`
 
 ### `/production` - Production Release Builds
 Production builds ready for Google Play Store submission. These include:
@@ -25,8 +25,12 @@ Production builds ready for Google Play Store submission. These include:
 - All Play Store compliance requirements met
 
 **To download production builds:**
-1. Go to the [Releases](https://github.com/Gameaday/Pixel-Warrior-Monsters/releases) page
-2. Download the latest release assets
+1. Go to the [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions) page
+2. Click on the latest successful "CI/CD Pipeline - Testing and Build" workflow run
+3. Scroll down to "Artifacts" section
+4. Download `production-bundle`
+
+Or go to the [Releases](https://github.com/Gameaday/Pixel-Warrior-Monsters/releases) page for tagged versions.
 
 ## Building Locally
 

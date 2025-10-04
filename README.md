@@ -1,5 +1,9 @@
 # Pixel Warrior Monsters
 
+[![CI/CD Pipeline](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/main.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/main.yml)
+[![Code Quality](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/security.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/security.yml)
+[![Release Pipeline](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/release.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/release.yml)
+
 An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizing pixel-based graphics, animation, and written to run on Android. This project aims to recreate all the core systems and features of the original game while avoiding copyright infringement through original assets and generic monster designs.
 
 ## 🎮 Alpha Testing Now Available!
@@ -9,7 +13,7 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 ### Quick Download
 1. Go to [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions)
 2. Click on the latest successful "CI/CD Pipeline" workflow
-3. Download `app-debug-apk` from the Artifacts section
+3. Download `development-apk` from the Artifacts section
 4. Install on your Android 7.0+ device
 
 📖 **Full instructions:** See [ALPHA_TESTING.md](ALPHA_TESTING.md) for detailed installation guide and testing checklist.
@@ -179,6 +183,20 @@ The project is currently in alpha testing phase with:
 
 **Current Version:** 1.0.0-alpha (versionCode: 1)
 
+## CI/CD Status
+
+All builds and tests run automatically on every push to main:
+
+| Workflow | Status | Description |
+|----------|--------|-------------|
+| CI/CD Pipeline | [![CI/CD Pipeline](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/main.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/main.yml) | Build, test, and artifact generation |
+| Code Quality | [![Code Quality](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/security.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/security.yml) | Security scans and static analysis |
+| Release Pipeline | [![Release Pipeline](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/release.yml/badge.svg)](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions/workflows/release.yml) | Production release on version tags |
+
+**Artifacts Generated on Each Build:**
+- `development-apk`: Debug APK for testing (90-day retention)
+- `production-bundle`: Release APK + AAB for Play Store (180-day retention)
+
 ## Building the Project
 
 ### For Development
@@ -213,10 +231,19 @@ Output:
 
 ### Automated Builds
 
-GitHub Actions automatically builds and tests the project on every push:
-- **Debug APK**: Available as `app-debug-apk` artifact in workflow runs
-- **Release Builds**: Created when version tags are pushed
-- **All Tests**: Run automatically with coverage reporting
+GitHub Actions automatically builds and tests the project on every push to main:
+
+**Development Build:**
+- **Artifact**: `development-apk` 
+- **Contains**: Debug APK for alpha testing
+- **Access**: [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions) → Latest CI/CD Pipeline → Artifacts
+
+**Production Bundle:**
+- **Artifact**: `production-bundle`
+- **Contains**: Release APK, AAB (App Bundle), and ProGuard mapping for Play Store
+- **Access**: [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions) → Latest CI/CD Pipeline → Artifacts
+
+**All Tests**: Run automatically with coverage reporting
 
 See [releases/README.md](releases/README.md) for more information about accessing builds.
 

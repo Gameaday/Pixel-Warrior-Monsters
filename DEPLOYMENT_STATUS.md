@@ -144,7 +144,7 @@
 **Download APK:**
 1. Visit [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions)
 2. Click latest "CI/CD Pipeline" workflow run
-3. Download `app-debug-apk` artifact
+3. Download `development-apk` artifact
 4. Install on Android 7.0+ device
 
 **Testing Guide:** See [ALPHA_TESTING.md](ALPHA_TESTING.md)

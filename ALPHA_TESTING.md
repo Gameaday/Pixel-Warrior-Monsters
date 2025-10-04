@@ -14,7 +14,7 @@ Welcome to the alpha testing phase of Pixel Warrior Monsters! This guide will he
 1. **Download the Alpha APK**
    - Go to [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions)
    - Click on the latest successful "Android CI" workflow
-   - Scroll to "Artifacts" and download `app-debug-apk`
+   - Scroll to "Artifacts" and download `development-apk`
    - Extract the ZIP file to get `app-debug.apk`
 
 2. **Enable Unknown Sources** (if not already enabled)
