@@ -2,6 +2,8 @@
 
 This document lists everything accessible on GitHub for alpha testing and development.
 
+**📦 For detailed artifact information, see [ARTIFACT_REPOSITORY.md](ARTIFACT_REPOSITORY.md)**
+
 ## 🎮 Alpha Testing APK
 
 ### How to Download
@@ -10,7 +12,7 @@ This document lists everything accessible on GitHub for alpha testing and develo
 1. Visit: https://github.com/Gameaday/Pixel-Warrior-Monsters/actions
 2. Click on the latest "CI/CD Pipeline - Testing and Build" workflow
 3. Scroll to "Artifacts" section
-4. Download `app-debug-apk` (contains app-debug.apk)
+4. Download `development-apk` (contains app-debug.apk)
 
 **File Details:**
 - **Name**: app-debug.apk
@@ -18,6 +20,19 @@ This document lists everything accessible on GitHub for alpha testing and develo
 - **Signing**: Debug keystore (for testing only)
 - **Min Android**: 7.0 (API 24)
 - **Target Android**: 14 (API 34)
+
+### Production Bundle (For Developers)
+
+For Play Store submission and production testing:
+1. Visit: https://github.com/Gameaday/Pixel-Warrior-Monsters/actions
+2. Click on the latest "CI/CD Pipeline - Testing and Build" workflow
+3. Download `production-bundle` artifact
+
+**Bundle Contents:**
+- **app-release.apk**: Release APK for sideloading (~3MB optimized)
+- **app-release.aab**: Android App Bundle for Google Play Store (~4MB)
+- **mapping.txt**: ProGuard/R8 mapping file (for crash reports)
+- **README.md**: Installation and submission instructions
 
 ### Installation
 1. Transfer APK to Android device
@@ -72,9 +87,13 @@ Full source code is available in the repository:
 GitHub Actions automatically:
 1. Runs all 200+ unit tests
 2. Performs lint checks
-3. Builds debug APK
-4. Builds release APK
-5. Uploads artifacts
+3. Builds debug APK (development build)
+4. Builds release APK and AAB (production bundle)
+5. Uploads artifacts with 90-day retention (development) and 180-day retention (production)
+
+**Available Artifacts:**
+- **development-apk**: Debug APK for alpha testing (~23MB)
+- **production-bundle**: Release APK, AAB, and ProGuard mapping for Play Store (~3-4MB optimized)
 
 **Access artifacts**: Go to any workflow run → Scroll to "Artifacts"
 
@@ -132,7 +151,8 @@ cd Pixel-Warrior-Monsters
 - **Discussions**: https://github.com/Gameaday/Pixel-Warrior-Monsters/discussions
 
 ### Latest Builds
-- **Alpha APK**: https://github.com/Gameaday/Pixel-Warrior-Monsters/actions (latest workflow → artifacts)
+- **Development APK**: https://github.com/Gameaday/Pixel-Warrior-Monsters/actions (latest workflow → `development-apk` artifact)
+- **Production Bundle**: https://github.com/Gameaday/Pixel-Warrior-Monsters/actions (latest workflow → `production-bundle` artifact)
 - **Releases**: https://github.com/Gameaday/Pixel-Warrior-Monsters/releases (when available)
 
 ### Documentation
@@ -144,7 +164,7 @@ cd Pixel-Warrior-Monsters
 ## ❓ FAQ
 
 ### Q: Where can I download the game?
-**A:** Go to [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions), click latest workflow, download `app-debug-apk` artifact.
+**A:** Go to [GitHub Actions](https://github.com/Gameaday/Pixel-Warrior-Monsters/actions), click latest workflow, download `development-apk` artifact.
 
 ### Q: Is there a Play Store release?
 **A:** Not yet. Currently in alpha testing phase. Play Store launch is planned after alpha feedback.

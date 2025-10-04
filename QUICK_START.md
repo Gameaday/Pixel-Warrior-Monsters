@@ -13,7 +13,7 @@
 3. **Download APK**:
    - Scroll to the bottom of the page
    - Find "Artifacts" section
-   - Click on `app-debug-apk` to download
+   - Click on `development-apk` to download
    - Extract the ZIP file to get `app-debug.apk`
 
 4. **Install on Android Device**:
