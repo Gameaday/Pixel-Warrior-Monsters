@@ -123,17 +123,17 @@ jobs:
         ls -la "$PAGES_OUT/dev"
 
     - name: Configure GitHub Pages
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
       uses: actions/configure-pages@v3
 
     - name: Upload development artifacts as Pages artifact
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
       uses: actions/upload-pages-artifact@v1
       with:
         path: ./pages_output/dev
 
     - name: Deploy development artifact to Pages
-      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
       uses: actions/deploy-pages@v1
         
     - name: Prepare production bundle
@@ -171,13 +171,13 @@ jobs:
         ls -la "$OUT_DIR"
 
     - name: Upload production bundle as Pages artifact
-      if: github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
       uses: actions/upload-pages-artifact@v1
       with:
         path: ./pages_output/releases
 
     - name: Deploy production Pages artifact
-      if: github.ref == 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
       uses: actions/deploy-pages@v1
 
   integration-tests:
