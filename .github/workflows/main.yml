@@ -122,19 +122,43 @@ jobs:
         cp -v app/build/outputs/bundle/debug/*.aab "$PAGES_OUT/dev/" || true
         ls -la "$PAGES_OUT/dev"
 
-    - name: Configure GitHub Pages
+    - name: Publish development artifacts to gh-pages
       if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
-      uses: actions/configure-pages@v3
-
-    - name: Upload development artifacts as Pages artifact
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
-      uses: actions/upload-pages-artifact@v1
-      with:
-        path: ./pages_output/dev
-
-    - name: Deploy development artifact to Pages
-      if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
-      uses: actions/deploy-pages@v1
+      env:
+        REPO: ${{ github.repository }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PAGES_SRC: pages_output/dev
+      run: |
+        set -euo pipefail
+        if [ ! -d "$PAGES_SRC" ]; then
+          echo "No development artifacts to publish at $PAGES_SRC" && exit 0
+        fi
+        echo "Preparing to publish development artifacts from $PAGES_SRC to gh-pages"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        TMP_DIR=$(mktemp -d)
+        echo "Cloning gh-pages branch into $TMP_DIR"
+        if git ls-remote --exit-code --heads "https://x-access-token:${TOKEN}@github.com/${REPO}.git" gh-pages; then
+          git clone --branch gh-pages "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "$TMP_DIR"
+        else
+          # Create a new orphan gh-pages branch
+          git clone "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "$TMP_DIR"
+          cd "$TMP_DIR"
+          git checkout --orphan gh-pages
+          git rm -rf . || true
+        fi
+        cd "$TMP_DIR"
+        # Remove old dev/ and replace with new
+        rm -rf dev || true
+        mkdir -p dev
+        cp -r "$GITHUB_WORKSPACE/$PAGES_SRC"/* dev/ || true
+        git add -A
+        if git diff --staged --quiet; then
+          echo "No changes to publish"
+        else
+          git commit -m "Publish development artifacts from ${GITHUB_REF}"
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" gh-pages
+        fi
         
     - name: Prepare production bundle
       run: |
@@ -170,15 +194,40 @@ jobs:
         cp -r production-bundle/* "$OUT_DIR/" || true
         ls -la "$OUT_DIR"
 
-    - name: Upload production bundle as Pages artifact
+    - name: Publish production bundle to gh-pages/releases
       if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
-      uses: actions/upload-pages-artifact@v1
-      with:
-        path: ./pages_output/releases
-
-    - name: Deploy production Pages artifact
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'Gameaday/Pixel-Warrior-Monsters'
-      uses: actions/deploy-pages@v1
+      env:
+        REPO: ${{ github.repository }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PAGES_SRC: pages_output/releases
+      run: |
+        set -euo pipefail
+        if [ ! -d "$PAGES_SRC" ]; then
+          echo "No production artifacts to publish at $PAGES_SRC" && exit 0
+        fi
+        echo "Preparing to publish production artifacts from $PAGES_SRC to gh-pages/releases"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        TMP_DIR=$(mktemp -d)
+        if git ls-remote --exit-code --heads "https://x-access-token:${TOKEN}@github.com/${REPO}.git" gh-pages; then
+          git clone --branch gh-pages "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "$TMP_DIR"
+        else
+          git clone "https://x-access-token:${TOKEN}@github.com/${REPO}.git" "$TMP_DIR"
+          cd "$TMP_DIR"
+          git checkout --orphan gh-pages
+          git rm -rf . || true
+        fi
+        cd "$TMP_DIR"
+        rm -rf releases || true
+        mkdir -p releases
+        cp -r "$GITHUB_WORKSPACE/$PAGES_SRC"/* releases/ || true
+        git add -A
+        if git diff --staged --quiet; then
+          echo "No changes to publish"
+        else
+          git commit -m "Publish production artifacts (latest) from ${GITHUB_REF}"
+          git push "https://x-access-token:${TOKEN}@github.com/${REPO}.git" gh-pages
+        fi
 
   integration-tests:
     needs: build
