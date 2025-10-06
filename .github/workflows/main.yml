@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+permissions:
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -104,6 +108,33 @@ jobs:
         name: development-apk
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 90
+
+    - name: Publish development APK to GitHub Pages
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      env:
+        PAGES_BRANCH: gh-pages
+      run: |
+        # Create a pages_output folder in the workspace and copy only APK/AAB files we want to publish
+        PAGES_OUT=./pages_output
+        mkdir -p "$PAGES_OUT/dev"
+        cp -v app/build/outputs/apk/debug/*.apk "$PAGES_OUT/dev/" || true
+        # If any AAB exists for debug builds, include them as well
+        cp -v app/build/outputs/bundle/debug/*.aab "$PAGES_OUT/dev/" || true
+        ls -la "$PAGES_OUT/dev"
+
+    - name: Configure GitHub Pages
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v3
+
+    - name: Upload development artifacts as Pages artifact
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ./pages_output/dev
+
+    - name: Deploy development artifact to Pages
+      if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+      uses: actions/deploy-pages@v1
         
     - name: Prepare production bundle
       run: |
@@ -130,6 +161,24 @@ jobs:
         name: production-bundle
         path: production-bundle/
         retention-days: 180
+
+    - name: Publish production bundle to GitHub Pages (latest)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        OUT_DIR=./pages_output/releases/latest
+        mkdir -p "$OUT_DIR"
+        cp -r production-bundle/* "$OUT_DIR/" || true
+        ls -la "$OUT_DIR"
+
+    - name: Upload production bundle as Pages artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: ./pages_output/releases
+
+    - name: Deploy production Pages artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/deploy-pages@v1
 
   integration-tests:
     needs: build
