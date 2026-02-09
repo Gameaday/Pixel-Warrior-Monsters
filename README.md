@@ -20,6 +20,8 @@ An open source reimagining of the original Dragon Warrior Monsters (DQM) utilizi
 
 ### 📚 Documentation
 - **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
+- **[PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md)** - ⭐ **NEW:** Comprehensive project state analysis
+- **[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)** - ⭐ **NEW:** Transparent list of missing/incomplete features
 - **[QUICK_START.md](QUICK_START.md)** - Fast track to downloading and installing
 - **[ALPHA_TESTING.md](ALPHA_TESTING.md)** - Complete testing guide with checklist
 - **[releases/README.md](releases/README.md)** - Build distribution info
@@ -172,16 +174,24 @@ This project is designed to avoid copyright infringement:
 
 ## Development Status
 
-✅ **Alpha Testing Ready** - All core systems implemented and tested!
+✅ **Alpha Testing Ready** - Core single-player systems implemented and tested!
 
 The project is currently in alpha testing phase with:
-- ✅ 200+ unit tests passing
+- ✅ 195+ unit tests passing
 - ✅ Full CI/CD pipeline with automated builds
-- ✅ All major features implemented and functional
+- ✅ Core single-player features implemented and functional
 - ✅ Complete game loop from start to endgame
 - ✅ Debug APK available for Android device testing
 
 **Current Version:** 1.0.0-alpha (versionCode: 1)
+
+### ⚠️ Important Notes
+- **Multiplayer NOT Implemented:** Despite some documentation claims, online PvP is NOT included in v1.0 (planned for v2.0)
+- **Story System Incomplete:** Quest tracking and narrative progression need completion
+- **Audio is Procedural:** Current implementation uses synthesis, not actual audio files
+
+📋 **See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) for complete list of missing/incomplete features**  
+📊 **See [PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md) for detailed project analysis**
 
 ## CI/CD Status
 
