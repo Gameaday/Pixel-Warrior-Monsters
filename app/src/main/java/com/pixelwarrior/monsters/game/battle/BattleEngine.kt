@@ -11,6 +11,14 @@ import kotlin.random.Random
  */
 class BattleEngine {
     
+    companion object {
+        private const val DEFEND_DEFENSE_MULTIPLIER = 1.5f
+        private const val CRITICAL_HIT_CHANCE = 0.05f
+        private const val RANDOM_VARIANCE_MIN = 0.85f
+        private const val RANDOM_VARIANCE_RANGE = 0.3f
+        private const val BASE_JOIN_CHANCE = 0.1f
+    }
+    
     /**
      * Calculate damage from an attack
      */
@@ -34,11 +42,11 @@ class BattleEngine {
         val typeModifier = calculateTypeEffectiveness(attacker.type1, defender.type1)
         
         // Critical hit chance (5% base)
-        val isCritical = Random.nextFloat() < 0.05f
+        val isCritical = Random.nextFloat() < CRITICAL_HIT_CHANCE
         val criticalModifier = if (isCritical) 1.5f else 1.0f
         
         // Random variance (85%-115%)
-        val randomModifier = Random.nextFloat() * 0.3f + 0.85f
+        val randomModifier = Random.nextFloat() * RANDOM_VARIANCE_RANGE + RANDOM_VARIANCE_MIN
         
         val finalDamage = (baseDamage * levelModifier * typeModifier * criticalModifier * randomModifier).toInt()
         
@@ -181,9 +189,9 @@ class BattleEngine {
     private fun executeDefend(battleState: BattleState, action: BattleActionData): BattleState {
         val isPlayerAction = battleState.playerMonsters.contains(action.actingMonster)
         
-        // Apply a temporary defense boost by increasing current defense by 50%
+        // Apply a temporary defense boost by increasing current defense
         val boostedStats = action.actingMonster.currentStats.copy(
-            defense = (action.actingMonster.currentStats.defense * 1.5f).toInt()
+            defense = (action.actingMonster.currentStats.defense * DEFEND_DEFENSE_MULTIPLIER).toInt()
         )
         val boostedMonster = action.actingMonster.copy(currentStats = boostedStats)
         
@@ -484,7 +492,7 @@ class BattleEngine {
      * Calculate chance for wild monster to want to join after battle
      */
     private fun calculateJoinChance(monster: Monster): Float {
-        val baseChance = 0.1f // 10% base chance
+        val baseChance = BASE_JOIN_CHANCE
         val affectionBonus = monster.affection * 0.005f // 0.5% per affection point
         val levelPenalty = (monster.level - 5) * 0.01f // Harder for higher level monsters
         

@@ -626,6 +626,9 @@ class GameViewModel : ViewModel() {
         val allIds = discoveredIds + save.partyMonsters.map { it.speciesId } + save.farmMonsters.map { it.speciesId }
         return getAllSpecies().filter { it.id in allIds }
     }
+    /**
+     * Get Quality of Life system for UI
+     */
     fun getQoLSystem(): com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem {
         // Stub implementation - return a basic QoL system
         return com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem()
