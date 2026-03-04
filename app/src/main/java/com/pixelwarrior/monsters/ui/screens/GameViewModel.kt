@@ -47,18 +47,22 @@ class GameViewModel : ViewModel() {
     fun startNewGame(playerName: String) {
         viewModelScope.launch {
             try {
-                // Create a stub game save for development
+                val starterMonster = generateStarterMonster()
                 val newSave = GameSave(
                     playerId = "player_${System.currentTimeMillis()}",
                     playerName = playerName,
-                    currentLevel = "tutorial",
+                    currentLevel = "starting_meadow",
                     position = Position(0f, 0f),
-                    partyMonsters = emptyList(),
+                    partyMonsters = listOf(starterMonster),
                     farmMonsters = emptyList(),
-                    inventory = mapOf("basic_capture" to 10),
-                    gold = 100L,
+                    inventory = mapOf(
+                        "basic_treat" to 5,
+                        "healing_herb" to 3,
+                        "monster_food" to 3
+                    ),
+                    gold = 200L,
                     playtimeMinutes = 0L,
-                    storyProgress = mapOf("tutorial" to true),
+                    storyProgress = mapOf("game_started" to true),
                     unlockedGates = emptyList(),
                     gameSettings = GameSettings(),
                     cookingSkill = CookingSkill(),
@@ -66,13 +70,45 @@ class GameViewModel : ViewModel() {
                     lastSaved = System.currentTimeMillis()
                 )
                 _gameSave.value = newSave
-                _gameMessage.value = "Welcome to Pixel Warrior Monsters, $playerName!"
+                _gameMessage.value = "Welcome, $playerName! ${starterMonster.name} joins your party!"
                 clearMessageAfterDelay()
             } catch (e: Exception) {
                 _gameMessage.value = "Failed to start new game: ${e.message}"
                 clearMessageAfterDelay()
             }
         }
+    }
+    
+    /**
+     * Generate a starter monster for new players
+     */
+    private fun generateStarterMonster(): Monster {
+        val personalities = Personality.values().filter { it != Personality.NONE }
+        val baseStats = MonsterStats(
+            attack = 30, defense = 25, agility = 35,
+            magic = 20, wisdom = 30, maxHp = 120, maxMp = 40
+        )
+        return Monster(
+            id = java.util.UUID.randomUUID().toString(),
+            speciesId = "starter_slime",
+            name = "Buddy",
+            type1 = MonsterType.NORMAL,
+            type2 = null,
+            family = MonsterFamily.SLIME,
+            level = 5,
+            currentHp = baseStats.maxHp,
+            currentMp = baseStats.maxMp,
+            experience = 0,
+            experienceToNext = 150,
+            baseStats = baseStats,
+            currentStats = GameUtils.calculateStatsForLevel(baseStats, 5),
+            skills = listOf("tackle", "heal"),
+            traits = listOf("Friendly"),
+            isWild = false,
+            captureRate = 100,
+            growthRate = GrowthRate.MEDIUM_FAST,
+            personality = personalities.random()
+        )
     }
     
     /**
@@ -485,8 +521,111 @@ class GameViewModel : ViewModel() {
     }
     
     /**
-     * Get Quality of Life system for UI
+     * Get all monster species for the codex
      */
+    fun getAllSpecies(): List<MonsterSpecies> {
+        return listOf(
+            MonsterSpecies(
+                id = "starter_slime", name = "Gel Slime",
+                type1 = MonsterType.NORMAL, type2 = null, family = MonsterFamily.SLIME,
+                baseStats = MonsterStats(30, 25, 35, 20, 30, 120, 40),
+                captureRate = 200, growthRate = GrowthRate.MEDIUM_FAST,
+                description = "A friendly slime that makes an excellent companion for new adventurers."
+            ),
+            MonsterSpecies(
+                id = "fire_sprite", name = "Flame Sprite",
+                type1 = MonsterType.FIRE, type2 = null, family = MonsterFamily.MATERIAL,
+                baseStats = MonsterStats(45, 20, 50, 60, 40, 90, 80),
+                captureRate = 150, growthRate = GrowthRate.FAST,
+                description = "A small sprite made of living flame. Quick and magical but fragile."
+            ),
+            MonsterSpecies(
+                id = "forest_beast", name = "Moss Wolf",
+                type1 = MonsterType.GRASS, type2 = MonsterType.NORMAL, family = MonsterFamily.BEAST,
+                baseStats = MonsterStats(55, 45, 40, 25, 35, 140, 50),
+                captureRate = 120, growthRate = GrowthRate.MEDIUM_SLOW,
+                description = "A wolf-like creature that has adapted to forest life, growing moss on its back."
+            ),
+            MonsterSpecies(
+                id = "sky_bird", name = "Wind Falcon",
+                type1 = MonsterType.FLYING, type2 = MonsterType.NORMAL, family = MonsterFamily.BIRD,
+                baseStats = MonsterStats(40, 30, 70, 35, 45, 100, 60),
+                captureRate = 100, growthRate = GrowthRate.FAST,
+                description = "A majestic falcon that rides the wind currents with incredible speed."
+            ),
+            MonsterSpecies(
+                id = "grass_bug", name = "Leaf Beetle",
+                type1 = MonsterType.BUG, type2 = MonsterType.GRASS, family = MonsterFamily.PLANT,
+                baseStats = MonsterStats(35, 40, 30, 15, 20, 100, 30),
+                captureRate = 220, growthRate = GrowthRate.FAST,
+                description = "A beetle with leaf-like wings found in meadows."
+            ),
+            MonsterSpecies(
+                id = "tiny_bird", name = "Sparrow",
+                type1 = MonsterType.FLYING, type2 = null, family = MonsterFamily.BIRD,
+                baseStats = MonsterStats(25, 20, 45, 15, 25, 80, 30),
+                captureRate = 240, growthRate = GrowthRate.FAST,
+                description = "A common bird often seen in peaceful areas."
+            ),
+            MonsterSpecies(
+                id = "tree_spirit", name = "Dryad Sprite",
+                type1 = MonsterType.GRASS, type2 = MonsterType.PSYCHIC, family = MonsterFamily.PLANT,
+                baseStats = MonsterStats(20, 30, 35, 55, 50, 90, 70),
+                captureRate = 100, growthRate = GrowthRate.MEDIUM_SLOW,
+                description = "A mystical spirit that inhabits ancient trees in enchanted forests."
+            ),
+            MonsterSpecies(
+                id = "lava_worm", name = "Magma Worm",
+                type1 = MonsterType.FIRE, type2 = MonsterType.GROUND, family = MonsterFamily.BEAST,
+                baseStats = MonsterStats(50, 55, 20, 40, 30, 130, 40),
+                captureRate = 90, growthRate = GrowthRate.SLOW,
+                description = "A worm-like creature that thrives in volcanic caves."
+            ),
+            MonsterSpecies(
+                id = "crystal_golem", name = "Crystal Golem",
+                type1 = MonsterType.ROCK, type2 = MonsterType.ICE, family = MonsterFamily.MATERIAL,
+                baseStats = MonsterStats(60, 70, 15, 30, 35, 160, 30),
+                captureRate = 70, growthRate = GrowthRate.SLOW,
+                description = "A massive golem formed from crystallized minerals deep underground."
+            ),
+            MonsterSpecies(
+                id = "stone_guardian", name = "Stone Guardian",
+                type1 = MonsterType.ROCK, type2 = MonsterType.FIGHTING, family = MonsterFamily.MATERIAL,
+                baseStats = MonsterStats(65, 75, 25, 20, 40, 150, 35),
+                captureRate = 60, growthRate = GrowthRate.SLOW,
+                description = "An ancient guardian that protects the ruins from intruders."
+            ),
+            MonsterSpecies(
+                id = "ghost_knight", name = "Phantom Knight",
+                type1 = MonsterType.GHOST, type2 = MonsterType.DARK, family = MonsterFamily.UNDEAD,
+                baseStats = MonsterStats(55, 50, 45, 50, 45, 110, 70),
+                captureRate = 50, growthRate = GrowthRate.MEDIUM_SLOW,
+                description = "The spirit of a fallen warrior, bound to the ancient ruins."
+            ),
+            MonsterSpecies(
+                id = "ancient_dragon", name = "Ancient Dragon",
+                type1 = MonsterType.DRAGON, type2 = MonsterType.FIRE, family = MonsterFamily.DRAGON,
+                baseStats = MonsterStats(80, 70, 60, 75, 65, 180, 100),
+                captureRate = 20, growthRate = GrowthRate.SLOW,
+                description = "A legendary dragon of immense power that guards the deepest ruins."
+            )
+        )
+    }
+    
+    /**
+     * Get discovered species based on game progress
+     */
+    fun getDiscoveredSpecies(): List<MonsterSpecies> {
+        val save = _gameSave.value ?: return emptyList()
+        val discoveredIds = save.storyProgress.keys
+            .filter { it.startsWith("discovered_") }
+            .map { it.removePrefix("discovered_") }
+            .toSet()
+        
+        // Always include starter slime + any encountered species
+        val allIds = discoveredIds + save.partyMonsters.map { it.speciesId } + save.farmMonsters.map { it.speciesId }
+        return getAllSpecies().filter { it.id in allIds }
+    }
     fun getQoLSystem(): com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem {
         // Stub implementation - return a basic QoL system
         return com.pixelwarrior.monsters.game.qol.QualityOfLifeSystem()

@@ -74,11 +74,11 @@ class WorldExplorer {
     /**
      * Calculate movement through an area and return any events
      */
-    fun exploreArea(areaId: String, currentPosition: Position, direction: Direction): ExplorationResult {
+    fun exploreArea(areaId: String, currentPosition: Position, direction: Direction, playerLevel: Int = 1): ExplorationResult {
         val newPosition = moveInDirection(currentPosition, direction)
         
-        // Check for encounters
-        val encounter = attemptRandomEncounter(areaId, 10) // TODO: Use actual player level
+        // Check for encounters using actual player level
+        val encounter = attemptRandomEncounter(areaId, playerLevel)
         
         // Check for items or special locations
         val itemFound = if (Random.nextFloat() < 0.05f) generateRandomItem() else null

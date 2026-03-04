@@ -176,14 +176,34 @@ class BattleEngine {
     }
     
     /**
-     * Execute defend action
+     * Execute defend action - boosts defense for the acting monster this turn
      */
     private fun executeDefend(battleState: BattleState, action: BattleActionData): BattleState {
-        // Defending reduces incoming damage by 50% for this turn
-        // For now, just show a message since we'd need to track the defend status
-        return battleState.copy(
-            lastAction = "${action.actingMonster.name} is defending and takes a defensive stance!"
+        val isPlayerAction = battleState.playerMonsters.contains(action.actingMonster)
+        
+        // Apply a temporary defense boost by increasing current defense by 50%
+        val boostedStats = action.actingMonster.currentStats.copy(
+            defense = (action.actingMonster.currentStats.defense * 1.5f).toInt()
         )
+        val boostedMonster = action.actingMonster.copy(currentStats = boostedStats)
+        
+        return if (isPlayerAction) {
+            val updatedPlayers = battleState.playerMonsters.toMutableList()
+            val idx = updatedPlayers.indexOf(action.actingMonster)
+            if (idx >= 0) updatedPlayers[idx] = boostedMonster
+            battleState.copy(
+                playerMonsters = updatedPlayers,
+                lastAction = "${action.actingMonster.name} takes a defensive stance! Defense boosted!"
+            )
+        } else {
+            val updatedEnemies = battleState.enemyMonsters.toMutableList()
+            val idx = updatedEnemies.indexOf(action.actingMonster)
+            if (idx >= 0) updatedEnemies[idx] = boostedMonster
+            battleState.copy(
+                enemyMonsters = updatedEnemies,
+                lastAction = "${action.actingMonster.name} takes a defensive stance! Defense boosted!"
+            )
+        }
     }
     
     /**
@@ -308,29 +328,105 @@ class BattleEngine {
     }
     
     /**
-     * Get skill by ID (placeholder - would load from database)
+     * Get skill by ID from comprehensive skill database
      */
     private fun getSkillById(skillId: String): Skill? {
         return when (skillId) {
+            "tackle" -> Skill(
+                id = "tackle", name = "Tackle",
+                description = "A basic physical attack",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 0, power = 40, accuracy = 100
+            )
             "fireball" -> Skill(
-                id = "fireball",
-                name = "Fireball",
+                id = "fireball", name = "Fireball",
                 description = "A ball of fire that burns the enemy",
-                type = SkillType.MAGICAL,
-                target = SkillTarget.SINGLE_ENEMY,
-                mpCost = 8,
-                power = 75,
-                accuracy = 90
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 8, power = 75, accuracy = 90
             )
             "heal" -> Skill(
-                id = "heal",
-                name = "Heal",
+                id = "heal", name = "Heal",
                 description = "Restores HP to the target",
-                type = SkillType.HEALING,
-                target = SkillTarget.SELF,
-                mpCost = 6,
-                power = 50,
-                accuracy = 100
+                type = SkillType.HEALING, target = SkillTarget.SELF,
+                mpCost = 6, power = 50, accuracy = 100
+            )
+            "bite" -> Skill(
+                id = "bite", name = "Bite",
+                description = "Bites the enemy with sharp fangs",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 3, power = 50, accuracy = 95
+            )
+            "gust" -> Skill(
+                id = "gust", name = "Gust",
+                description = "Creates a powerful wind attack",
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 5, power = 45, accuracy = 95
+            )
+            "spark" -> Skill(
+                id = "spark", name = "Spark",
+                description = "A small burst of flame",
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 4, power = 35, accuracy = 100
+            )
+            "flame_burst" -> Skill(
+                id = "flame_burst", name = "Flame Burst",
+                description = "An explosion of intense fire",
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 12, power = 90, accuracy = 85
+            )
+            "inferno" -> Skill(
+                id = "inferno", name = "Inferno",
+                description = "Engulfs the enemy in raging flames",
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 18, power = 120, accuracy = 80
+            )
+            "vine_whip" -> Skill(
+                id = "vine_whip", name = "Vine Whip",
+                description = "Strikes with thorny vines",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 5, power = 55, accuracy = 95
+            )
+            "howl" -> Skill(
+                id = "howl", name = "Howl",
+                description = "A fearsome howl that raises attack",
+                type = SkillType.SUPPORT, target = SkillTarget.SELF,
+                mpCost = 4, power = 0, accuracy = 100
+            )
+            "forest_charge" -> Skill(
+                id = "forest_charge", name = "Forest Charge",
+                description = "A powerful charge infused with nature energy",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 10, power = 85, accuracy = 90
+            )
+            "peck" -> Skill(
+                id = "peck", name = "Peck",
+                description = "Pecks the enemy with a sharp beak",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 0, power = 35, accuracy = 100
+            )
+            "dive_bomb" -> Skill(
+                id = "dive_bomb", name = "Dive Bomb",
+                description = "Swoops down from high altitude to strike",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 8, power = 70, accuracy = 85
+            )
+            "tornado" -> Skill(
+                id = "tornado", name = "Tornado",
+                description = "Creates a devastating tornado",
+                type = SkillType.MAGICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 15, power = 100, accuracy = 80
+            )
+            "bounce" -> Skill(
+                id = "bounce", name = "Bounce",
+                description = "Bounces on the enemy with force",
+                type = SkillType.PHYSICAL, target = SkillTarget.SINGLE_ENEMY,
+                mpCost = 4, power = 45, accuracy = 100
+            )
+            "regenerate" -> Skill(
+                id = "regenerate", name = "Regenerate",
+                description = "Gradually restores HP over time",
+                type = SkillType.HEALING, target = SkillTarget.SELF,
+                mpCost = 10, power = 80, accuracy = 100
             )
             else -> null
         }

@@ -42,8 +42,8 @@ fun SaveLoadScreen(
     val audioViewModel: AudioViewModel = viewModel(factory = AudioViewModelFactory(context))
     val gameViewModel: GameViewModel = viewModel()
     
-    // Mock save data for demonstration
-    val availableSaves = remember {
+    // Mutable save data state
+    var saves by remember { mutableStateOf(
         listOf(
             SaveSlot(
                 id = "save1",
@@ -70,7 +70,9 @@ fun SaveLoadScreen(
                 lastSaved = System.currentTimeMillis() - 172800000 // 2 days ago
             )
         )
-    }
+    ) }
+    
+    var showDeleteConfirm by remember { mutableStateOf<String?>(null) }
     
     Column(
         modifier = modifier
@@ -101,7 +103,7 @@ fun SaveLoadScreen(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(availableSaves) { saveSlot ->
+            items(saves) { saveSlot ->
                 SaveSlotCard(
                     saveSlot = saveSlot,
                     mode = mode,
@@ -114,7 +116,7 @@ fun SaveLoadScreen(
                     },
                     onDelete = {
                         audioViewModel.playMenuBackSound()
-                        // TODO: Implement save deletion
+                        showDeleteConfirm = saveSlot.id
                     }
                 )
             }
@@ -130,6 +132,23 @@ fun SaveLoadScreen(
                     )
                 }
             }
+        }
+        
+        // Delete confirmation dialog
+        showDeleteConfirm?.let { saveId ->
+            com.pixelwarrior.monsters.ui.components.ConfirmationDialog(
+                title = "Delete Save",
+                message = "Are you sure you want to delete this save? This action cannot be undone.",
+                confirmText = "Delete",
+                cancelText = "Cancel",
+                onConfirm = {
+                    saves = saves.filter { it.id != saveId }
+                    showDeleteConfirm = null
+                },
+                onCancel = {
+                    showDeleteConfirm = null
+                }
+            )
         }
     }
 }

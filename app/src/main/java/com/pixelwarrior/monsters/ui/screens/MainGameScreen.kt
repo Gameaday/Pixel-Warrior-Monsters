@@ -30,6 +30,7 @@ import com.pixelwarrior.monsters.ui.theme.PixelBlue
 fun MainGameScreen() {
     var currentScreen by remember { mutableStateOf(GameScreen.MAIN_MENU) }
     var gameViewModel: GameViewModel = viewModel()
+    var selectedMonster by remember { mutableStateOf<Monster?>(null) }
     
     val context = LocalContext.current
     val audioViewModel: AudioViewModel = viewModel(
@@ -174,9 +175,10 @@ fun MainGameScreen() {
                 MonsterManagementScreen(
                     partyMonsters = save.partyMonsters,
                     farmMonsters = save.farmMonsters,
-                    onMonsterSelected = { 
+                    onMonsterSelected = { monster ->
                         audioViewModel.playMenuSelectSound()
-                        /* TODO: Handle monster selection */ 
+                        selectedMonster = monster
+                        currentScreen = GameScreen.MONSTER_DETAIL
                     },
                     onPartyChanged = { newParty ->
                         audioViewModel.playMenuSelectSound()
@@ -226,21 +228,23 @@ fun MainGameScreen() {
         GameScreen.MONSTER_DETAIL -> {
             val gameSave by gameViewModel.gameSave.collectAsState()
             gameSave?.let { save ->
-                if (save.partyMonsters.isNotEmpty()) {
+                val monsterToShow = selectedMonster ?: save.partyMonsters.firstOrNull()
+                if (monsterToShow != null) {
                     MonsterDetailScreen(
-                        monster = save.partyMonsters.first(), // Show first party monster as example
+                        monster = monsterToShow,
                         onBack = {
                             audioViewModel.playMenuBackSound()
+                            selectedMonster = null
                             currentScreen = GameScreen.MONSTER_MANAGEMENT
                         },
                         onRename = { newName ->
-                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} renamed to $newName!")
+                            gameViewModel.addGameMessage("${monsterToShow.name} renamed to $newName!")
                         },
                         onHeal = {
-                            gameViewModel.addGameMessage("${save.partyMonsters.first().name} was healed!")
+                            gameViewModel.addGameMessage("${monsterToShow.name} was healed!")
                         },
                         onGiveTreat = { treatType ->
-                            gameViewModel.addGameMessage("Gave ${treatType.replace("_", " ")} to ${save.partyMonsters.first().name}!")
+                            gameViewModel.addGameMessage("Gave ${treatType.replace("_", " ")} to ${monsterToShow.name}!")
                         }
                     )
                 } else {
@@ -317,8 +321,8 @@ fun MainGameScreen() {
             val gameSave by gameViewModel.gameSave.collectAsState()
             gameSave?.let { save ->
                 MonsterCodexScreen(
-                    discoveredMonsters = emptyList(), // Stub - would normally track discovered species
-                    allSpecies = emptyList(), // Stub - would normally get from repository
+                    discoveredMonsters = gameViewModel.getDiscoveredSpecies(),
+                    allSpecies = gameViewModel.getAllSpecies(),
                     onBackPressed = { 
                         audioViewModel.playMenuBackSound()
                         currentScreen = GameScreen.WORLD_MAP 
