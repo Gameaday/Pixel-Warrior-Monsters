@@ -103,7 +103,8 @@ fun BattleScreen(
                                         onBattleAction(actionData)
                                     }
                                 }
-                            }
+                            },
+                            isWildBattle = battleState.isWildBattle
                         )
                     }
                 }
@@ -263,6 +264,11 @@ fun MonsterHealthBar(
     modifier: Modifier = Modifier
 ) {
     val hpPercentage = if (maxHp > 0) currentHp.toFloat() / maxHp else 0f
+    val hpColor = when {
+        hpPercentage > 0.5f -> PixelGreen
+        hpPercentage > 0.25f -> ExpYellow
+        else -> HpRed
+    }
     
     Column(modifier = modifier) {
         if (showNumbers) {
@@ -294,7 +300,7 @@ fun MonsterHealthBar(
                 modifier = Modifier
                     .fillMaxWidth(hpPercentage)
                     .fillMaxHeight()
-                    .background(HpRed, RoundedCornerShape(4.dp))
+                    .background(hpColor, RoundedCornerShape(4.dp))
             )
         }
     }
@@ -384,34 +390,50 @@ fun BattleLogDisplay(
 @Composable
 fun BattleActionsPanel(
     onAction: (BattleAction) -> Unit,
+    isWildBattle: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        BattleActionButton(
-            text = "Attack",
-            onClick = { onAction(BattleAction.ATTACK) },
-            modifier = Modifier.weight(1f)
-        )
-        BattleActionButton(
-            text = "Skills",
-            onClick = { onAction(BattleAction.SKILL) },
-            modifier = Modifier.weight(1f)
-        )
-        BattleActionButton(
-            text = "Defend",
-            onClick = { onAction(BattleAction.DEFEND) },
-            modifier = Modifier.weight(1f)
-        )
-        BattleActionButton(
-            text = "Run",
-            onClick = { onAction(BattleAction.RUN) },
-            modifier = Modifier.weight(1f)
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            BattleActionButton(
+                text = "Attack",
+                onClick = { onAction(BattleAction.ATTACK) },
+                modifier = Modifier.weight(1f)
+            )
+            BattleActionButton(
+                text = "Skills",
+                onClick = { onAction(BattleAction.SKILL) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            BattleActionButton(
+                text = "Defend",
+                onClick = { onAction(BattleAction.DEFEND) },
+                modifier = Modifier.weight(1f)
+            )
+            if (isWildBattle) {
+                BattleActionButton(
+                    text = "Treat",
+                    onClick = { onAction(BattleAction.TREAT) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            BattleActionButton(
+                text = "Run",
+                onClick = { onAction(BattleAction.RUN) },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 

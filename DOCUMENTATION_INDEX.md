@@ -7,8 +7,9 @@ Complete guide to all documentation in the Pixel Warrior Monsters repository.
 New to the project? Start with these:
 
 1. **[README.md](README.md)** - Project overview, features, and main documentation
-2. **[QUICK_START.md](QUICK_START.md)** - Fastest way to download and install the alpha build
-3. **[ALPHA_RELEASE_SUMMARY.md](ALPHA_RELEASE_SUMMARY.md)** - Complete overview of what's available
+2. **[PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md)** - ⭐ **NEW:** Complete project state analysis and path forward
+3. **[QUICK_START.md](QUICK_START.md)** - Fastest way to download and install the alpha build
+4. **[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)** - ⭐ **NEW:** Transparent list of what's missing/incomplete
 
 ## 📱 For Alpha Testers
 
@@ -34,7 +35,9 @@ Technical documentation for contributors:
 - **[README.md#cicd-status](README.md#cicd-status)** - CI/CD status and badges
 
 ### Development Guides
-- **[ROADMAP.md](ROADMAP.md)** - Feature roadmap and implementation status
+- **[PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md)** - ⭐ **NEW:** Comprehensive project state, technical debt, and strategy
+- **[KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)** - ⭐ **NEW:** Transparent feature status and known issues
+- **[ROADMAP.md](ROADMAP.md)** - Feature roadmap and implementation status (updated with accurate status)
 - **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Technical implementation details
 - **[BUILD_FIXES_SUMMARY.md](BUILD_FIXES_SUMMARY.md)** - Build system fixes applied
 
@@ -83,7 +86,9 @@ Documentation for releasing to production:
 
 | Document | Purpose | Audience | Status |
 |----------|---------|----------|--------|
-| README.md | Main documentation | Everyone | ✅ Complete |
+| README.md | Main documentation | Everyone | ✅ Updated |
+| PROJECT_ASSESSMENT.md | Project state analysis | Developers/Stakeholders | ⭐ NEW |
+| KNOWN_LIMITATIONS.md | Missing features list | Everyone | ⭐ NEW |
 | QUICK_START.md | Fast installation | Testers | ✅ Complete |
 | ALPHA_TESTING.md | Testing guide | Testers | ✅ Complete |
 | ALPHA_RELEASE_SUMMARY.md | Release overview | Everyone | ✅ Complete |
@@ -91,7 +96,7 @@ Documentation for releasing to production:
 | DEPLOYMENT_STATUS.md | Deployment roadmap | Developers | ✅ Complete |
 | PRODUCTION_BUNDLE.md | Play Store guide | Developers | ✅ Complete |
 | PLAY_STORE_PREPARATION.md | Store checklist | Developers | ✅ Complete |
-| ROADMAP.md | Feature roadmap | Developers | ✅ Complete |
+| ROADMAP.md | Feature roadmap | Developers | ✅ Updated |
 | IMPLEMENTATION_PLAN.md | Implementation details | Developers | ✅ Complete |
 | BUILD_FIXES_SUMMARY.md | Build fixes | Developers | ✅ Complete |
 | INCOMPLETE_FEATURES_REPORT.md | Feature analysis | Developers | ℹ️ Historical |
@@ -101,6 +106,8 @@ Documentation for releasing to production:
 
 **I want to...**
 
+- **Understand the project status** → [PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md) ⭐
+- **See what's missing** → [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) ⭐
 - **Download the alpha build** → [QUICK_START.md](QUICK_START.md)
 - **Test the game** → [ALPHA_TESTING.md](ALPHA_TESTING.md)
 - **Build from source** → [README.md#building-the-project](README.md#building-the-project) or use `./build.sh`
@@ -120,6 +127,7 @@ Documentation for releasing to production:
 
 **Not sure where to start?**
 
-- **Testers**: Start with [QUICK_START.md](QUICK_START.md)
-- **Developers**: Start with [README.md](README.md)
-- **Everyone**: Check out [ALPHA_RELEASE_SUMMARY.md](ALPHA_RELEASE_SUMMARY.md)
+- **Want to understand the project?** Start with [PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md) ⭐
+- **Testers**: Start with [QUICK_START.md](QUICK_START.md) then check [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)
+- **Developers**: Start with [README.md](README.md) then read [PROJECT_ASSESSMENT.md](PROJECT_ASSESSMENT.md)
+- **Everyone**: Check out [ALPHA_RELEASE_SUMMARY.md](ALPHA_RELEASE_SUMMARY.md) and [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md)
